@@ -429,19 +429,6 @@
   }
 
   /* ---------------------------------------------------------
-     Sponsor prospectus placeholder
-     --------------------------------------------------------- */
-  function initProspectus() {
-    var link = $('[data-prospectus]');
-    if (!link) return;
-    link.addEventListener('click', function (e) {
-      if (link.getAttribute('href') !== '#') return;
-      e.preventDefault();
-      window.location.href = 'mailto:sponsors@beaconhacks.org?subject=Beacon%20Hacks%20prospectus';
-    });
-  }
-
-  /* ---------------------------------------------------------
      Venue photos — fall back to the placeholder look if a file
      is missing, so the strip never shows broken images.
      --------------------------------------------------------- */
@@ -464,7 +451,6 @@
     initMotion();
     initFaq();
     initApply();
-    initProspectus();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
