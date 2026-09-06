@@ -441,8 +441,26 @@
     });
   }
 
+  /* ---------------------------------------------------------
+     Venue photos — fall back to the placeholder look if a file
+     is missing, so the strip never shows broken images.
+     --------------------------------------------------------- */
+  function initVenueShots() {
+    $$('.venue-shot img').forEach(function (img) {
+      var fail = function () {
+        var fig = img.closest('.venue-shot');
+        if (fig) fig.classList.add('is-empty');
+        if (img.parentNode) img.parentNode.removeChild(img);
+      };
+      img.addEventListener('error', fail);
+      // The error may already have fired before this ran.
+      if (img.complete && img.naturalWidth === 0) fail();
+    });
+  }
+
   function boot() {
     initCountdown();
+    initVenueShots();
     initMotion();
     initFaq();
     initApply();

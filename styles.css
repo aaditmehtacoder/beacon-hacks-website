@@ -370,6 +370,25 @@ h1, h2, h3, p, dl, dd, dt { margin: 0; }
   font-family: var(--mono); font-size: 11px; color: rgba(242, 239, 232, .32);
 }
 .ph--venue { flex: none; width: 420px; height: 280px; }
+
+/* venue filmstrip: real photos, with the dashed placeholder as the fallback */
+.venue-shot { flex: none; width: 420px; margin: 0; position: relative; }
+.venue-shot img {
+  display: block; width: 420px; height: 280px; object-fit: cover;
+  border-radius: 12px; border: 1px solid var(--line); background: var(--bg-panel);
+}
+.venue-shot figcaption {
+  margin-top: 9px; font-family: var(--mono); font-size: 10.5px;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--ink-42);
+}
+.venue-shot.is-empty::before {
+  content: attr(data-label); display: grid; place-items: center;
+  width: 420px; height: 280px; border-radius: 12px;
+  border: 1px dashed var(--line-hard);
+  background: repeating-linear-gradient(45deg, rgba(242, 239, 232, .045) 0 8px, transparent 8px 16px);
+  font-family: var(--mono); font-size: 11px; color: rgba(242, 239, 232, .32);
+}
+.venue-shot.is-empty figcaption { display: none; }
 .ph--portrait {
   aspect-ratio: 1; font-size: 10px; color: var(--ink-30);
   background: repeating-linear-gradient(45deg, rgba(242, 239, 232, .05) 0 7px, transparent 7px 14px);
@@ -571,6 +590,8 @@ body.is-locked { overflow: hidden; }
   .venue-bottom { grid-template-columns: minmax(0, 1fr); }
   .venue-notes { grid-template-columns: minmax(0, 1fr); gap: 20px; }
   .ph--venue { width: 300px; height: 200px; }
+  .venue-shot, .venue-shot img, .venue-shot.is-empty::before { width: 300px; }
+  .venue-shot img, .venue-shot.is-empty::before { height: 200px; }
 
   .crew-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .backers-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }

@@ -63,9 +63,12 @@ A non-2xx response leaves the applicant on step 3 with an error and their answer
 
 ## Before this goes live
 
-- **Placeholders to replace** — dashed boxes marked `venue photo`, `portrait`, and
-  `logo` (`.ph` in the CSS). Swap each for an `<img>`; the boxes already hold their
-  aspect ratio.
+- **Venue photos** — drop five files into `assets/venue/` and run
+  `./optimize-venue-photos.sh`. See `assets/venue/README.md` for the names. Missing
+  files fall back to the dashed placeholder, so they can be added one at a time.
+- **Other placeholders** — dashed boxes marked `portrait` and `logo` (`.ph` in the
+  CSS) still need real art. Swap each for an `<img>`; the boxes hold their aspect
+  ratio already.
 - **Dead links** — Code of conduct, Discord and Instagram in the footer are `href="#"`.
   The sponsor "View prospectus" link falls back to a mailto until it has a real PDF.
 - **Names and numbers** — judges, organizers, prize amounts and the 42-schools figure
