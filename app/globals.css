@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Beacon Hacks — light mode design system
+   Warm paper, ink, and one beacon amber. Everything else is
+   spacing and rules.
+   ============================================================ */
+
+@theme {
+  /* --- surfaces --- */
+  --color-paper:      #faf8f4;
+  --color-paper-warm: #f4f0e7;
+  --color-paper-deep: #ece7db;
+  --color-card:       #ffffff;
+
+  /* --- ink --- */
+  --color-ink:        #16150f;
+  --color-ink-2:      #46433b;
+  --color-ink-3:      #6f6a5f;
+  --color-ink-4:      #97917f;
+
+  /* --- the beacon --- */
+  --color-beacon:      #f2a100;  /* fills, dots, the light itself */
+  --color-beacon-hi:   #ffb833;
+  --color-beacon-deep: #a35c00;  /* amber that passes contrast on paper */
+  --color-beacon-ink:  #1a1200;  /* text sitting on a beacon fill */
+  --color-beacon-wash: #fdf3df;
+
+  /* --- rules --- */
+  --color-line:      rgba(22, 21, 15, 0.11);
+  --color-line-soft: rgba(22, 21, 15, 0.06);
+  --color-line-hard: rgba(22, 21, 15, 0.20);
+
+  /* --- type --- */
+  --font-display: var(--font-bricolage), "Space Grotesk", system-ui, sans-serif;
+  --font-sans:    var(--font-geist), system-ui, -apple-system, sans-serif;
+
+  /* --- layout --- */
+  --spacing-gut: 1.75rem;
+
+  /* --- motion --- */
+  --ease-out-soft: cubic-bezier(0.22, 0.7, 0.25, 1);
+
+  --animate-sweep:  sweep 7s linear infinite;
+  --animate-pulse-dot: pulse-dot 2.8s ease-in-out infinite;
+  --animate-drift: drift 34s linear infinite;
+}
+
+@keyframes sweep     { to { transform: rotate(360deg); } }
+@keyframes pulse-dot { 0%, 100% { opacity: 0.45; transform: scale(0.92); } 50% { opacity: 1; transform: scale(1); } }
+@keyframes drift     { to { transform: translateX(-50%); } }
+
+/* ------------------------------------------------------------ base */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--color-beacon); color: var(--color-beacon-ink); }
+
+  :focus-visible {
+    outline: 2px solid var(--color-beacon-deep);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  p { text-wrap: pretty; }
+
+  /* Native accordion marker off; we draw our own. */
+  summary::-webkit-details-marker { display: none; }
+  summary { list-style: none; }
+}
+
+/* ------------------------------------------------------------ utilities */
+
+@utility wrap {
+  width: 100%;
+  max-width: 78rem;
+  margin-inline: auto;
+  padding-inline: var(--spacing-gut);
+}
+
+/* Eyebrow: the small label that opens every section. */
+@utility eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-beacon-deep);
+}
+
+/* The small caps label used for metadata, keys and chips. */
+@utility label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Hairline grid paper, used behind the hero and the closing band. */
+@utility grid-paper {
+  background-image:
+    linear-gradient(to right, var(--color-line-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-line-soft) 1px, transparent 1px);
+  background-size: 4.5rem 4.5rem;
+}
+
+/* Reveal: elements start here, <Reveal> animates them out of it. */
+@utility will-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
