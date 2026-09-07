@@ -1,87 +1,80 @@
 # Beacon Hacks — website
 
-Static one-page site for Beacon Hacks, built from the **Beacon Hacks v2** Claude Design
-artboard (`claude.ai/design` project `9c37c446…`). No build step, no dependencies.
+Next.js 16 (App Router) + React 19 + Tailwind v4. Light mode, one accent colour,
+no component library.
 
 ```
-index.html    markup + content
-styles.css    design tokens and all layout
-app.js        countdown, scroll motion, FAQ, apply wizard
-serve.py      threaded local server (for previewing and for Tailscale)
+app/                 routes, fonts, metadata, generated OG card
+  api/notify/        the notify-list endpoint (validated, rate limited)
+  code-of-conduct/   the CoC page
+components/          one file per section, plus ui/ primitives
+lib/event.ts         every fact about the event that appears twice
+lib/content.ts       all page copy and data
+lib/status.ts        the three gates shown on the status board
+public/photos/       stock photography (see "Photos" below)
 ```
 
 ## Run it
 
 ```bash
-./serve.py
+npm install
+npm run dev            # http://localhost:3000
 ```
 
-Then open http://127.0.0.1:8791. Opening `index.html` straight off disk works too.
+If `localhost` returns **HTTP 431**, another local app has left oversized cookies
+on it. Use `http://127.0.0.1:3000` instead — `next.config.ts` already allows that
+origin for dev assets.
 
-`serve.py` is a threaded server bound to loopback. `python3 -m http.server` also
-works, but it handles one request at a time, so a handful of simultaneous visitors
-can stall each other.
-
-## Deploy
-
-Drop the static files on any host (Netlify, Vercel, GitHub Pages, S3). Nothing
-server-side is required unless you wire up the application form below.
-
-### Serving it from this Mac instead
-
-`cloudflared tunnel --url http://127.0.0.1:8791` gives a temporary public HTTPS URL
-backed by `serve.py`. The link lasts only while both stay running, and the hostname
-changes on every restart.
-
-Tailscale Funnel also works, but note two traps found the hard way:
-
-- Funnel hostnames publish **AAAA records only**. Anyone on an IPv4-only network
-  cannot reach them. You will not notice from a machine on the tailnet, because
-  MagicDNS resolves the name to the node's own `100.x` address and never touches
-  the public path.
-- With an exit node active, `cloudflared` fails too: DNS goes to MagicDNS at
-  `100.100.100.100`, which cannot resolve Cloudflare's edge SRV records, and the
-  QUIC handshake to the edge times out. Turn the exit node off first.
-
-## Wiring the application form
-
-`app.js` starts with:
-
-```js
-var APPLY_ENDPOINT = null;
+```bash
+npm run build && npm start
+npx tsc --noEmit       # typecheck
 ```
 
-While it is `null` the three-step wizard validates and shows the confirmation screen
-but **sends nothing**. Set it to a URL (Formspree, a Google Form proxy, a Cloudflare
-Worker, your own API) and the wizard POSTs JSON:
+## The honesty rule
 
-```json
-{ "name": "", "email": "", "school": "", "firstHackathon": true, "idea": "", "shirt": "M", "diet": "" }
+**Nothing on this site may state something that has not actually been secured.**
+
+`lib/event.ts`, `lib/content.ts` and `lib/status.ts` are the only places facts
+live, and each unconfirmed thing is rendered through `<Locked>` / `<LockChip>`
+(`components/ui/locked.tsx`) instead of being asserted. The status board
+(`components/status-board.tsx`) is the single source of truth for what is real.
+
+Currently locked, and what unlocks it:
+
+| Locked | Gate | Unlock by |
+|---|---|---|
+| Venue name, address, photos of the building | Gate 1 | Written approval from the host's facilities team. Then fill in `EVENT.venue` and set `confirmed: true`. |
+| Prize cash, hardware, perks | Gate 2 | Money actually committed. Update `EVENT.budget.raisedUsd`; add amounts to `PLANNED_PRIZE_CATEGORIES` only once funded. |
+| Application form, countdown, deadlines | Gate 3 | Gates 1 and 2 done. Set `EVENT.applications.open`. |
+| Judges | — | Someone agreeing in writing. There is no judges list until then. |
+| Sponsor logos | — | A signed sponsor. The tiers are empty dashed slots, labelled as open. |
+
+Also deliberately absent until Gate 1: the **schema.org `Event` block**. Publishing
+structured event data for an unconfirmed date and venue would push it into search
+results and calendar surfaces. Restore it in `app/page.tsx` once the date is locked.
+
+## Photos
+
+`public/photos/` is stock photography from Unsplash (free to use commercially, no
+attribution required). **None of it is the Beacon venue.** The site says so in
+three places — the hero image badge, the strip heading in the venue section, and
+the footer — and those labels must stay until they are replaced with real photos
+we took ourselves.
+
+## Notify list
+
+`app/api/notify/route.ts` validates with Zod, rate limits per IP, and forwards to
+`NOTIFY_WEBHOOK_URL` if set:
+
+```bash
+NOTIFY_WEBHOOK_URL=https://formspree.io/f/xxxx npm run dev
 ```
 
-A non-2xx response leaves the applicant on step 3 with an error and their answers intact.
+Unset, it validates and logs server-side and the form still works end to end.
+Payload: `{ email, school, role: "student" | "mentor" | "sponsor" | "other" }`.
 
-## Before this goes live
+## Still to fill in
 
-- **Venue photos** — drop five files into `assets/venue/` and run
-  `./optimize-venue-photos.sh`. See `assets/venue/README.md` for the names. Missing
-  files fall back to the dashed placeholder, so they can be added one at a time.
-- **Other placeholders** — dashed boxes marked `portrait` and `logo` (`.ph` in the
-  CSS) still need real art. Swap each for an `<img>`; the boxes hold their aspect
-  ratio already.
-- **Dead links** — Code of conduct, Discord and Instagram in the footer are `href="#"`.
-  The sponsor "View prospectus" link falls back to a mailto until it has a real PDF.
-- **Names and numbers** — judges, organizers, prize amounts and the 42-schools figure
-  came from the design comp and should be confirmed before publishing.
-- **Date** — the countdown targets `2027-01-30T08:30:00-08:00`, set in `app.js`
-  (`EVENT_START`) and repeated in the JSON-LD block in `index.html`.
-
-## Notes on behavior
-
-- Scroll motion (reveals, counters, the timetable rail, the venue filmstrip, hero
-  parallax) is a direct port of the artboard's script. It reads and writes in separate
-  passes inside one rAF loop to avoid layout thrash, and only elements near the
-  viewport are tracked.
-- `prefers-reduced-motion: reduce` disables all of it and renders the finished state.
-- Without JavaScript the page is still complete and readable: content is in the HTML,
-  the FAQ uses `<details>`, and reveal animations only ever hide things once JS runs.
+- Karsten's full name and both organizer roles in `ORGANIZERS` (`lib/content.ts`).
+- Whether `team@beaconhacks.org` / `sponsors@beaconhacks.org` actually receive mail.
+- The domain in `EVENT.url`, which metadata and the OG card resolve against.
