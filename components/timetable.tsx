@@ -51,9 +51,14 @@ export function Timetable() {
         <div className="flex flex-col gap-12">
           {SCHEDULE.map((phase) => (
             <div key={phase.label}>
-              <Reveal className="mb-5 flex items-baseline gap-3 sm:pl-[9.5rem]">
+              <Reveal className="mb-5 flex flex-wrap items-baseline gap-3 sm:pl-[9.5rem]">
                 <span className="label text-ink">{phase.label}</span>
                 <span className="label text-ink-4">{phase.window}</span>
+                {phase.note ? (
+                  <span className="label rounded-full border border-dashed border-line-hard px-2.5 py-1 text-ink-3">
+                    {phase.note}
+                  </span>
+                ) : null}
               </Reveal>
 
               <ol className="flex flex-col">

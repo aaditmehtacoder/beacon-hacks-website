@@ -39,9 +39,14 @@ export const EVENT = {
     raisedUsd: 0,
   },
 
+  /**
+   * Early applications are open: people can apply now and hear the day
+   * spots are confirmed. Nobody is confirmed until Gates 1 and 2 land.
+   */
   applications: {
-    open: false,
-    note: "Applications open once the venue and the budget are locked.",
+    open: true,
+    early: true,
+    note: "Early applications are open. Spots are confirmed once the venue and the budget are locked.",
   },
 
   /**

@@ -3,7 +3,7 @@ import { EVENT } from "@/lib/event";
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: { userAgent: "*", allow: "/", disallow: "/api/" },
+    rules: { userAgent: "*", allow: "/", disallow: ["/api/", "/admin"] },
     sitemap: `${EVENT.url}/sitemap.xml`,
   };
 }

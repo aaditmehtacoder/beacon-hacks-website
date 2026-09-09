@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EVENT } from "@/lib/event";
 import { LinkButton } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
+import { BeaconMark } from "@/components/ui/beacon-mark";
 
 export const metadata: Metadata = {
   title: "Code of conduct",
@@ -16,10 +17,7 @@ export default function CodeOfConduct() {
       <header className="sticky top-0 z-50 border-b border-line bg-paper/85 shadow-head backdrop-blur-xl">
         <div className="wrap flex h-16 items-center gap-5">
           <Link href="/" className="flex items-center gap-2.5">
-            <span
-              aria-hidden="true"
-              className="size-2.5 rounded-full bg-beacon shadow-lamp"
-            />
+            <BeaconMark className="size-6 text-beacon drop-shadow-[0_0_6px_rgba(255,178,40,0.55)]" />
             <span className="font-display text-[0.9375rem] font-bold tracking-tight">
               BEACON HACKS
             </span>

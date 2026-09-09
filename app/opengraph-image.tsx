@@ -79,7 +79,7 @@ export default async function Image() {
         <div style={{ display: "flex", color: "#8b8577" }}>·</div>
         <div style={{ display: "flex" }}>{EVENT.venue.label}</div>
         <div style={{ display: "flex", color: "#8b8577" }}>·</div>
-        <div style={{ display: "flex" }}>Applications not open yet</div>
+        <div style={{ display: "flex" }}>Early applications open</div>
       </div>
     </div>,
     size,

@@ -2,8 +2,6 @@ import { Reveal } from "./ui/reveal";
 import { TextReveal } from "./ui/text-reveal";
 import { Magnetic } from "./ui/magnetic";
 import { LinkButton } from "./ui/button";
-import { NotifyButton } from "./notify/notify-button";
-import { LockIcon } from "./ui/locked";
 import { Beacon } from "./beacon/beacon";
 import { EVENT } from "@/lib/event";
 
@@ -28,7 +26,7 @@ const FACTS = [
  */
 export function Hero() {
   return (
-    <section id="top" className="relative -mt-[calc(4rem+1px)] motion-safe:h-[200svh]">
+    <section id="top" className="relative -mt-[calc(4rem+1px)] motion-safe:lg:h-[200svh]">
       <div className="sticky top-0 h-[100svh] overflow-hidden bg-band text-band-ink">
         <Beacon frame={false} className="absolute inset-0" />
 
@@ -42,8 +40,8 @@ export function Hero() {
           <div className="max-w-2xl">
             <Reveal>
               <p className="inline-flex items-center gap-2 rounded-full border border-band-ink/15 bg-band-ink/10 py-1.5 pr-4 pl-3 text-band-ink/85 backdrop-blur">
-                <LockIcon className="size-3 text-band-ink/60" />
-                <span className="label">Applications not open yet</span>
+                <span aria-hidden="true" className="size-1.5 rounded-full bg-beacon shadow-lamp" />
+                <span className="label">Early applications open</span>
               </p>
             </Reveal>
 
@@ -78,9 +76,9 @@ export function Hero() {
             <Reveal delay={620}>
               <div className="mt-9 flex flex-wrap gap-3">
                 <Magnetic>
-                  <NotifyButton size="lg" variant="beacon">
-                    Get notified →
-                  </NotifyButton>
+                  <LinkButton href="/apply" variant="beacon" size="lg">
+                    Apply early →
+                  </LinkButton>
                 </Magnetic>
                 <Magnetic>
                   <LinkButton href="#sponsors" variant="ghost" size="lg">
@@ -116,18 +114,33 @@ export function Hero() {
               </span>
             </div>
 
-            <dl className="stage-facts pointer-events-auto grid w-full grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-band-ink/12 bg-band/60 p-5 backdrop-blur-md sm:grid-cols-5 lg:ml-auto lg:w-auto lg:max-w-3xl">
-              {FACTS.map(([k, v, note]) => (
-                <div key={k} className="flex flex-col gap-1">
-                  <dt className="label text-band-ink/50">{k}</dt>
-                  <dd className="text-[0.9375rem] font-medium">{v}</dd>
-                  <dd className="text-xs text-band-ink/55">{note}</dd>
-                </div>
-              ))}
-            </dl>
+            <div className="stage-facts hidden w-full lg:ml-auto lg:block lg:w-auto lg:max-w-3xl">
+              <Facts />
+            </div>
           </div>
         </div>
       </div>
+
+      {/* On phones the stage is copy and lamp only; the facts follow in flow. */}
+      <div className="wrap py-6 lg:hidden">
+        <Reveal>
+          <Facts />
+        </Reveal>
+      </div>
     </section>
+  );
+}
+
+function Facts() {
+  return (
+    <dl className="pointer-events-auto grid grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-band-ink/12 bg-band/60 p-5 backdrop-blur-md sm:grid-cols-5">
+      {FACTS.map(([k, v, note]) => (
+        <div key={k} className="flex flex-col gap-1">
+          <dt className="label text-band-ink/50">{k}</dt>
+          <dd className="text-[0.9375rem] font-medium">{v}</dd>
+          <dd className="text-xs text-band-ink/55">{note}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

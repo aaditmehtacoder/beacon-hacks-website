@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EVENT } from "@/lib/event";
+import { BeaconMark } from "./ui/beacon-mark";
 
 export function SiteFooter() {
   return (
@@ -7,7 +8,7 @@ export function SiteFooter() {
       <div className="wrap flex flex-col gap-6 py-10 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="flex items-center gap-2.5">
-            <span aria-hidden="true" className="size-2 rounded-full bg-beacon" />
+            <BeaconMark className="size-5 text-beacon" />
             <span className="font-display text-sm font-bold tracking-tight">
               BEACON HACKS
             </span>

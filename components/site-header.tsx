@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { motion, useScroll, useSpring } from "motion/react";
 import { NAV } from "@/lib/event";
 import { NotifyButton } from "./notify/notify-button";
+import { LinkButton } from "./ui/button";
+import { BeaconMark } from "./ui/beacon-mark";
 
 export function SiteHeader() {
   const { scrollYProgress } = useScroll();
@@ -70,10 +72,7 @@ export function SiteHeader() {
 
       <div className="wrap flex h-16 items-center gap-5">
         <a href="#top" className="flex shrink-0 items-center gap-2.5">
-          <span
-            aria-hidden="true"
-            className="size-2.5 rounded-full bg-beacon shadow-lamp motion-safe:animate-pulse-dot"
-          />
+          <BeaconMark className="size-6 text-beacon drop-shadow-[0_0_6px_rgba(255,178,40,0.55)]" />
           <span className="font-display text-[0.9375rem] font-bold tracking-tight">
             BEACON HACKS
           </span>
@@ -104,7 +103,15 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2 lg:ml-0">
-          <NotifyButton size="sm">Get notified</NotifyButton>
+          {/* wrapped, because the button's own inline-flex outranks hidden */}
+          <span className="hidden sm:inline-flex">
+            <NotifyButton size="sm" variant="ghost">
+              Get notified
+            </NotifyButton>
+          </span>
+          <LinkButton href="/apply" size="sm">
+            Apply
+          </LinkButton>
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}

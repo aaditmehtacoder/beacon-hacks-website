@@ -2,13 +2,15 @@ import { SPONSOR_NOTES } from "@/lib/content";
 import { EVENT } from "@/lib/event";
 import { Reveal } from "./ui/reveal";
 import { LinkButton } from "./ui/button";
+import { SponsorTiers } from "./sponsor-tiers";
 import { TextReveal } from "./ui/text-reveal";
 
-/** Tiers are open slots until real sponsors sign; we say so rather than faking logos. */
-const TIERS = [
-  { label: "Title", slots: 2, size: "h-28 text-base" },
-  { label: "Gold", slots: 3, size: "h-20 text-[0.9375rem]" },
-  { label: "Bronze", slots: 6, size: "h-16 text-sm" },
+/** Open slots until real sponsors sign; we say so rather than faking logos. */
+const WALL = [
+  { label: "Platinum", slots: 2, size: "h-28 text-base", cols: "sm:grid-cols-2" },
+  { label: "Gold", slots: 3, size: "h-20 text-[0.9375rem]", cols: "grid-cols-2 sm:grid-cols-3" },
+  { label: "Silver", slots: 4, size: "h-16 text-sm", cols: "grid-cols-2 sm:grid-cols-4" },
+  { label: "Bronze", slots: 6, size: "h-16 text-sm", cols: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6" },
 ] as const;
 
 export function Sponsors() {
@@ -33,7 +35,7 @@ export function Sponsors() {
       </div>
 
       <div className="mt-14 flex flex-col gap-10">
-        {TIERS.map((tier, t) => (
+        {WALL.map((tier, t) => (
           <div key={tier.label}>
             <Reveal>
               <p className="label mb-4 flex items-center gap-3 text-ink-4">
@@ -41,15 +43,7 @@ export function Sponsors() {
                 <span aria-hidden="true" className="h-px flex-1 bg-line" />
               </p>
             </Reveal>
-            <div
-              className={`grid gap-3 ${
-                tier.slots === 2
-                  ? "sm:grid-cols-2"
-                  : tier.slots === 3
-                    ? "grid-cols-2 sm:grid-cols-3"
-                    : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6"
-              }`}
-            >
+            <div className={`grid gap-3 ${tier.cols}`}>
               {Array.from({ length: tier.slots }, (_, i) => (
                 <Reveal key={i} delay={t * 40 + i * 40} variant="tilt">
                   <div
@@ -62,6 +56,26 @@ export function Sponsors() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* the offer */}
+      <div className="mt-16 border-t border-line pt-10">
+        <Reveal>
+          <p className="eyebrow">Tiers</p>
+        </Reveal>
+        <Reveal delay={60}>
+          <h3 className="mt-3 text-3xl sm:text-4xl">What each tier gets.</h3>
+        </Reveal>
+        <Reveal delay={110}>
+          <p className="mt-4 max-w-2xl leading-relaxed text-ink-2">
+            Every tier includes everything below it. Cash goes to food, space
+            and prizes for high schoolers; nothing carrying your name is
+            printed until you have signed off on it.
+          </p>
+        </Reveal>
+        <div className="mt-8">
+          <SponsorTiers />
+        </div>
       </div>
 
       <div className="mt-16 grid gap-8 border-t border-line pt-10 sm:grid-cols-3">

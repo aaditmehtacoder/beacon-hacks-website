@@ -106,7 +106,13 @@ export const PLANNED_PRIZE_CATEGORIES = [
 ];
 
 export type Slot = { time: string; title: string; note: string };
-export type Phase = { label: string; window: string; slots: Slot[] };
+export type Phase = {
+  label: string;
+  window: string;
+  /** Something about the phase that is not a moment, like what is still open. */
+  note?: string;
+  slots: Slot[];
+};
 
 /** The shape of the day. Times move if the venue's hours differ. */
 export const SCHEDULE: Phase[] = [
@@ -155,6 +161,7 @@ export const SCHEDULE: Phase[] = [
   {
     label: "Night",
     window: "6 to 11",
+    note: "Workshops TBD",
     slots: [
       {
         time: "6:00 PM",
@@ -174,6 +181,83 @@ export const SCHEDULE: Phase[] = [
     ],
   },
 ];
+
+export type SponsorTier = {
+  id: "bronze" | "silver" | "gold" | "platinum";
+  name: string;
+  priceUsd: number;
+  /** Dot colour. The rest of the card stays in the site palette. */
+  accent: string;
+  /** New at this tier. Every tier also includes everything below it. */
+  perks: string[];
+};
+
+/** Ascending. The site computes what each tier inherits from the ones below. */
+export const SPONSOR_TIERS: SponsorTier[] = [
+  {
+    id: "bronze",
+    name: "Bronze",
+    priceUsd: 500,
+    accent: "#c8894a",
+    perks: [
+      "Logo on the website",
+      "Listed on the room banner",
+      "An item on the sponsor table",
+      "Thanked by name at closing",
+      "Logo on the prize slides",
+      "Logo on the opening slides",
+    ],
+  },
+  {
+    id: "silver",
+    name: "Silver",
+    priceUsd: 1_000,
+    accent: "#b9bcc4",
+    perks: ["A thirty minute workshop slot", "Logo on the shirt"],
+  },
+  {
+    id: "gold",
+    name: "Gold",
+    priceUsd: 2_000,
+    accent: "#ffb228",
+    perks: [
+      "A half-day table in the main room",
+      "Up to two mentors on the floor",
+      "Your name on a track prize",
+      "Named on the Gold sponsor slide",
+      "Larger logo on the website and shirts",
+    ],
+  },
+  {
+    id: "platinum",
+    name: "Platinum",
+    priceUsd: 4_000,
+    accent: "#ece8dc",
+    perks: [
+      "A table for the full day",
+      "Up to four mentors on the floor",
+      "A \u201cPresented by\u201d lockup",
+      "Largest logo, top of the wall",
+      "Three minutes at the opening",
+      "Hand out an award at closing",
+      "Name a prize category",
+      "A judge on the panel",
+      "Your own slide at opening and closing",
+    ],
+  },
+];
+
+/** Not cash. Credited at whichever cash tier the value matches. */
+export const IN_KIND = {
+  note: "Credited at the matching cash tier",
+  items: [
+    "Food or drink",
+    "API credits or licences",
+    "Hardware loans",
+    "Mentors only, no cash",
+    "Sponsor a specific meal",
+  ],
+};
 
 export const SPONSOR_NOTES = [
   {
@@ -199,7 +283,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: "Can I apply yet?",
-    a: "Not yet. Applications open after the venue is confirmed and the budget is covered. Leave your email and you will hear the day that changes, before anyone else.",
+    a: "Yes, early. The application takes two minutes and puts you in the queue. Nobody is confirmed until the venue is signed and the budget is covered, and you will hear the day that happens. If it falls through, you will hear that too.",
   },
   {
     q: "Where is it, and when?",

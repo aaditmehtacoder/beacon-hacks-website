@@ -5,7 +5,11 @@ lens in the hero. Dark only, one accent colour, no component library.
 
 ```
 app/                 routes, fonts, metadata, generated OG card
-  api/notify/        the notify-list endpoint (validated, rate limited)
+  apply/             the early application
+  admin/             the dashboard: applications and the notify list
+  api/apply/         stores an application
+  api/notify/        stores a notify signup
+  api/admin/         sign in, list, CSV, delete
   code-of-conduct/   the CoC page
 components/          one file per section, plus ui/ primitives
   beacon/            the three.js lens: scene, frame, CSS fallback
@@ -15,6 +19,8 @@ components/          one file per section, plus ui/ primitives
 lib/event.ts         every fact about the event that appears twice
 lib/content.ts       all page copy and data
 lib/status.ts        the three gates shown on the status board
+lib/store.ts         where signups live (Upstash Redis, or a local file)
+lib/admin-auth.ts    the shared admin password and its cookie
 app/robots.ts        robots.txt
 app/sitemap.ts       sitemap.xml, the two public routes
 public/photos/       stock photography (see "Photos" below)
@@ -115,7 +121,7 @@ Currently locked, and what unlocks it:
 |---|---|---|
 | Venue name, address, photos of the building | Gate 1 | Written approval from the host's facilities team. Then fill in `EVENT.venue` and set `confirmed: true`. |
 | Prize cash, hardware, perks | Gate 2 | Money actually committed. Update `EVENT.budget.raisedUsd`; add amounts to `PLANNED_PRIZE_CATEGORIES` only once funded. |
-| Application form, countdown, deadlines | Gate 3 | Gates 1 and 2 done. Set `EVENT.applications.open`. |
+| Confirmed spots, countdown, deadlines | Gate 3 | Gates 1 and 2 done. Early applications are open now; confirmations wait for both. |
 | Judges | n/a | Someone agreeing in writing. There is no judges list until then. |
 | Sponsor logos | n/a | A signed sponsor. The tiers are empty dashed slots, labelled as open. |
 
@@ -134,17 +140,26 @@ The same rule covers the host's own photography. Until they have signed off in
 writing *and* given permission to use their images, their building does not
 appear here, whether or not the picture is public on their site.
 
-## Notify list
+## Applications, the notify list, and the admin page
 
-`app/api/notify/route.ts` validates with Zod, rate limits per IP, and forwards to
-`NOTIFY_WEBHOOK_URL` if set:
+`/apply` takes an early application (six fields). "Get notified" takes an
+email from anyone who is not applying. Both land in the same store, one row
+per email, newest wins, and both are rate limited per IP.
 
-```bash
-NOTIFY_WEBHOOK_URL=https://formspree.io/f/xxxx npm run dev
-```
+**Storage** is `lib/store.ts`. With `KV_REST_API_URL` and `KV_REST_API_TOKEN`
+set it uses Upstash Redis; add "Upstash Redis" from the Vercel Marketplace and
+those are set for you. Locally it writes `.data/entries.json` (gitignored). On
+Vercel without a database it keeps entries in `/tmp` and the admin page says
+loudly that nothing is being saved.
 
-Unset, it validates and logs server-side and the form still works end to end.
-Payload: `{ email, school, role: "student" | "mentor" | "sponsor" | "other" }`.
+**`/admin`** shows everyone, newest first: filter, search, copy the emails,
+download a CSV, remove a row. It is behind one shared password,
+`ADMIN_PASSWORD`, which must be set in production (the development default is
+`cwb`, so it works out of the box without a password in git). The page is
+`noindex` and excluded from `robots.txt` and the sitemap.
+
+Optionally set `NOTIFY_WEBHOOK_URL` and every signup is also POSTed there as
+JSON. `.env.example` lists all of it.
 
 ## Still to fill in
 

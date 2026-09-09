@@ -2,26 +2,23 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { fieldClass } from "@/components/ui/field";
 import { notifySchema } from "@/lib/notify-schema";
 import { useNotify } from "./notify-provider";
 
 type Role = "student" | "mentor" | "sponsor" | "other";
 
 const ROLES: { value: Role; label: string }[] = [
-  { value: "student", label: "I want to hack" },
   { value: "mentor", label: "I could mentor or judge" },
   { value: "sponsor", label: "I might sponsor" },
+  { value: "other", label: "Something else" },
 ];
 
-const fieldClass =
-  "w-full rounded-xl border border-line bg-paper px-4 py-3 text-[0.9375rem] text-ink " +
-  "placeholder:text-ink-4 transition-colors focus:border-beacon focus:bg-card focus:outline-none " +
-  "focus:ring-4 focus:ring-beacon/20";
-
 /**
- * One step, one required field. Applications are not open, so this collects
- * only what is needed to tell someone when they are.
+ * One step, one required field, for everyone who is not applying: mentors,
+ * judges, sponsors, parents. Students are pointed at the application.
  */
 export function NotifyModal() {
   const { open } = useNotify();
@@ -55,7 +52,7 @@ function Dialog() {
 
   const [email, setEmail] = useState(seedEmail);
   const [school, setSchool] = useState("");
-  const [role, setRole] = useState<Role>("student");
+  const [role, setRole] = useState<Role>("mentor");
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
@@ -195,8 +192,8 @@ function Dialog() {
               </h2>
               <p className="mx-auto mt-4 max-w-sm text-[0.9375rem] leading-relaxed text-ink-2">
                 We have <span className="font-medium text-ink">{email}</span>.
-                You will hear from us when applications actually open, and not
-                before. No newsletter, no countdown emails.
+                You will hear from us the day the venue and the budget are
+                locked, and not before. No newsletter, no countdown emails.
               </p>
               <Button
                 type="button"
@@ -213,8 +210,11 @@ function Dialog() {
                 Hear it first.
               </h2>
               <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-2">
-                Applications are not open. Leave an email and we will tell you
-                the day they are. One message, when there is actually news.
+                Leave an email and you hear the day the venue and the budget
+                are locked. One message, when there is actually news.{" "}
+                <Link href="/apply" className="text-beacon-deep underline underline-offset-4">
+                  A student? Apply instead.
+                </Link>
               </p>
 
               <div className="mt-6 flex flex-col gap-4">

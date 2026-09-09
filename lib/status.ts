@@ -39,10 +39,10 @@ export const GATES: Gate[] = [
     id: "applications",
     order: "Gate 3",
     title: "Applications open",
-    state: "blocked",
+    state: "active",
     detail:
-      "Registration opens once the room and the money are both real. Everyone on the notify list hears first, on the same day.",
-    unlocks: "Opens the application form and the countdown",
+      "Early applications are open now. Nobody is confirmed until the room and the money are both real, and everyone who applied hears the same day that changes.",
+    unlocks: "Confirms spots and starts the countdown",
   },
 ];
 

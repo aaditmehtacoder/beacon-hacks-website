@@ -1,18 +1,15 @@
 import { NextResponse } from "next/server";
-import { notifySchema } from "@/lib/notify-schema";
+import { applySchema } from "@/lib/notify-schema";
 import { addEntry } from "@/lib/store";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 
-/**
- * The notify list. Stored, and also forwarded to NOTIFY_WEBHOOK_URL if that
- * is set (Formspree, a Worker, a sheet proxy, whatever you use).
- */
+/** An early application. Stored; forwarded to NOTIFY_WEBHOOK_URL if set. */
 const WEBHOOK = process.env.NOTIFY_WEBHOOK_URL;
 
 export async function POST(request: Request) {
-  if (rateLimited(`notify:${clientIp(request)}`)) {
+  if (rateLimited(`apply:${clientIp(request)}`)) {
     return NextResponse.json(
-      { ok: false, error: "Too many signups from here. Try again in a minute." },
+      { ok: false, error: "Too many applications from here. Try again in a minute." },
       { status: 429 },
     );
   }
@@ -24,7 +21,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Send JSON." }, { status: 400 });
   }
 
-  const parsed = notifySchema.safeParse(body);
+  const parsed = applySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { ok: false, error: parsed.error.issues[0]?.message ?? "Check the form." },
@@ -34,17 +31,16 @@ export async function POST(request: Request) {
 
   const entry = {
     id: crypto.randomUUID(),
-    kind: "notify" as const,
-    email: parsed.data.email,
-    school: parsed.data.school || undefined,
-    role: parsed.data.role,
+    kind: "application" as const,
+    ...parsed.data,
+    idea: parsed.data.idea || undefined,
     receivedAt: new Date().toISOString(),
   };
 
   try {
     await addEntry(entry);
   } catch (error) {
-    console.error("[notify] store failed", error);
+    console.error("[apply] store failed", error);
     return NextResponse.json(
       { ok: false, error: "We could not save that. Try again, or email us." },
       { status: 500 },
@@ -60,7 +56,7 @@ export async function POST(request: Request) {
       });
       if (!upstream.ok) throw new Error(`upstream ${upstream.status}`);
     } catch (error) {
-      console.error("[notify] forwarding failed", error);
+      console.error("[apply] forwarding failed", error);
     }
   }
 

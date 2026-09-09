@@ -1,15 +1,8 @@
-"use client";
-
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/button";
 import { Reveal } from "@/components/ui/reveal";
-import { LockChip } from "@/components/ui/locked";
-import { useNotify } from "./notify-provider";
+import { NotifyButton } from "./notify-button";
 
 export function NotifyBand() {
-  const { openNotify } = useNotify();
-  const [email, setEmail] = useState("");
-
   return (
     <section id="notify" className="wrap scroll-mt-24 py-20 sm:py-28">
       <Reveal variant="tilt">
@@ -20,39 +13,27 @@ export function NotifyBand() {
           />
 
           <div className="relative">
-            <LockChip>Applications open at Gate 3</LockChip>
+            <p className="label inline-flex items-center gap-2 rounded-full border border-line bg-paper px-2.5 py-1 text-ink-3">
+              <span aria-hidden="true" className="size-1.5 rounded-full bg-beacon" />
+              Early applications open
+            </p>
             <h2 className="mx-auto mt-6 max-w-xl text-4xl leading-[1.05] sm:text-5xl">
-              Be the first to know.
+              Apply early.
             </h2>
             <p className="mx-auto mt-5 max-w-lg leading-relaxed text-ink-2">
-              There is no form to fill in yet and no deadline to miss. Leave an
-              email and you will hear from us the day applications open.
+              Two minutes, six questions. You go in the queue now and hear the
+              day spots are confirmed. Mentors, judges and sponsors can leave an
+              email instead.
             </p>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                openNotify(email);
-              }}
-              className="mx-auto mt-9 flex max-w-lg flex-col gap-3 sm:flex-row"
-              noValidate
-            >
-              <label htmlFor="lead-email" className="sr-only">
-                Your email address
-              </label>
-              <input
-                id="lead-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@school.edu"
-                autoComplete="email"
-                className="flex-1 rounded-full border border-line bg-paper px-6 py-4 text-[0.9375rem] placeholder:text-ink-4 focus:border-beacon focus:bg-card focus:ring-4 focus:ring-beacon/20 focus:outline-none"
-              />
-              <Button type="submit" size="lg">
-                Notify me →
-              </Button>
-            </form>
+            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <LinkButton href="/apply" variant="beacon" size="lg">
+                Apply now →
+              </LinkButton>
+              <NotifyButton size="lg" variant="ghost">
+                Not a student? Get notified
+              </NotifyButton>
+            </div>
           </div>
         </div>
       </Reveal>

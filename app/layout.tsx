@@ -20,7 +20,7 @@ const sans = Geist({
 });
 
 const DESCRIPTION =
-  "A free one day hackathon being built for Bay Area high schoolers, targeting January 2027 in Belmont, CA. Applications are not open yet, and the site says exactly what is confirmed and what is not.";
+  "A free one day hackathon being built for Bay Area high schoolers, targeting January 2027 in Belmont, CA. Early applications are open, and the site says exactly what is confirmed and what is not.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(EVENT.url),

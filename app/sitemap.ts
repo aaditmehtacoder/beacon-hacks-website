@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
 import { EVENT } from "@/lib/event";
 
-/** Two public pages. No application route exists until Gate 3 opens one. */
+/** The public pages. /admin is deliberately not here. */
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: EVENT.url, changeFrequency: "weekly", priority: 1 },
+    { url: `${EVENT.url}/apply`, changeFrequency: "weekly", priority: 0.9 },
     {
       url: `${EVENT.url}/code-of-conduct`,
       changeFrequency: "yearly",
