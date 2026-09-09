@@ -42,7 +42,7 @@ export function StatusBoard() {
           <Reveal delay={110}>
             <p className="text-lg leading-relaxed text-ink-2">
               Beacon Hacks is being built in the open. Three things have to be
-              true before it is a real event, and none of them are done.
+              true before it is a real event, and none of them are done yet.
               Anything on this site that depends on them is marked locked rather
               than stated as fact.
             </p>
@@ -103,8 +103,8 @@ export function StatusBoard() {
               />
             </div>
             <p className="mt-4 text-sm leading-relaxed text-ink-3">
-              Sponsor outreach has not started. That number updates on this page
-              as money is actually committed, not pledged.
+              Sponsor outreach is under way. That number updates on this page as
+              money is actually committed, not pledged.
             </p>
           </div>
         </Reveal>

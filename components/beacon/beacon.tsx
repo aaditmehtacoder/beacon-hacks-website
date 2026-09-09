@@ -33,11 +33,18 @@ type Tier = "low" | "high";
  * not before hydration, not while three.js downloads, not without WebGL, and
  * not if the scene fails after it started.
  */
-export function Beacon({ className = "" }: { className?: string }) {
+export function Beacon({
+  className = "",
+  frame: framed = true,
+}: {
+  className?: string;
+  /** false: no border or rounding, for the full-screen stage. */
+  frame?: boolean;
+}) {
   const reduce = useReducedMotion();
   const frame = useRef<HTMLDivElement>(null);
   const pointer = useRef<Pointer>({ x: 0, y: 0, active: false });
-  const scroll = useRef<Scroll>({ y: 0 });
+  const scroll = useRef<Scroll>({ y: 0, p: 0 });
   const [stage, setStage] = useState<Stage>("idle");
   const [tier, setTier] = useState<Tier>("high");
   const [inView, setInView] = useState(true);
@@ -90,14 +97,29 @@ export function Beacon({ className = "" }: { className?: string }) {
     return () => window.removeEventListener("pointermove", onMove);
   }, [reduce]);
 
-  /* Scrolling turns the lens. */
+  /* Scrolling turns the lens, and progress through the pinned stage (the
+     nearest <section>) drives the camera. The same number goes onto <html>
+     as --stage-progress so the copy can follow it in CSS. */
   useEffect(() => {
+    const stage = frame.current?.closest("section") ?? null;
     const onScroll = () => {
       scroll.current.y = window.scrollY;
+      let progress = 0;
+      if (stage) {
+        const rect = stage.getBoundingClientRect();
+        const span = rect.height - window.innerHeight;
+        progress = span > 0 ? Math.min(1, Math.max(0, -rect.top / span)) : 0;
+      }
+      scroll.current.p = progress;
+      document.documentElement.style.setProperty("--stage-progress", progress.toFixed(3));
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
   /* Written to <html> so the hero background can breathe with the beam. */
@@ -120,7 +142,7 @@ export function Beacon({ className = "" }: { className?: string }) {
       ref={frame}
       role="img"
       aria-label="A lighthouse lens turning slowly. Its beam sweeps past every few seconds."
-      className={`relative overflow-hidden rounded-2xl border border-line bg-band shadow-figure ${className}`}
+      className={`overflow-hidden bg-band ${framed ? "relative rounded-2xl border border-line shadow-figure" : ""} ${className}`}
     >
       <BeaconFallback
         className={`absolute inset-0 transition-opacity duration-1000 ${live ? "opacity-0" : "opacity-100"}`}

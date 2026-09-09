@@ -20,7 +20,7 @@ export const STATS: Stat[] = [
   {
     value: "$0",
     label: "Of $10,500 raised",
-    note: "Sponsorship has not started",
+    note: "Outreach under way, nothing committed",
   },
   {
     value: "Free",
@@ -172,40 +172,6 @@ export const SCHEDULE: Phase[] = [
         note: "Prizes, thank yous, everyone out by 11.",
       },
     ],
-  },
-];
-
-export type Shot = { src: string; caption: string; alt: string };
-
-/**
- * Illustrative stock photography of hackathons and workspaces. These are NOT
- * the Beacon venue and the page says so out loud wherever they appear.
- */
-export const MOOD_SHOTS: Shot[] = [
-  {
-    src: "/photos/main-floor.jpg",
-    caption: "A room on the clock",
-    alt: "A wide open floor of long desks filled with people working on laptops",
-  },
-  {
-    src: "/photos/atrium.jpg",
-    caption: "Somewhere to think",
-    alt: "A bright lounge with armchairs, a low table and tall windows",
-  },
-  {
-    src: "/photos/workshop.jpg",
-    caption: "Workshops in parallel",
-    alt: "A large room set with round tables facing projection screens",
-  },
-  {
-    src: "/photos/kitchen.jpg",
-    caption: "Coffee that never runs out",
-    alt: "Three hands raising coffee cups over a wooden table",
-  },
-  {
-    src: "/photos/lobby.jpg",
-    caption: "Somewhere to reset",
-    alt: "A window counter with stools, a laptop and a tall plant looking over the city",
   },
 ];
 

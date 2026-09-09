@@ -1,5 +1,3 @@
-import Image from "next/image";
-import { MOOD_SHOTS } from "@/lib/content";
 import { EVENT } from "@/lib/event";
 import { Reveal } from "./ui/reveal";
 import { LockChip } from "./ui/locked";
@@ -66,41 +64,6 @@ export function Venue() {
         </Reveal>
       </div>
 
-      {/* Illustrative photography, labelled as such so nobody reads it as the venue. */}
-      <div className="mt-14">
-        <div className="wrap">
-          <Reveal>
-            <p className="label text-ink-4">
-              What a build day looks like · stock photography, not the Beacon
-              venue
-            </p>
-          </Reveal>
-        </div>
-
-        <div className="mt-5 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <ul className="flex w-max snap-x snap-mandatory gap-4 px-(--spacing-gut)">
-            {MOOD_SHOTS.map((shot, i) => (
-              <li key={shot.src} className="snap-start">
-                <figure className="group w-[78vw] max-w-[34rem] sm:w-[26rem]">
-                  <div className="relative aspect-3/2 overflow-hidden rounded-2xl border border-line bg-paper-deep">
-                    <Image
-                      src={shot.src}
-                      alt={shot.alt}
-                      fill
-                      loading={i < 2 ? "eager" : "lazy"}
-                      sizes="(min-width: 640px) 26rem, 78vw"
-                      className="photo object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                    />
-                  </div>
-                  <figcaption className="label mt-3 text-ink-3">
-                    {shot.caption}
-                  </figcaption>
-                </figure>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
     </section>
   );
 }

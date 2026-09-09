@@ -55,9 +55,13 @@ export function SiteHeader() {
     return () => io.disconnect();
   }, []);
 
+  /* At the top the header sits on the night stage, so it is light on dark
+     in either theme; once lifted it is paper and ink again. */
+  const over = !lifted;
+
   return (
     <header
-      className={`sticky top-0 z-50 transition-[background-color,border-color,box-shadow] duration-300 ${
+      className={`sticky top-0 z-50 transition-[background-color,border-color,box-shadow,color] duration-300 ${
         lifted
           ? "border-b border-line bg-paper/85 shadow-head backdrop-blur-xl"
           : "border-b border-transparent bg-transparent"
@@ -75,12 +79,16 @@ export function SiteHeader() {
             aria-hidden="true"
             className="size-2.5 rounded-full bg-beacon shadow-lamp motion-safe:animate-pulse-dot"
           />
-          <span className="font-display text-[0.9375rem] font-bold tracking-tight">
+          <span
+            className={`font-display text-[0.9375rem] font-bold tracking-tight transition-colors ${over ? "text-band-ink" : "text-ink"}`}
+          >
             BEACON HACKS
           </span>
         </a>
 
-        <span className="label hidden border-l border-line pl-5 text-ink-3 xl:inline">
+        <span
+          className={`label hidden border-l pl-5 transition-colors xl:inline ${over ? "border-band-ink/20 text-band-ink/60" : "border-line text-ink-3"}`}
+        >
           In the open, gate by gate
         </span>
 
@@ -95,8 +103,12 @@ export function SiteHeader() {
               aria-current={active === item.href ? "true" : undefined}
               className={`rounded-full px-3 py-1.5 text-[0.8125rem] transition-colors ${
                 active === item.href
-                  ? "bg-paper-warm text-ink"
-                  : "text-ink-3 hover:text-ink"
+                  ? over
+                    ? "bg-band-ink/12 text-band-ink"
+                    : "bg-paper-warm text-ink"
+                  : over
+                    ? "text-band-ink/65 hover:text-band-ink"
+                    : "text-ink-3 hover:text-ink"
               }`}
             >
               {item.label}
@@ -105,14 +117,16 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2 lg:ml-0">
-          <ThemeToggle />
-          <NotifyButton size="sm">Get notified</NotifyButton>
+          <ThemeToggle tone={over ? "stage" : "page"} />
+          <NotifyButton size="sm" variant={over ? "beacon" : "primary"}>
+            Get notified
+          </NotifyButton>
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
             aria-expanded={menuOpen}
             aria-label="Menu"
-            className="grid size-9 place-items-center rounded-full border border-line text-ink transition-colors hover:border-line-hard lg:hidden"
+            className={`grid size-9 place-items-center rounded-full border transition-colors lg:hidden ${over ? "border-band-ink/25 text-band-ink hover:border-band-ink/60" : "border-line text-ink hover:border-line-hard"}`}
           >
             <svg viewBox="0 0 16 16" className="size-4" aria-hidden="true">
               {menuOpen ? (

@@ -61,14 +61,25 @@ function LampIcon() {
  * The header control. Flips to the opposite of whatever is on screen, which
  * also settles a visitor who was still on "system".
  */
-export function ThemeToggle({ className = "" }: { className?: string }) {
+export function ThemeToggle({
+  className = "",
+  tone = "page",
+}: {
+  className?: string;
+  /** stage: sitting on the night hero, so light on dark in either theme. */
+  tone?: "page" | "stage";
+}) {
   const { toggle } = useTheme();
+  const colours =
+    tone === "stage"
+      ? "border-band-ink/25 text-band-ink/80 hover:border-band-ink/60 hover:text-band-ink"
+      : "border-line text-ink-2 hover:border-line-hard hover:text-ink";
 
   return (
     <button
       type="button"
       onClick={toggle}
-      className={`grid size-9 shrink-0 place-items-center rounded-full border border-line text-ink-2 transition-colors hover:border-line-hard hover:text-ink ${className}`}
+      className={`grid size-9 shrink-0 place-items-center rounded-full border transition-colors ${colours} ${className}`}
     >
       <LampIcon />
       <span className="sr-only" data-theme-when="light">

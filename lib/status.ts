@@ -31,8 +31,8 @@ export const GATES: Gate[] = [
     id: "funding",
     order: "Gate 2",
     title: "Day funded",
-    state: "blocked",
-    detail: `$${EVENT.budget.raisedUsd.toLocaleString()} of $${EVENT.budget.targetUsd.toLocaleString()} raised. Sponsor outreach has not started. Food, space and prizes all come out of this.`,
+    state: "active",
+    detail: `$${EVENT.budget.raisedUsd.toLocaleString()} of $${EVENT.budget.targetUsd.toLocaleString()} raised. Sponsor outreach is under way and nothing is committed yet. Food, space and prizes all come out of this.`,
     unlocks: "Unlocks prizes and keeps the day free to attend",
   },
   {

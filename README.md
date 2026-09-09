@@ -12,7 +12,6 @@ components/          one file per section, plus ui/ primitives
   theme/             the light/dark system: boot script, provider, controls
   ui/reveal.tsx      the one scroll entrance (rise, or tilt for cards)
   ui/text-reveal.tsx masked display type rising from its baseline
-  ui/parallax.tsx    hero depth, nothing else
   ui/magnetic.tsx    buttons that lean toward the cursor
 lib/event.ts         every fact about the event that appears twice
 lib/content.ts       all page copy and data
@@ -58,8 +57,10 @@ just after the headline has settled.
   screen or the tab is hidden, and renders one still frame for
   `prefers-reduced-motion`.
 - Phones and small laptops get fewer motes and a lower pixel ratio.
-- Scrolling turns the lens: the beams sweep with you, and the camera rises to
-  look down on it as the hero leaves.
+- The hero is a full-viewport stage that pins for one screen of scrolling:
+  the lens turns with the scroll, the camera rises and pushes in, the facts
+  rise into place (`--stage-progress`, plain CSS), then the page lets go.
+  Under reduced motion it is one unpinned screen with the facts shown.
 - It writes `--beam-facing` (0..1, how squarely a beam points at the visitor)
   onto `<html>` every frame; the hero background uses it to breathe with the
   light.
@@ -68,8 +69,9 @@ just after the headline has settled.
   lamp if that stays dark. A lost WebGL context, a thrown error, or a machine
   without half-float framebuffers ends up on the CSS lamp too.
 
-The panel is night in both themes on purpose. Glass and bloom need a dark
-ground, and a framed window into the dark sits well on paper.
+The stage is night in both themes on purpose: glass and bloom need a dark
+ground. The header is light on dark while it sits on the stage and returns
+to paper and ink once lifted.
 
 Inside `beacon-scene.tsx`, everything the frame loop touches is declared in
 JSX and reached through a ref. The React Compiler lint forbids mutating
@@ -77,7 +79,7 @@ anything created during render, and that is the idiomatic way around it.
 
 ## Motion
 
-Four pieces, all of which are no-ops under `prefers-reduced-motion`:
+Three pieces, all of which are no-ops under `prefers-reduced-motion`:
 
 - `<Reveal>` fires once on the way in. `variant="rise"` fades up;
   `variant="tilt"` also settles flat from a slight lean, and is what card
@@ -86,8 +88,6 @@ Four pieces, all of which are no-ops under `prefers-reduced-motion`:
   in the hero, `inView` everywhere else. It observes the outer, unclipped span:
   the inner one starts translated outside the clip region, and an observer on
   it would never report it visible.
-- `<Parallax>` is used in the hero only, for depth: the grid drifts slower
-  than the page and the lamp leaves a touch faster.
 - `<Magnetic>` lets the primary buttons lean a few pixels toward the mouse.
 
 ## Light and dark
@@ -140,9 +140,9 @@ results and calendar surfaces. Restore it in `app/page.tsx` once the date is loc
 ## Photos
 
 `public/photos/` is stock photography from Unsplash (free to use commercially, no
-attribution required). **None of it is the Beacon venue.** The site says so in
-two places: the strip heading in the venue section, and the footer. Those
-labels must stay until they are replaced with real photos we took ourselves.
+attribution required), used only for the three cards in the Day section.
+**None of it is the Beacon venue.** The footer says so, and that line must
+stay until the photos are replaced with real ones we took ourselves.
 
 The same rule covers the host's own photography. Until they have signed off in
 writing *and* given permission to use their images, their building does not

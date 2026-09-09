@@ -42,7 +42,8 @@ export type BeaconSceneProps = {
   onFail?: () => void;
 };
 
-export type Scroll = { y: number };
+/** Page scroll, plus how far through the pinned hero stage we are (0..1). */
+export type Scroll = { y: number; p: number };
 
 type Caps = { halfFloat: boolean };
 
@@ -388,7 +389,7 @@ function Scene({
     [],
   );
 
-  const moteCount = tier === "low" ? 220 : 440;
+  const moteCount = tier === "low" ? 240 : 520;
   const moteData = useMemo(() => buildMotes(moteCount), [moteCount]);
 
   /* The glare texture is drawn on a 2D canvas, which is a side effect, so
@@ -440,7 +441,12 @@ function Scene({
     const wanted = reduced ? 0 : (scroll.current?.y ?? 0) * SCROLL_TURN;
     scrollPhase.current += (wanted - scrollPhase.current) * (1 - Math.exp(-delta * 7));
     const phase = (reduced ? STILL_PHASE : PHASE0 + SPEED * t) + scrollPhase.current;
-    const scrolled = reduced ? 0 : Math.min(1, (scroll.current?.y ?? 0) / 900);
+
+    /* Progress through the pinned stage drives the camera: it rises, pushes
+       in, and ends looking down on the lamp as the page lets go. */
+    const stage = reduced ? 0 : (scroll.current?.p ?? 0);
+    const scrolled = stage * stage * (3 - 2 * stage);
+    const wide = state.viewport.aspect >= 1.1;
 
     /* rise and settle as it lights */
     const settle = 1 - Math.pow(1 - Math.min(1, t / 1.6), 3);
@@ -493,11 +499,11 @@ function Scene({
     const p = pointer.current;
     const drift = reduced ? 0 : Math.sin(now * 0.12) * 0.22;
     const tx = p?.active ? p.x * 0.5 : drift;
-    const ty = (p?.active ? -0.3 + p.y * 0.26 : -0.3 + (reduced ? 0 : Math.sin(now * 0.09) * 0.08)) + scrolled * 1.1;
-    target.current.set(tx, ty, 6.2 - scrolled * 0.4);
+    const ty = (p?.active ? -0.3 + p.y * 0.26 : -0.3 + (reduced ? 0 : Math.sin(now * 0.09) * 0.08)) + scrolled * 1.5;
+    target.current.set(tx, ty, 7 - scrolled * 0.9);
     if (reduced) state.camera.position.copy(target.current);
     else state.camera.position.lerp(target.current, 1 - Math.exp(-delta * 2.6));
-    state.camera.lookAt(0, 0.05 - scrolled * 0.3, 0);
+    state.camera.lookAt(wide ? -1.35 : 0, (wide ? 0.05 : 0.95) - scrolled * 0.5, 0);
 
     if (Math.abs(facing - lastFacing.current) > 0.004) {
       lastFacing.current = facing;
@@ -667,12 +673,12 @@ export function BeaconScene({ running, reduced, tier, pointer, scroll, onReady, 
     <Canvas
       flat
       frameloop={frameloop}
-      dpr={tier === "low" ? [1, 1.25] : [1, 1.75]}
+      dpr={tier === "low" ? [1, 1.25] : [1, 1.5]}
       gl={{ antialias: false, alpha: false, stencil: false, powerPreference: "high-performance" }}
-      camera={{ fov: 32, near: 0.1, far: 60, position: [0, -0.3, 6.2] }}
+      camera={{ fov: 32, near: 0.1, far: 60, position: [0, -0.3, 7] }}
       onCreated={({ gl, scene }) => {
         gl.setClearColor(0x050508, 1);
-        gl.transmissionResolutionScale = tier === "low" ? 0.35 : 0.6;
+        gl.transmissionResolutionScale = tier === "low" ? 0.35 : 0.5;
         const env = makeEnvironment(gl);
         environment.current = env;
         scene.environment = env.texture;

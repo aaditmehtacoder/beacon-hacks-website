@@ -72,7 +72,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             animation clears on the way in. With no JavaScript there is
             nothing to clear it, so the page would render blank. */}
         <noscript>
-          <style>{`[style*="opacity:0"]{opacity:1!important;transform:none!important}`}</style>
+          <style>{`[style*="opacity:0"]{opacity:1!important;transform:none!important}.stage-facts{opacity:1!important;transform:none!important}`}</style>
         </noscript>
       </head>
       <body className="flex min-h-dvh flex-col">
