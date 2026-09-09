@@ -50,13 +50,12 @@ export const EVENT = {
   },
 
   /**
-   * One inbox for now. Split sponsors off to its own address once one
-   * exists and actually receives mail; nothing else on the site needs to
-   * change, every link reads from here.
+   * One inbox. Split sponsors off to its own address if one is set up;
+   * nothing else on the site needs to change, every link reads from here.
    */
   email: {
-    team: "team.beaconhacks@gmail.com",
-    sponsors: "team.beaconhacks@gmail.com",
+    team: "team@beaconhacks.com",
+    sponsors: "team@beaconhacks.com",
   },
 
   /** The primary host. The apex redirects here, so canonicals point here. */
