@@ -3,7 +3,6 @@ import Link from "next/link";
 import { EVENT } from "@/lib/event";
 import { LinkButton } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 export const metadata: Metadata = {
   title: "Code of conduct",
@@ -28,15 +27,12 @@ export default function CodeOfConduct() {
           <span className="label hidden border-l border-line pl-5 text-ink-3 sm:inline">
             Code of conduct
           </span>
-          <div className="ml-auto flex items-center gap-4">
-            <Link
-              href="/"
-              className="text-[0.9375rem] text-ink-3 hover:text-ink"
-            >
-              Back to the site
-            </Link>
-            <ThemeToggle />
-          </div>
+          <Link
+            href="/"
+            className="ml-auto text-[0.9375rem] text-ink-3 hover:text-ink"
+          >
+            Back to the site
+          </Link>
         </div>
       </header>
 

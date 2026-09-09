@@ -21,10 +21,14 @@ const FACTS = [
  * pushes in, the facts rise into place, then the page lets go into the
  * marquee. The section is twice the viewport tall; the inside is sticky.
  * Under reduced motion it is one screen, unpinned, with the facts shown.
+ *
+ * The section pulls up under the sticky header (its 4rem plus the 1px
+ * border) so the night is behind the header at the top of the page; the
+ * header is light on dark there and needs something dark to sit on.
  */
 export function Hero() {
   return (
-    <section id="top" className="relative motion-safe:h-[200svh]">
+    <section id="top" className="relative -mt-[calc(4rem+1px)] motion-safe:h-[200svh]">
       <div className="sticky top-0 h-[100svh] overflow-hidden bg-band text-band-ink">
         <Beacon frame={false} className="absolute inset-0" />
 
@@ -79,7 +83,7 @@ export function Hero() {
                   </NotifyButton>
                 </Magnetic>
                 <Magnetic>
-                  <LinkButton href="#sponsors" variant="stage" size="lg">
+                  <LinkButton href="#sponsors" variant="ghost" size="lg">
                     Sponsor Beacon
                   </LinkButton>
                 </Magnetic>

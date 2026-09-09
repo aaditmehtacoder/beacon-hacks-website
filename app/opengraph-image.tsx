@@ -15,7 +15,7 @@ export default async function Image() {
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        background: "#faf8f4",
+        background: "#0f0e0c",
         padding: "72px 80px",
         fontFamily: "sans-serif",
         position: "relative",
@@ -30,7 +30,7 @@ export default async function Image() {
           height: 700,
           borderRadius: 9999,
           background:
-            "radial-gradient(circle, rgba(242,161,0,0.30), rgba(242,161,0,0) 62%)",
+            "radial-gradient(circle, rgba(255,178,40,0.28), rgba(255,178,40,0) 62%)",
         }}
       />
 
@@ -40,10 +40,11 @@ export default async function Image() {
             width: 20,
             height: 20,
             borderRadius: 9999,
-            background: "#f2a100",
+            background: "#ffb228",
+            boxShadow: "0 0 24px rgba(255,178,40,0.8)",
           }}
         />
-        <div style={{ fontSize: 26, letterSpacing: 6, color: "#46433b" }}>
+        <div style={{ fontSize: 26, letterSpacing: 6, color: "#c4bfb2" }}>
           BEACON HACKS
         </div>
       </div>
@@ -53,7 +54,7 @@ export default async function Image() {
           style={{
             fontSize: 108,
             fontWeight: 700,
-            color: "#16150f",
+            color: "#f5f2ea",
             lineHeight: 1.02,
             letterSpacing: -4,
           }}
@@ -64,7 +65,7 @@ export default async function Image() {
           style={{
             fontSize: 108,
             fontWeight: 700,
-            color: "#a35c00",
+            color: "#ffb228",
             lineHeight: 1.02,
             letterSpacing: -4,
           }}
@@ -73,11 +74,11 @@ export default async function Image() {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 40, fontSize: 26, color: "#46433b" }}>
+      <div style={{ display: "flex", gap: 40, fontSize: 26, color: "#c4bfb2" }}>
         <div style={{ display: "flex" }}>Target {EVENT.targetDateLabel}</div>
-        <div style={{ display: "flex", color: "#97917f" }}>·</div>
+        <div style={{ display: "flex", color: "#8b8577" }}>·</div>
         <div style={{ display: "flex" }}>{EVENT.venue.label}</div>
-        <div style={{ display: "flex", color: "#97917f" }}>·</div>
+        <div style={{ display: "flex", color: "#8b8577" }}>·</div>
         <div style={{ display: "flex" }}>Applications not open yet</div>
       </div>
     </div>,

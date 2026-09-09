@@ -1,7 +1,7 @@
 # Beacon Hacks website
 
 Next.js 16 (App Router) + React 19 + Tailwind v4, with a three.js lighthouse
-lens in the hero. Light and dark, one accent colour, no component library.
+lens in the hero. Dark only, one accent colour, no component library.
 
 ```
 app/                 routes, fonts, metadata, generated OG card
@@ -9,7 +9,6 @@ app/                 routes, fonts, metadata, generated OG card
   code-of-conduct/   the CoC page
 components/          one file per section, plus ui/ primitives
   beacon/            the three.js lens: scene, frame, CSS fallback
-  theme/             the light/dark system: boot script, provider, controls
   ui/reveal.tsx      the one scroll entrance (rise, or tilt for cards)
   ui/text-reveal.tsx masked display type rising from its baseline
   ui/magnetic.tsx    buttons that lean toward the cursor
@@ -69,9 +68,8 @@ just after the headline has settled.
   lamp if that stays dark. A lost WebGL context, a thrown error, or a machine
   without half-float framebuffers ends up on the CSS lamp too.
 
-The stage is night in both themes on purpose: glass and bloom need a dark
-ground. The header is light on dark while it sits on the stage and returns
-to paper and ink once lifted.
+The stage sits on `band`, a step below the page, and pulls up under the
+sticky header so the night is behind the header at the very top.
 
 Inside `beacon-scene.tsx`, everything the frame loop touches is declared in
 JSX and reached through a ref. The React Compiler lint forbids mutating
@@ -90,29 +88,17 @@ Three pieces, all of which are no-ops under `prefers-reduced-motion`:
   it would never report it visible.
 - `<Magnetic>` lets the primary buttons lean a few pixels toward the mouse.
 
-## Light and dark
+## The palette
 
-One palette, two themes. `app/globals.css` holds the light values in `@theme` and
-the dark values in a single `:root[data-theme="dark"]` block, so day and night are
-the same design lit differently rather than two stylesheets. Almost nothing in the
-components carries a `dark:` variant; they name tokens and the tokens change.
+Dark only. Every colour, rule, shadow and glow is a variable at the top of
+`app/globals.css`, and components name tokens rather than colours. Two of the
+names need a word:
 
-Three things to know before editing it:
-
-- **`band` / `band-ink`, not `ink` / `paper`.** The marquee and the closing card
-  are night in both themes. Using `ink` there would invert them along with
-  everything else and turn them white after dark.
-- **Shadows and glows are variables** (`--sh-*`, `--glow-*`), applied through the
-  `@utility` rules at the bottom of the file. Tailwind inlines colours inside its
-  own `shadow-*` scale, which would freeze them at the light values.
-- **The theme is set before first paint** by the inline script in
-  `components/theme/theme-script.ts`, which writes `data-theme` (resolved) and
-  `data-theme-pref` (what the visitor chose, `system` included) onto `<html>`.
-  The toggle icon, its screen-reader label and the footer segmented control all
-  read those attributes in CSS, so they are correct before React hydrates.
-
-The header button flips light and dark; the footer control also offers System,
-which hands the choice back to the operating system and follows it live.
+- `band` / `band-ink` are the deep band a step below the page: the hero
+  stage, the marquee and the closing card, and the ink that goes with them.
+- Shadows and glows are variables (`--sh-*`, `--glow-*`) applied through the
+  `@utility` rules at the bottom of the file, because Tailwind inlines colours
+  in its own shadow scale and the palette should live in one place.
 
 ## The honesty rule
 

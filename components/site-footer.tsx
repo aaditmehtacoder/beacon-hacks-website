@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { EVENT } from "@/lib/event";
-import { ThemeSelect } from "./theme/theme-select";
 
 export function SiteFooter() {
   return (
@@ -23,27 +22,23 @@ export function SiteFooter() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-6 sm:items-end">
-          <nav className="flex flex-col gap-2 text-[0.9375rem] sm:text-right">
-            <Link href="#status" className="text-ink-2 hover:text-beacon-deep">
-              Build status
-            </Link>
-            <Link
-              href="/code-of-conduct"
-              className="text-ink-2 hover:text-beacon-deep"
-            >
-              Code of conduct
-            </Link>
-            <Link
-              href={`mailto:${EVENT.email.team}`}
-              className="text-ink-2 hover:text-beacon-deep"
-            >
-              {EVENT.email.team}
-            </Link>
-          </nav>
-
-          <ThemeSelect />
-        </div>
+        <nav className="flex flex-col gap-2 text-[0.9375rem] sm:text-right">
+          <Link href="#status" className="text-ink-2 hover:text-beacon-deep">
+            Build status
+          </Link>
+          <Link
+            href="/code-of-conduct"
+            className="text-ink-2 hover:text-beacon-deep"
+          >
+            Code of conduct
+          </Link>
+          <Link
+            href={`mailto:${EVENT.email.team}`}
+            className="text-ink-2 hover:text-beacon-deep"
+          >
+            {EVENT.email.team}
+          </Link>
+        </nav>
       </div>
     </footer>
   );

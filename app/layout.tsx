@@ -3,8 +3,7 @@ import { Bricolage_Grotesque, Geist } from "next/font/google";
 import { EVENT } from "@/lib/event";
 import { NotifyProvider } from "@/components/notify/notify-provider";
 import { NotifyModal } from "@/components/notify/notify-modal";
-import { ThemeProvider } from "@/components/theme/theme-provider";
-import { THEME_BG, THEME_BOOT_SCRIPT } from "@/components/theme/theme-script";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({
@@ -49,28 +48,18 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: THEME_BG.light },
-    { media: "(prefers-color-scheme: dark)", color: THEME_BG.dark },
-  ],
-  colorScheme: "light dark",
+  themeColor: "#0f0e0c",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${display.variable} ${sans.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="en" className={`${display.variable} ${sans.variable}`}>
       <head>
-        {/* Sets data-theme before the first paint. Without this, a visitor
-            on a dark machine gets a frame of white. */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
-
         {/* <Reveal> ships its start state as an inline opacity:0, which the
             animation clears on the way in. With no JavaScript there is
-            nothing to clear it, so the page would render blank. */}
+            nothing to clear it, so the page would render blank. The stage
+            facts wait on scroll progress the same way. */}
         <noscript>
           <style>{`[style*="opacity:0"]{opacity:1!important;transform:none!important}.stage-facts{opacity:1!important;transform:none!important}`}</style>
         </noscript>
@@ -82,12 +71,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <ThemeProvider>
-          <NotifyProvider>
-            {children}
-            <NotifyModal />
-          </NotifyProvider>
-        </ThemeProvider>
+        <NotifyProvider>
+          {children}
+          <NotifyModal />
+        </NotifyProvider>
+        {/* Vercel Analytics. Silent in development, reports only on Vercel. */}
+        <Analytics />
       </body>
     </html>
   );
