@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 
-type Variant = "primary" | "ghost" | "quiet";
+type Variant = "primary" | "ghost" | "quiet" | "beacon";
 type Size = "sm" | "md" | "lg";
 
 const BASE =
@@ -17,6 +17,8 @@ const VARIANT: Record<Variant, string> = {
     "bg-transparent text-ink border border-line-hard hover:border-ink hover:bg-ink hover:text-paper",
   quiet:
     "bg-card text-ink border border-line hover:border-line-hard shadow-quiet",
+  beacon:
+    "bg-beacon text-beacon-ink border border-beacon hover:bg-beacon-hi hover:border-beacon-hi shadow-glow",
 };
 
 const SIZE: Record<Size, string> = {

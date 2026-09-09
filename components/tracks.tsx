@@ -12,7 +12,7 @@ export function Tracks() {
     >
       <div className="grid gap-6 lg:grid-cols-3">
         {TRACKS.map((track, i) => (
-          <Reveal key={track.name} delay={i * 90}>
+          <Reveal key={track.name} delay={i * 90} variant="tilt">
             <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-card p-7 transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-beacon hover:shadow-glow-lift">
               {/* Wash that lifts on hover, so the card feels lit rather than moved. */}
               <span

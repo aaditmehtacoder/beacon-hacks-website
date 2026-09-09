@@ -1,8 +1,11 @@
-import Image from "next/image";
 import { Reveal } from "./ui/reveal";
+import { TextReveal } from "./ui/text-reveal";
+import { Magnetic } from "./ui/magnetic";
+import { Parallax } from "./ui/parallax";
 import { LinkButton } from "./ui/button";
 import { NotifyButton } from "./notify/notify-button";
 import { LockIcon } from "./ui/locked";
+import { Beacon } from "./beacon/beacon";
 import { EVENT } from "@/lib/event";
 
 const FACTS = [
@@ -19,21 +22,16 @@ export function Hero() {
       id="top"
       className="relative overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-28"
     >
-      {/* The beacon: rings and a slow sweep, clipped to a circle so it reads
-          as a lighthouse lamp rather than a stray wedge. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10"
       >
-        <div className="grid-paper absolute inset-0 opacity-60 [mask-image:radial-gradient(115%_75%_at_45%_0%,black,transparent_72%)]" />
-
-        <div className="absolute -top-40 -right-40 size-[38rem] overflow-hidden rounded-full sm:-top-52 sm:-right-52 sm:size-[48rem]">
-          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,var(--glow-lamp),transparent_60%)]" />
-          <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,transparent_0deg,var(--glow-sweep)_22deg,transparent_52deg)] motion-safe:animate-sweep" />
-          <div className="absolute inset-0 rounded-full border border-line-soft" />
-          <div className="absolute inset-[14%] rounded-full border border-line-soft" />
-          <div className="absolute inset-[30%] rounded-full border border-line-soft" />
-        </div>
+        <Parallax speed={0.18} className="absolute inset-0">
+          <div className="grid-paper absolute inset-0 opacity-60 [mask-image:radial-gradient(115%_75%_at_45%_0%,black,transparent_72%)]" />
+        </Parallax>
+        {/* The lamp's light, cast onto the page. The scene writes
+            --beam-facing every frame: 1 when a beam points straight at you. */}
+        <div className="absolute inset-0 bg-[radial-gradient(55%_45%_at_74%_42%,var(--glow-sweep),transparent_70%)] [opacity:var(--beam-facing,0)]" />
       </div>
 
       <div className="wrap grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
@@ -45,15 +43,14 @@ export function Hero() {
             </p>
           </Reveal>
 
-          <Reveal delay={70}>
-            <h1 className="mt-7 text-[clamp(3.5rem,12vw,8.5rem)] leading-[0.86] font-bold tracking-[-0.045em]">
-              Beacon
-              <br />
-              <span className="text-beacon-deep">Hacks</span>
-            </h1>
-          </Reveal>
+          <h1 className="mt-7 text-[clamp(3.5rem,12vw,8.5rem)] leading-[0.86] font-bold tracking-[-0.045em]">
+            <TextReveal delay={120}>Beacon</TextReveal>
+            <TextReveal delay={240} className="text-beacon-deep">
+              Hacks
+            </TextReveal>
+          </h1>
 
-          <Reveal delay={120}>
+          <Reveal delay={420}>
             <p className="mt-7 flex items-center gap-4">
               <span
                 aria-hidden="true"
@@ -65,7 +62,7 @@ export function Hero() {
             </p>
           </Reveal>
 
-          <Reveal delay={160}>
+          <Reveal delay={520}>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-ink-2">
               A free one day hackathon being built for Bay Area high schoolers,
               targeting January 2027 in Belmont. It is not funded yet and the
@@ -73,16 +70,20 @@ export function Hero() {
             </p>
           </Reveal>
 
-          <Reveal delay={210}>
+          <Reveal delay={620}>
             <div className="mt-9 flex flex-wrap gap-3">
-              <NotifyButton size="lg">Get notified →</NotifyButton>
-              <LinkButton href="#sponsors" variant="ghost" size="lg">
-                Sponsor Beacon
-              </LinkButton>
+              <Magnetic>
+                <NotifyButton size="lg">Get notified →</NotifyButton>
+              </Magnetic>
+              <Magnetic>
+                <LinkButton href="#sponsors" variant="ghost" size="lg">
+                  Sponsor Beacon
+                </LinkButton>
+              </Magnetic>
             </div>
           </Reveal>
 
-          <Reveal delay={250}>
+          <Reveal delay={720}>
             <p className="mt-5 text-sm text-ink-3">
               <a
                 href="#status"
@@ -94,21 +95,10 @@ export function Hero() {
           </Reveal>
         </div>
 
-        <Reveal delay={180}>
+        <Reveal delay={200}>
+          <Parallax speed={-0.08}>
           <figure className="relative">
-            <div className="relative aspect-4/5 overflow-hidden rounded-2xl border border-line bg-paper-warm shadow-figure">
-              <Image
-                src="/photos/hero.jpg"
-                alt="A mentor leaning over a laptop with three students, all of them laughing"
-                fill
-                priority
-                sizes="(min-width: 1024px) 40vw, 100vw"
-                className="photo object-cover"
-              />
-              <figcaption className="label absolute right-3 bottom-3 rounded-full bg-band/75 px-3 py-1.5 text-band-ink backdrop-blur">
-                Stock photo, not our venue
-              </figcaption>
-            </div>
+            <Beacon className="aspect-square sm:aspect-4/5" />
 
             <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-line bg-card/80 p-5 backdrop-blur sm:grid-cols-3 lg:grid-cols-2">
               {FACTS.map(([k, v, note]) => (
@@ -120,6 +110,7 @@ export function Hero() {
               ))}
             </dl>
           </figure>
+          </Parallax>
         </Reveal>
       </div>
     </section>

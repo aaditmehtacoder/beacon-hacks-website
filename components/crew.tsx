@@ -40,13 +40,13 @@ export function Crew() {
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:max-w-2xl">
         {ORGANIZERS.map((person, i) => (
-          <Reveal key={person.name} delay={i * 70}>
+          <Reveal key={person.name} delay={i * 70} variant="tilt">
             <Card person={person} />
           </Reveal>
         ))}
       </div>
 
-      <Reveal delay={140}>
+      <Reveal delay={140} variant="tilt">
         <div className="mt-8 rounded-2xl border border-dashed border-line-hard bg-paper-warm/50 p-6 sm:p-8">
           <LockChip>Judges not recruited</LockChip>
           <h3 className="mt-5 text-xl">

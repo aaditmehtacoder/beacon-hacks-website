@@ -13,7 +13,7 @@ export function Day() {
     >
       <div className="grid gap-6 md:grid-cols-3">
         {STEPS.map((step, i) => (
-          <Reveal key={step.num} delay={i * 90}>
+          <Reveal key={step.num} delay={i * 90} variant="tilt">
             <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-card transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-line-hard hover:shadow-lift">
               <div className="relative aspect-3/2 overflow-hidden bg-paper-warm">
                 <Image

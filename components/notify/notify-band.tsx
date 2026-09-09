@@ -12,7 +12,7 @@ export function NotifyBand() {
 
   return (
     <section id="notify" className="wrap scroll-mt-24 py-20 sm:py-28">
-      <Reveal>
+      <Reveal variant="tilt">
         <div className="relative overflow-hidden rounded-3xl border border-line bg-card px-7 py-12 text-center sm:px-14 sm:py-16">
           <span
             aria-hidden="true"

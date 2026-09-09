@@ -5,6 +5,7 @@ import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import { SCHEDULE } from "@/lib/content";
 import { EVENT } from "@/lib/event";
 import { Reveal } from "./ui/reveal";
+import { TextReveal } from "./ui/text-reveal";
 
 export function Timetable() {
   const railRef = useRef<HTMLDivElement>(null);
@@ -29,7 +30,7 @@ export function Timetable() {
       <Reveal delay={60}>
         <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
           <h2 className="text-4xl leading-[1.05] sm:text-5xl">
-            One day, nine moments.
+            <TextReveal inView>One day, nine moments.</TextReveal>
           </h2>
           <span className="label text-ink-3">{EVENT.hoursLabel}</span>
         </div>

@@ -3,6 +3,7 @@ import { EVENT } from "@/lib/event";
 import { Reveal } from "./ui/reveal";
 import { LockChip } from "./ui/locked";
 import { LinkButton } from "./ui/button";
+import { TextReveal } from "./ui/text-reveal";
 
 /**
  * No cash figures, no hardware, no perks. Nothing is funded, so the section
@@ -16,11 +17,9 @@ export function Prizes() {
           <Reveal>
             <p className="eyebrow">Prizes</p>
           </Reveal>
-          <Reveal delay={60}>
-            <h2 className="mt-4 text-4xl leading-[1.05] sm:text-5xl">
-              Not funded yet.
-            </h2>
-          </Reveal>
+          <h2 className="mt-4 text-4xl leading-[1.05] sm:text-5xl">
+            <TextReveal inView delay={60}>Not funded yet.</TextReveal>
+          </h2>
           <Reveal delay={110}>
             <p className="mt-5 leading-relaxed text-ink-2">
               We are not going to publish cash amounts or hardware that nobody
@@ -37,7 +36,7 @@ export function Prizes() {
           </Reveal>
         </div>
 
-        <Reveal delay={80}>
+        <Reveal delay={80} variant="tilt">
           <div className="rounded-2xl border border-dashed border-line-hard bg-paper-warm/50 p-6 sm:p-8">
             <LockChip>Unlocks at Gate 2, funding</LockChip>
 

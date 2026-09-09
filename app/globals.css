@@ -101,6 +101,13 @@
   /* photographs are lit for daylight; night pulls them back a little */
   --photo-filter: none;
 
+  /* how squarely the hero lamp's beam points at the visitor, 0..1,
+     written every frame by components/beacon/beacon.tsx */
+  --beam-facing: 0;
+
+  /* film grain over everything; enough to give flat colour some tooth */
+  --grain: 0.028;
+
   color-scheme: light;
 }
 
@@ -163,6 +170,8 @@
 
   --photo-filter: brightness(0.88) contrast(1.03) saturate(0.96);
 
+  --grain: 0.05;
+
   color-scheme: dark;
 }
 
@@ -187,6 +196,20 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+  }
+
+  /* Grain. A fixed, tiled SVG noise with no blend mode, so the compositor
+     handles it and scrolling costs nothing. Sits above the modal on purpose:
+     it is a property of the screen, not of any one layer. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+    opacity: var(--grain);
   }
 
   ::selection { background: var(--color-beacon); color: var(--color-beacon-ink); }

@@ -2,6 +2,7 @@ import { SPONSOR_NOTES } from "@/lib/content";
 import { EVENT } from "@/lib/event";
 import { Reveal } from "./ui/reveal";
 import { LinkButton } from "./ui/button";
+import { TextReveal } from "./ui/text-reveal";
 
 /** Tiers are open slots until real sponsors sign; we say so rather than faking logos. */
 const TIERS = [
@@ -18,11 +19,9 @@ export function Sponsors() {
           <Reveal>
             <p className="eyebrow">Sponsors</p>
           </Reveal>
-          <Reveal delay={60}>
-            <h2 className="mt-4 text-4xl leading-[1.05] sm:text-5xl">
-              The companies backing Beacon.
-            </h2>
-          </Reveal>
+          <h2 className="mt-4 text-4xl leading-[1.05] sm:text-5xl">
+            <TextReveal inView delay={60}>The companies backing Beacon.</TextReveal>
+          </h2>
         </div>
         <Reveal delay={110}>
           <p className="text-lg leading-relaxed text-ink-2">
@@ -52,7 +51,7 @@ export function Sponsors() {
               }`}
             >
               {Array.from({ length: tier.slots }, (_, i) => (
-                <Reveal key={i} delay={t * 40 + i * 40}>
+                <Reveal key={i} delay={t * 40 + i * 40} variant="tilt">
                   <div
                     className={`grid ${tier.size} place-items-center rounded-xl border border-dashed border-line-hard bg-card/60 px-4 text-center label text-ink-4 transition-colors hover:border-beacon hover:bg-beacon-wash hover:text-beacon-deep`}
                   >

@@ -3,6 +3,7 @@ import { MOOD_SHOTS } from "@/lib/content";
 import { EVENT } from "@/lib/event";
 import { Reveal } from "./ui/reveal";
 import { LockChip } from "./ui/locked";
+import { TextReveal } from "./ui/text-reveal";
 
 export function Venue() {
   return (
@@ -15,13 +16,13 @@ export function Venue() {
           <Reveal>
             <p className="eyebrow">Venue</p>
           </Reveal>
-          <Reveal delay={60}>
-            <h2 className="mt-4 text-4xl leading-[1.05] sm:text-5xl">
+          <h2 className="mt-4 text-4xl leading-[1.05] sm:text-5xl">
+            <TextReveal inView delay={60}>
               Belmont, California.
               <br />
               <span className="text-ink-3">Room to be named.</span>
-            </h2>
-          </Reveal>
+            </TextReveal>
+          </h2>
           <Reveal delay={110}>
             <p className="mt-5 text-lg leading-relaxed text-ink-2">
               A host on the Peninsula has offered their space and asked us not
@@ -32,7 +33,7 @@ export function Venue() {
           </Reveal>
         </div>
 
-        <Reveal delay={80}>
+        <Reveal delay={80} variant="tilt">
           <div className="rounded-2xl border border-dashed border-line-hard bg-card/60 p-6 sm:p-8">
             <LockChip>Unlocks at Gate 1, venue approval</LockChip>
             <dl className="mt-6 divide-y divide-line-soft">

@@ -1,14 +1,19 @@
 # Beacon Hacks website
 
-Next.js 16 (App Router) + React 19 + Tailwind v4. Light and dark, one accent
-colour, no component library.
+Next.js 16 (App Router) + React 19 + Tailwind v4, with a three.js lighthouse
+lens in the hero. Light and dark, one accent colour, no component library.
 
 ```
 app/                 routes, fonts, metadata, generated OG card
   api/notify/        the notify-list endpoint (validated, rate limited)
   code-of-conduct/   the CoC page
 components/          one file per section, plus ui/ primitives
+  beacon/            the three.js lens: scene, frame, CSS fallback
   theme/             the light/dark system: boot script, provider, controls
+  ui/reveal.tsx      the one scroll entrance (rise, or tilt for cards)
+  ui/text-reveal.tsx masked display type rising from its baseline
+  ui/parallax.tsx    hero depth, nothing else
+  ui/magnetic.tsx    buttons that lean toward the cursor
 lib/event.ts         every fact about the event that appears twice
 lib/content.ts       all page copy and data
 lib/status.ts        the three gates shown on the status board
@@ -32,6 +37,52 @@ origin for dev assets.
 npm run build && npm start
 npx tsc --noEmit       # typecheck
 ```
+
+`three` is pinned to 0.185: `postprocessing` 6.39 caps it below 0.186. Bump
+them together.
+
+## The beacon
+
+`components/beacon/` is a Fresnel lighthouse lens built from the parts a real
+one has: a lamp, two bullseye panels that focus it into beams, dioptric rings,
+glass barrel arcs and brass astragals. The cage turns; the lamp does not. Dust
+in the air lights up only inside a beam, which is what makes the beam read as
+light. It ignites with a real lamp flicker, and the first sweep hits the camera
+just after the headline has settled.
+
+`beacon.tsx` is the frame and makes every call the page cares about:
+
+- The CSS lamp in `beacon-fallback.tsx` is always rendered, so the panel is
+  never empty: before hydration, while three.js downloads, or without WebGL2.
+- The scene mounts a beat after hydration, stops rendering when scrolled off
+  screen or the tab is hidden, and renders one still frame for
+  `prefers-reduced-motion`.
+- Phones and small laptops get fewer motes and a lower pixel ratio.
+- It writes `--beam-facing` (0..1, how squarely a beam points at the visitor)
+  onto `<html>` every frame; the hero background uses it to breathe with the
+  light.
+
+The panel is night in both themes on purpose. Glass and bloom need a dark
+ground, and a framed window into the dark sits well on paper.
+
+Inside `beacon-scene.tsx`, everything the frame loop touches is declared in
+JSX and reached through a ref. The React Compiler lint forbids mutating
+anything created during render, and that is the idiomatic way around it.
+
+## Motion
+
+Four pieces, all of which are no-ops under `prefers-reduced-motion`:
+
+- `<Reveal>` fires once on the way in. `variant="rise"` fades up;
+  `variant="tilt"` also settles flat from a slight lean, and is what card
+  grids get.
+- `<TextReveal>` lifts display type out from behind its own baseline. On mount
+  in the hero, `inView` everywhere else. It observes the outer, unclipped span:
+  the inner one starts translated outside the clip region, and an observer on
+  it would never report it visible.
+- `<Parallax>` is used in the hero only, for depth: the grid drifts slower
+  than the page and the lamp leaves a touch faster.
+- `<Magnetic>` lets the primary buttons lean a few pixels toward the mouse.
 
 ## Light and dark
 
@@ -84,9 +135,8 @@ results and calendar surfaces. Restore it in `app/page.tsx` once the date is loc
 
 `public/photos/` is stock photography from Unsplash (free to use commercially, no
 attribution required). **None of it is the Beacon venue.** The site says so in
-three places: the hero image badge, the strip heading in the venue section, and
-the footer. Those labels must stay until they are replaced with real photos we
-took ourselves.
+two places: the strip heading in the venue section, and the footer. Those
+labels must stay until they are replaced with real photos we took ourselves.
 
 The same rule covers the host's own photography. Until they have signed off in
 writing *and* given permission to use their images, their building does not

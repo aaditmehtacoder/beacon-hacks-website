@@ -2,6 +2,7 @@ import { GATES, STATE_LABEL, type GateState } from "@/lib/status";
 import { EVENT } from "@/lib/event";
 import { Reveal } from "./ui/reveal";
 import { LockIcon } from "./ui/locked";
+import { TextReveal } from "./ui/text-reveal";
 
 const DOT: Record<GateState, string> = {
   done: "bg-beacon border-beacon",
@@ -34,11 +35,9 @@ export function StatusBoard() {
             <Reveal>
               <p className="eyebrow">Where Beacon is right now</p>
             </Reveal>
-            <Reveal delay={60}>
-              <h2 className="mt-4 text-4xl leading-[1.05] sm:text-5xl">
-                Nothing here is pretending.
-              </h2>
-            </Reveal>
+            <h2 className="mt-4 text-4xl leading-[1.05] sm:text-5xl">
+              <TextReveal inView delay={60}>Nothing here is pretending.</TextReveal>
+            </h2>
           </div>
           <Reveal delay={110}>
             <p className="text-lg leading-relaxed text-ink-2">
@@ -52,7 +51,7 @@ export function StatusBoard() {
 
         <ol className="mt-12 grid gap-4 md:grid-cols-3">
           {GATES.map((gate, i) => (
-            <Reveal key={gate.id} delay={i * 80}>
+            <Reveal key={gate.id} delay={i * 80} variant="tilt">
               <li className="flex h-full flex-col rounded-2xl border border-line bg-card p-6">
                 <div className="flex items-center justify-between gap-3">
                   <span className="flex items-center gap-2.5">
@@ -82,7 +81,7 @@ export function StatusBoard() {
           ))}
         </ol>
 
-        <Reveal delay={120}>
+        <Reveal delay={120} variant="tilt">
           <div className="mt-6 rounded-2xl border border-line bg-card p-6">
             <div className="flex flex-wrap items-baseline justify-between gap-3">
               <span className="label text-ink-3">Raised toward the day</span>

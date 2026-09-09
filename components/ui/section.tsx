@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Reveal } from "./reveal";
+import { TextReveal } from "./text-reveal";
 
 type Props = {
   id?: string;
@@ -31,11 +32,11 @@ export function Section({
           <Reveal>
             <p className="eyebrow">{eyebrow}</p>
           </Reveal>
-          <Reveal delay={60}>
-            <h2 className="mt-4 text-4xl leading-[1.05] sm:text-5xl lg:text-[3.5rem]">
+          <h2 className="mt-4 text-4xl leading-[1.05] sm:text-5xl lg:text-[3.5rem]">
+            <TextReveal inView delay={60}>
               {title}
-            </h2>
-          </Reveal>
+            </TextReveal>
+          </h2>
           {lede ? (
             <Reveal delay={110}>
               <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-2">
