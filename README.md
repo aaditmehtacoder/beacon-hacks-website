@@ -163,5 +163,5 @@ Payload: `{ email, school, role: "student" | "mentor" | "sponsor" | "other" }`.
 ## Still to fill in
 
 - Karsten's full name and both organizer roles in `ORGANIZERS` (`lib/content.ts`).
-- Whether `team@beaconhacks.org` / `sponsors@beaconhacks.org` actually receive mail.
+- A separate sponsors address. Everything routes to `team.beaconhacks@gmail.com` until one exists.
 - The domain in `EVENT.url`, which metadata and the OG card resolve against.
