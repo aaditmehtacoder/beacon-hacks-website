@@ -58,9 +58,15 @@ just after the headline has settled.
   screen or the tab is hidden, and renders one still frame for
   `prefers-reduced-motion`.
 - Phones and small laptops get fewer motes and a lower pixel ratio.
+- Scrolling turns the lens: the beams sweep with you, and the camera rises to
+  look down on it as the hero leaves.
 - It writes `--beam-facing` (0..1, how squarely a beam points at the visitor)
   onto `<html>` every frame; the hero background uses it to breathe with the
   light.
+- It never shows a black box. A running loop is not proof of a visible lamp,
+  so once lit it reads the centre pixel a few times and hands over to the CSS
+  lamp if that stays dark. A lost WebGL context, a thrown error, or a machine
+  without half-float framebuffers ends up on the CSS lamp too.
 
 The panel is night in both themes on purpose. Glass and bloom need a dark
 ground, and a framed window into the dark sits well on paper.

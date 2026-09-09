@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, type RefObject } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Bloom, EffectComposer, ToneMapping } from "@react-three/postprocessing";
 import { ToneMappingMode } from "postprocessing";
@@ -34,9 +34,17 @@ export type BeaconSceneProps = {
   tier: "low" | "high";
   /** Normalised pointer, written by the wrapper from anywhere on the page. */
   pointer: RefObject<Pointer>;
+  /** Page scroll, written by the wrapper. Scrolling turns the lens. */
+  scroll: RefObject<Scroll>;
   onReady?: () => void;
   onFacing?: (facing: number) => void;
+  /** The scene cannot be trusted any more: show the CSS lamp instead. */
+  onFail?: () => void;
 };
+
+export type Scroll = { y: number };
+
+type Caps = { halfFloat: boolean };
 
 /* ------------------------------------------------------------ timing */
 
@@ -50,6 +58,10 @@ const FIRST_FLASH_AT = 2.6;
    the headline has settled. */
 const PHASE0 = Math.PI * 1.5 - SPEED * FIRST_FLASH_AT;
 const STILL_PHASE = Math.PI * 1.5 - 0.62;
+
+/* Radians of lens per pixel scrolled. On a desktop the hero leaves the
+   viewport after roughly 900px, which is a turn and a quarter. */
+const SCROLL_TURN = 0.0045;
 
 const BEAM_LENGTH = 9;
 const BEAM_RADIUS = 1.45;
@@ -304,8 +316,18 @@ function Iron() {
 
 /* ------------------------------------------------------------ scene */
 
-function Scene({ reduced, tier, pointer, onReady, onFacing }: Omit<BeaconSceneProps, "running">) {
+function Scene({
+  reduced,
+  tier,
+  pointer,
+  scroll,
+  caps,
+  onReady,
+  onFacing,
+  onFail,
+}: Omit<BeaconSceneProps, "running"> & { caps: Caps }) {
   const invalidate = useThree((s) => s.invalidate);
+  const canvas = useThree((s) => s.gl.domElement);
 
   const lamp = useRef<THREE.Group>(null);
   const cage = useRef<THREE.Group>(null);
@@ -324,6 +346,8 @@ function Scene({ reduced, tier, pointer, onReady, onFacing }: Omit<BeaconScenePr
   const frames = useRef(0);
   const lastFacing = useRef(-1);
   const target = useRef<THREE.Vector3 | null>(null);
+  const scrollPhase = useRef(0);
+  const probe = useRef({ buffer: null as Uint8Array | null, next: 0, samples: 0, dark: 0, done: false });
 
   const beams = useMemo(() => [beamParameters(), beamParameters()], []);
 
@@ -379,6 +403,16 @@ function Scene({ reduced, tier, pointer, onReady, onFacing }: Omit<BeaconScenePr
     return () => texture.dispose();
   }, []);
 
+  /* A lost context never comes back on its own here; hand over to the CSS lamp. */
+  useEffect(() => {
+    const onLost = (event: Event) => {
+      event.preventDefault();
+      onFail?.();
+    };
+    canvas.addEventListener("webglcontextlost", onLost);
+    return () => canvas.removeEventListener("webglcontextlost", onLost);
+  }, [canvas, onFail]);
+
   /* Reduced motion renders on demand: a handful of frames so the environment
      and transmission settle, then nothing until the page resizes. */
   useEffect(() => {
@@ -400,7 +434,13 @@ function Scene({ reduced, tier, pointer, onReady, onFacing }: Omit<BeaconScenePr
     const t = reduced ? 4 : now - start.current;
 
     const ig = ignition(t);
-    const phase = reduced ? STILL_PHASE : PHASE0 + SPEED * t;
+
+    /* The lens turns on its own, and scrolling turns it further. Only the
+       scroll part is smoothed, so the ignition flash keeps its timing. */
+    const wanted = reduced ? 0 : (scroll.current?.y ?? 0) * SCROLL_TURN;
+    scrollPhase.current += (wanted - scrollPhase.current) * (1 - Math.exp(-delta * 7));
+    const phase = (reduced ? STILL_PHASE : PHASE0 + SPEED * t) + scrollPhase.current;
+    const scrolled = reduced ? 0 : Math.min(1, (scroll.current?.y ?? 0) / 900);
 
     /* rise and settle as it lights */
     const settle = 1 - Math.pow(1 - Math.min(1, t / 1.6), 3);
@@ -453,11 +493,11 @@ function Scene({ reduced, tier, pointer, onReady, onFacing }: Omit<BeaconScenePr
     const p = pointer.current;
     const drift = reduced ? 0 : Math.sin(now * 0.12) * 0.22;
     const tx = p?.active ? p.x * 0.5 : drift;
-    const ty = p?.active ? -0.3 + p.y * 0.26 : -0.3 + (reduced ? 0 : Math.sin(now * 0.09) * 0.08);
-    target.current.set(tx, ty, 6.2);
+    const ty = (p?.active ? -0.3 + p.y * 0.26 : -0.3 + (reduced ? 0 : Math.sin(now * 0.09) * 0.08)) + scrolled * 1.1;
+    target.current.set(tx, ty, 6.2 - scrolled * 0.4);
     if (reduced) state.camera.position.copy(target.current);
     else state.camera.position.lerp(target.current, 1 - Math.exp(-delta * 2.6));
-    state.camera.lookAt(0, 0.05, 0);
+    state.camera.lookAt(0, 0.05 - scrolled * 0.3, 0);
 
     if (Math.abs(facing - lastFacing.current) > 0.004) {
       lastFacing.current = facing;
@@ -469,6 +509,34 @@ function Scene({ reduced, tier, pointer, onReady, onFacing }: Omit<BeaconScenePr
       if (frames.current === 3) onReady?.();
     }
   });
+
+  /* Without half-float targets there is no bloom, and no composer to draw the
+     frame either, so draw it here. */
+  useFrame(({ gl, scene, camera }) => {
+    if (!caps.halfFloat) gl.render(scene, camera);
+  }, 1);
+
+  /* The watchdog. A running loop is not proof of a visible lamp: a broken
+     framebuffer or a hot-reloaded canvas can present black while every
+     callback still fires. Once lit, read the centre pixel a few times; the
+     lamp sits there, so if it stays dark the scene is handed back to CSS. */
+  useFrame(({ gl }) => {
+    if (reduced) return;
+    const pr = probe.current;
+    if (pr.done || start.current === null) return;
+    const now = performance.now() / 1000;
+    if (now - start.current < 1.6 || now < pr.next) return;
+    pr.next = now + 0.35;
+    const ctx = gl.getContext();
+    if (!pr.buffer) pr.buffer = new Uint8Array(4);
+    ctx.readPixels(ctx.drawingBufferWidth >> 1, ctx.drawingBufferHeight >> 1, 1, 1, ctx.RGBA, ctx.UNSIGNED_BYTE, pr.buffer);
+    pr.samples += 1;
+    if (pr.buffer[0] + pr.buffer[1] + pr.buffer[2] < 24) pr.dark += 1;
+    if (pr.samples >= 5) {
+      pr.done = true;
+      if (pr.dark >= 4) onFail?.();
+    }
+  }, 2);
 
   return (
     <>
@@ -569,18 +637,21 @@ function Scene({ reduced, tier, pointer, onReady, onFacing }: Omit<BeaconScenePr
         <shaderMaterial ref={motes} args={[moteParameters]} />
       </points>
 
-      <EffectComposer multisampling={tier === "low" ? 0 : 4}>
-        <Bloom luminanceThreshold={1} luminanceSmoothing={0.2} mipmapBlur intensity={tier === "low" ? 1.05 : 1.3} radius={0.72} levels={tier === "low" ? 5 : 7} />
-        <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
-      </EffectComposer>
+      {caps.halfFloat ? (
+        <EffectComposer multisampling={0}>
+          <Bloom luminanceThreshold={1} luminanceSmoothing={0.2} mipmapBlur intensity={tier === "low" ? 1.05 : 1.3} radius={0.72} levels={tier === "low" ? 5 : 7} />
+          <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
+        </EffectComposer>
+      ) : null}
     </>
   );
 }
 
 /* ------------------------------------------------------------ canvas */
 
-export function BeaconScene({ running, reduced, tier, pointer, onReady, onFacing }: BeaconSceneProps) {
+export function BeaconScene({ running, reduced, tier, pointer, scroll, onReady, onFacing, onFail }: BeaconSceneProps) {
   const environment = useRef<THREE.WebGLRenderTarget | null>(null);
+  const [caps, setCaps] = useState<Caps | null>(null);
 
   useEffect(
     () => () => {
@@ -606,10 +677,30 @@ export function BeaconScene({ running, reduced, tier, pointer, onReady, onFacing
         environment.current = env;
         scene.environment = env.texture;
         scene.environmentIntensity = 0.6;
+        /* Bloom needs a half-float framebuffer; without one the lamp still
+           lights, it just does not glow. */
+        const ctx = gl.getContext();
+        setCaps({
+          halfFloat: !!(
+            ctx.getExtension("EXT_color_buffer_half_float") ||
+            ctx.getExtension("EXT_color_buffer_float")
+          ),
+        });
       }}
       style={{ position: "absolute", inset: 0 }}
     >
-      <Scene reduced={reduced} tier={tier} pointer={pointer} onReady={onReady} onFacing={onFacing} />
+      {caps ? (
+        <Scene
+          reduced={reduced}
+          tier={tier}
+          pointer={pointer}
+          scroll={scroll}
+          caps={caps}
+          onReady={onReady}
+          onFacing={onFacing}
+          onFail={onFail}
+        />
+      ) : null}
     </Canvas>
   );
 }
