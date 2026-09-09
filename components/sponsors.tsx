@@ -27,8 +27,8 @@ export function Sponsors() {
         <Reveal delay={110}>
           <p className="text-lg leading-relaxed text-ink-2">
             Every slot below is open, because nothing has been raised yet. These
-            are empty placeholders, not logos we are hiding — no company has
-            agreed to back Beacon.
+            are empty placeholders, not logos we are hiding. No company has agreed
+            to back Beacon.
           </p>
         </Reveal>
       </div>

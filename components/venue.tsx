@@ -88,7 +88,7 @@ export function Venue() {
                       fill
                       loading={i < 2 ? "eager" : "lazy"}
                       sizes="(min-width: 640px) 26rem, 78vw"
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                      className="photo object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                     />
                   </div>
                   <figcaption className="label mt-3 text-ink-3">

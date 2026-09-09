@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, useScroll, useSpring } from "motion/react";
 import { NAV } from "@/lib/event";
 import { NotifyButton } from "./notify/notify-button";
+import { ThemeToggle } from "./theme/theme-toggle";
 
 export function SiteHeader() {
   const { scrollYProgress } = useScroll();
@@ -34,7 +35,7 @@ export function SiteHeader() {
     if (!nodes.length) return;
 
     /* Track which sections are in the middle band, and clear the highlight
-       entirely once none of them are — otherwise it sticks to whatever was
+       entirely once none of them are. Otherwise it sticks to whatever was
        last seen while you sit at the top of the page. */
     const inBand = new Set<string>();
 
@@ -58,7 +59,7 @@ export function SiteHeader() {
     <header
       className={`sticky top-0 z-50 transition-[background-color,border-color,box-shadow] duration-300 ${
         lifted
-          ? "border-b border-line bg-paper/85 shadow-[0_1px_24px_rgba(22,21,15,0.05)] backdrop-blur-xl"
+          ? "border-b border-line bg-paper/85 shadow-head backdrop-blur-xl"
           : "border-b border-transparent bg-transparent"
       }`}
     >
@@ -72,7 +73,7 @@ export function SiteHeader() {
         <a href="#top" className="flex shrink-0 items-center gap-2.5">
           <span
             aria-hidden="true"
-            className="size-2.5 rounded-full bg-beacon shadow-[0_0_0_4px_rgba(242,161,0,0.16),0_0_14px_rgba(242,161,0,0.7)] motion-safe:animate-pulse-dot"
+            className="size-2.5 rounded-full bg-beacon shadow-lamp motion-safe:animate-pulse-dot"
           />
           <span className="font-display text-[0.9375rem] font-bold tracking-tight">
             BEACON HACKS
@@ -104,6 +105,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2 lg:ml-0">
+          <ThemeToggle />
           <NotifyButton size="sm">Get notified</NotifyButton>
           <button
             type="button"

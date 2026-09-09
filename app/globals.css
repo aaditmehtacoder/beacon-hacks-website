@@ -1,35 +1,58 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Beacon Hacks — light mode design system
-   Warm paper, ink, and one beacon amber. Everything else is
-   spacing and rules.
+   Beacon Hacks design system
+
+   One palette, two themes. Every colour, rule, shadow and glow
+   is a variable, so day and night are the same design lit
+   differently rather than two stylesheets.
+
+   The theme lives on <html data-theme="light|dark">, written
+   before first paint by the script in app/layout.tsx.
    ============================================================ */
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ------------------------------------------------------------ light */
 
 @theme {
   /* --- surfaces --- */
-  --color-paper:      #faf8f4;
-  --color-paper-warm: #f4f0e7;
-  --color-paper-deep: #ece7db;
-  --color-card:       #ffffff;
+  --color-paper:      #faf8f4;  /* the page */
+  --color-paper-warm: #f4f0e7;  /* alternating band */
+  --color-paper-deep: #ece7db;  /* recessed fills: tracks, empty bars */
+  --color-card:       #ffffff;  /* raised surface */
 
   /* --- ink --- */
   --color-ink:        #16150f;
   --color-ink-2:      #46433b;
   --color-ink-3:      #6f6a5f;
-  --color-ink-4:      #97917f;
+  --color-ink-4:      #767162;
 
   /* --- the beacon --- */
   --color-beacon:      #f2a100;  /* fills, dots, the light itself */
   --color-beacon-hi:   #ffb833;
-  --color-beacon-deep: #a35c00;  /* amber that passes contrast on paper */
+  --color-beacon-deep: #a35c00;  /* amber that passes contrast as text */
   --color-beacon-ink:  #1a1200;  /* text sitting on a beacon fill */
-  --color-beacon-wash: #fdf3df;
+  --color-beacon-wash: #fdf3df;  /* amber tint behind chips */
 
   /* --- rules --- */
   --color-line:      rgba(22, 21, 15, 0.11);
   --color-line-soft: rgba(22, 21, 15, 0.06);
   --color-line-hard: rgba(22, 21, 15, 0.20);
+
+  /* --- the inverted band ---
+     The marquee and the closing card are night in both themes, so they
+     get their own pair rather than borrowing ink and paper. */
+  --color-band:     #16150f;
+  --color-band-ink: #faf8f4;
+
+  /* --- overlays --- */
+  --color-scrim: rgba(22, 21, 15, 0.38);
+
+  /* --- form errors --- */
+  --color-danger:      #991b1b;
+  --color-danger-wash: #fef2f2;
+  --color-danger-line: rgba(153, 27, 27, 0.20);
 
   /* --- type --- */
   --font-display: var(--font-bricolage), "Space Grotesk", system-ui, sans-serif;
@@ -44,6 +67,103 @@
   --animate-sweep:  sweep 7s linear infinite;
   --animate-pulse-dot: pulse-dot 2.8s ease-in-out infinite;
   --animate-drift: drift 34s linear infinite;
+}
+
+/* Effects that are not single colours, so they cannot live in @theme.
+   Kept out of the colour namespace on purpose: nothing generates a
+   utility for them except the @utility rules further down. */
+:root {
+  /* elevation */
+  --sh-hair:   0 1px 2px rgba(22, 21, 15, 0.16);
+  --sh-quiet:  0 1px 2px rgba(22, 21, 15, 0.05);
+  --sh-head:   0 1px 24px rgba(22, 21, 15, 0.05);
+  --sh-lift:   0 20px 50px -24px rgba(22, 21, 15, 0.40);
+  --sh-figure: 0 18px 50px -20px rgba(22, 21, 15, 0.35);
+  --sh-modal:  0 24px 80px rgba(22, 21, 15, 0.22);
+
+  /* the light itself */
+  --sh-glow:      0 6px 20px rgba(242, 161, 0, 0.32);
+  --sh-glow-lift: 0 20px 50px -26px rgba(242, 161, 0, 0.55);
+  --sh-lamp:      0 0 0 4px rgba(242, 161, 0, 0.16), 0 0 14px rgba(242, 161, 0, 0.70);
+  --sh-lamp-lg:   0 0 0 10px rgba(242, 161, 0, 0.16), 0 0 40px rgba(242, 161, 0, 0.50);
+  --sh-ring:      0 0 0 3px rgba(242, 161, 0, 0.16);
+
+  /* amber washes used inside gradients */
+  --glow-lamp:    rgba(242, 161, 0, 0.20);  /* hero lamp */
+  --glow-sweep:   rgba(242, 161, 0, 0.30);  /* hero sweep arm */
+  --glow-soft:    rgba(242, 161, 0, 0.16);  /* notify band */
+  --glow-card:    rgba(242, 161, 0, 0.14);  /* track card hover */
+  --glow-closing: rgba(242, 161, 0, 0.22);  /* closing band */
+
+  /* hairline grid drawn on the always-dark band */
+  --band-grid: rgba(250, 248, 244, 0.05);
+
+  /* photographs are lit for daylight; night pulls them back a little */
+  --photo-filter: none;
+
+  color-scheme: light;
+}
+
+/* ------------------------------------------------------------ dark
+
+   Same design after dark. Paper becomes a warm near-black, ink becomes
+   a warm off-white, and the beacon opens up a stop so it still reads as
+   a light rather than a highlighter.                                  */
+
+:root[data-theme="dark"] {
+  --color-paper:      #0f0e0c;
+  --color-paper-warm: #15140f;
+  --color-paper-deep: #292620;
+  --color-card:       #1a1813;
+
+  --color-ink:        #f5f2ea;
+  --color-ink-2:      #c4bfb2;
+  --color-ink-3:      #948e80;
+  --color-ink-4:      #8b8577;
+
+  --color-beacon:      #ffb228;
+  --color-beacon-hi:   #ffc75c;
+  --color-beacon-deep: #ffbe5c;
+  --color-beacon-ink:  #1a1200;
+  --color-beacon-wash: #241a06;
+
+  --color-line:      rgba(245, 242, 234, 0.13);
+  --color-line-soft: rgba(245, 242, 234, 0.07);
+  --color-line-hard: rgba(245, 242, 234, 0.28);
+
+  --color-band:     #070706;
+  --color-band-ink: #f0ede4;
+
+  --color-scrim: rgba(4, 4, 3, 0.72);
+
+  --color-danger:      #fca5a5;
+  --color-danger-wash: #2a1210;
+  --color-danger-line: rgba(252, 165, 165, 0.22);
+
+  --sh-hair:   0 1px 2px rgba(0, 0, 0, 0.55);
+  --sh-quiet:  0 1px 2px rgba(0, 0, 0, 0.45);
+  --sh-head:   0 1px 24px rgba(0, 0, 0, 0.55);
+  --sh-lift:   0 22px 60px -26px rgba(0, 0, 0, 0.85);
+  --sh-figure: 0 24px 60px -22px rgba(0, 0, 0, 0.80);
+  --sh-modal:  0 30px 90px rgba(0, 0, 0, 0.75);
+
+  --sh-glow:      0 8px 26px rgba(255, 178, 40, 0.30);
+  --sh-glow-lift: 0 20px 54px -24px rgba(255, 178, 40, 0.50);
+  --sh-lamp:      0 0 0 4px rgba(255, 178, 40, 0.18), 0 0 18px rgba(255, 178, 40, 0.75);
+  --sh-lamp-lg:   0 0 0 10px rgba(255, 178, 40, 0.18), 0 0 52px rgba(255, 178, 40, 0.55);
+  --sh-ring:      0 0 0 3px rgba(255, 178, 40, 0.22);
+
+  --glow-lamp:    rgba(255, 178, 40, 0.22);
+  --glow-sweep:   rgba(255, 178, 40, 0.32);
+  --glow-soft:    rgba(255, 178, 40, 0.20);
+  --glow-card:    rgba(255, 178, 40, 0.16);
+  --glow-closing: rgba(255, 178, 40, 0.26);
+
+  --band-grid: rgba(245, 242, 234, 0.055);
+
+  --photo-filter: brightness(0.88) contrast(1.03) saturate(0.96);
+
+  color-scheme: dark;
 }
 
 @keyframes sweep     { to { transform: rotate(360deg); } }
@@ -129,6 +249,69 @@
 @utility will-reveal {
   opacity: 0;
   transform: translateY(18px);
+}
+
+/* Elevation. These read through variables rather than Tailwind's shadow
+   scale so a single token swap re-lights every card after dark. */
+@utility shadow-hair      { box-shadow: var(--sh-hair); }
+@utility shadow-quiet     { box-shadow: var(--sh-quiet); }
+@utility shadow-head      { box-shadow: var(--sh-head); }
+@utility shadow-lift      { box-shadow: var(--sh-lift); }
+@utility shadow-figure    { box-shadow: var(--sh-figure); }
+@utility shadow-modal     { box-shadow: var(--sh-modal); }
+@utility shadow-glow      { box-shadow: var(--sh-glow); }
+@utility shadow-glow-lift { box-shadow: var(--sh-glow-lift); }
+@utility shadow-lamp      { box-shadow: var(--sh-lamp); }
+@utility shadow-lamp-lg   { box-shadow: var(--sh-lamp-lg); }
+@utility shadow-ring-lamp { box-shadow: var(--sh-ring); }
+
+/* Photography, graded for the current theme. */
+@utility photo { filter: var(--photo-filter); }
+
+/* ------------------------------------------------------------ theme control
+
+   Everything below is driven by the attributes the boot script writes on
+   <html>, so the control is already correct on first paint and nothing
+   depends on React having hydrated.                                       */
+
+/* A cross-fade only while the theme is actually changing. Transitioning
+   colour permanently would make every hover on the site feel laggy. */
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-theme-switching] *,
+  :root[data-theme-switching] *::before,
+  :root[data-theme-switching] *::after {
+    transition:
+      background-color 260ms var(--ease-out-soft),
+      border-color 260ms var(--ease-out-soft),
+      color 260ms var(--ease-out-soft),
+      fill 260ms var(--ease-out-soft),
+      box-shadow 260ms var(--ease-out-soft),
+      filter 260ms var(--ease-out-soft) !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* One label in the accessibility tree at a time, so the button announces
+   what it will do rather than what it is. */
+[data-theme="dark"]  [data-theme-when="light"],
+[data-theme="light"] [data-theme-when="dark"] { display: none; }
+
+/* Sun becomes moon: the rays fold away and a bite is taken out of the disc. */
+.lamp__cut  { transition: transform 500ms var(--ease-out-soft); }
+.lamp__disc { transform-origin: center; transition: transform 500ms var(--ease-out-soft); }
+.lamp__rays { transform-origin: center; transition: transform 500ms var(--ease-out-soft), opacity 240ms linear; }
+
+[data-theme="dark"] .lamp__cut  { transform: translate(-7px, 2px); }
+[data-theme="dark"] .lamp__disc { transform: scale(1.5); }
+[data-theme="dark"] .lamp__rays { transform: scale(0.4) rotate(40deg); opacity: 0; }
+
+/* The stored preference, not the resolved theme, selects the footer pill. */
+[data-theme-pref="system"] [data-pref="system"],
+[data-theme-pref="light"]  [data-pref="light"],
+[data-theme-pref="dark"]   [data-pref="dark"] {
+  background: var(--color-card);
+  color: var(--color-ink);
+  box-shadow: var(--sh-quiet);
 }
 
 @media (prefers-reduced-motion: reduce) {

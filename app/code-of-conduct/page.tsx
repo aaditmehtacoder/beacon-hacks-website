@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EVENT } from "@/lib/event";
 import { LinkButton } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 export const metadata: Metadata = {
   title: "Code of conduct",
@@ -13,12 +14,12 @@ export const metadata: Metadata = {
 export default function CodeOfConduct() {
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-line bg-paper/85 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-line bg-paper/85 shadow-head backdrop-blur-xl">
         <div className="wrap flex h-16 items-center gap-5">
           <Link href="/" className="flex items-center gap-2.5">
             <span
               aria-hidden="true"
-              className="size-2.5 rounded-full bg-beacon shadow-[0_0_0_4px_rgba(242,161,0,0.16)]"
+              className="size-2.5 rounded-full bg-beacon shadow-lamp"
             />
             <span className="font-display text-[0.9375rem] font-bold tracking-tight">
               BEACON HACKS
@@ -27,12 +28,15 @@ export default function CodeOfConduct() {
           <span className="label hidden border-l border-line pl-5 text-ink-3 sm:inline">
             Code of conduct
           </span>
-          <Link
-            href="/"
-            className="ml-auto text-[0.9375rem] text-ink-3 hover:text-ink"
-          >
-            Back to the site
-          </Link>
+          <div className="ml-auto flex items-center gap-4">
+            <Link
+              href="/"
+              className="text-[0.9375rem] text-ink-3 hover:text-ink"
+            >
+              Back to the site
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
@@ -44,9 +48,9 @@ export default function CodeOfConduct() {
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-ink-2">
             Beacon Hacks is a fourteen hour event for high schoolers, many of
-            whom are attending their first hackathon. Everyone in the building —
-            attendees, mentors, judges, sponsors, volunteers and organizers —
-            agrees to this before the doors open.
+            whom are attending their first hackathon. Everyone in the building
+            agrees to this before the doors open: attendees, mentors, judges,
+            sponsors, volunteers and organizers.
           </p>
 
           <Prose>
@@ -162,7 +166,7 @@ export default function CodeOfConduct() {
               in a closed room. Nobody leaves the venue with an adult who is not
               their own parent or guardian. If a mentor, judge or sponsor makes
               you uncomfortable in any way, that is exactly the thing this page
-              exists for — tell an organizer.
+              exists for. Tell an organizer.
             </p>
 
             <H>Who this binds</H>

@@ -143,7 +143,7 @@ function Dialog() {
       <button
         type="button"
         aria-label="Close"
-        className="absolute inset-0 cursor-default bg-ink/35 backdrop-blur-[3px]"
+        className="absolute inset-0 cursor-default bg-scrim backdrop-blur-[3px]"
         onClick={closeNotify}
       />
 
@@ -152,7 +152,7 @@ function Dialog() {
         role="dialog"
         aria-modal="true"
         aria-labelledby={headingId}
-        className="relative w-full max-w-lg overflow-hidden rounded-t-3xl border border-line bg-card shadow-[0_24px_80px_rgba(22,21,15,0.22)] sm:rounded-3xl"
+        className="relative w-full max-w-lg overflow-hidden rounded-t-3xl border border-line bg-card shadow-modal sm:rounded-3xl"
         initial={reduce ? undefined : { y: 24, scale: 0.985, opacity: 0 }}
         animate={reduce ? undefined : { y: 0, scale: 1, opacity: 1 }}
         exit={reduce ? undefined : { y: 16, scale: 0.99, opacity: 0 }}
@@ -188,7 +188,7 @@ function Dialog() {
             <div className="py-2 text-center">
               <span
                 aria-hidden="true"
-                className="mx-auto mb-6 block size-14 rounded-full bg-beacon shadow-[0_0_0_10px_rgba(242,161,0,0.16),0_0_40px_rgba(242,161,0,0.5)]"
+                className="mx-auto mb-6 block size-14 rounded-full bg-beacon shadow-lamp-lg"
               />
               <h2 id={headingId} className="text-2xl">
                 Light is on.
@@ -196,7 +196,7 @@ function Dialog() {
               <p className="mx-auto mt-4 max-w-sm text-[0.9375rem] leading-relaxed text-ink-2">
                 We have <span className="font-medium text-ink">{email}</span>.
                 You will hear from us when applications actually open, and not
-                before — no newsletter, no countdown emails.
+                before. No newsletter, no countdown emails.
               </p>
               <Button
                 type="button"
@@ -242,7 +242,7 @@ function Dialog() {
                         onClick={() => setRole(opt.value)}
                         className={`rounded-xl border px-3 py-3 text-sm transition-all ${
                           role === opt.value
-                            ? "border-beacon bg-beacon-wash font-medium text-ink shadow-[0_0_0_3px_rgba(242,161,0,0.16)]"
+                            ? "border-beacon bg-beacon-wash font-medium text-ink shadow-ring-lamp"
                             : "border-line bg-paper text-ink-2 hover:border-line-hard hover:text-ink"
                         }`}
                       >
@@ -268,7 +268,7 @@ function Dialog() {
               {error ? (
                 <p
                   role="alert"
-                  className="mt-5 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800"
+                  className="mt-5 rounded-lg border border-danger-line bg-danger-wash px-3 py-2 text-sm text-danger"
                 >
                   {error}
                 </p>

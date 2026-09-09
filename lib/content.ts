@@ -12,7 +12,7 @@ export type Stat = {
 
 export const STATS: Stat[] = [
   {
-    value: "75–100",
+    value: "75-100",
     label: "Planned capacity",
     note: "What the day is designed for",
   },

@@ -28,8 +28,8 @@ export function Hero() {
         <div className="grid-paper absolute inset-0 opacity-60 [mask-image:radial-gradient(115%_75%_at_45%_0%,black,transparent_72%)]" />
 
         <div className="absolute -top-40 -right-40 size-[38rem] overflow-hidden rounded-full sm:-top-52 sm:-right-52 sm:size-[48rem]">
-          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(242,161,0,0.20),transparent_60%)]" />
-          <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,transparent_0deg,rgba(242,161,0,0.30)_22deg,transparent_52deg)] motion-safe:animate-sweep" />
+          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,var(--glow-lamp),transparent_60%)]" />
+          <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,transparent_0deg,var(--glow-sweep)_22deg,transparent_52deg)] motion-safe:animate-sweep" />
           <div className="absolute inset-0 rounded-full border border-line-soft" />
           <div className="absolute inset-[14%] rounded-full border border-line-soft" />
           <div className="absolute inset-[30%] rounded-full border border-line-soft" />
@@ -69,7 +69,7 @@ export function Hero() {
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-ink-2">
               A free one day hackathon being built for Bay Area high schoolers,
               targeting January 2027 in Belmont. It is not funded yet and the
-              room is not signed yet — this page says exactly where it stands.
+              room is not signed yet. This page says exactly where it stands.
             </p>
           </Reveal>
 
@@ -96,16 +96,16 @@ export function Hero() {
 
         <Reveal delay={180}>
           <figure className="relative">
-            <div className="relative aspect-4/5 overflow-hidden rounded-2xl border border-line bg-paper-warm shadow-[0_18px_50px_-20px_rgba(22,21,15,0.35)]">
+            <div className="relative aspect-4/5 overflow-hidden rounded-2xl border border-line bg-paper-warm shadow-figure">
               <Image
                 src="/photos/hero.jpg"
                 alt="A mentor leaning over a laptop with three students, all of them laughing"
                 fill
                 priority
                 sizes="(min-width: 1024px) 40vw, 100vw"
-                className="object-cover"
+                className="photo object-cover"
               />
-              <figcaption className="label absolute right-3 bottom-3 rounded-full bg-ink/70 px-3 py-1.5 text-paper backdrop-blur">
+              <figcaption className="label absolute right-3 bottom-3 rounded-full bg-band/75 px-3 py-1.5 text-band-ink backdrop-blur">
                 Stock photo, not our venue
               </figcaption>
             </div>

@@ -16,7 +16,7 @@ export function NotifyBand() {
         <div className="relative overflow-hidden rounded-3xl border border-line bg-card px-7 py-12 text-center sm:px-14 sm:py-16">
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute -top-40 left-1/2 size-[36rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(242,161,0,0.16),transparent_62%)]"
+            className="pointer-events-none absolute -top-40 left-1/2 size-[36rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,var(--glow-soft),transparent_62%)]"
           />
 
           <div className="relative">

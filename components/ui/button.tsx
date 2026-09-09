@@ -12,11 +12,11 @@ const BASE =
 const VARIANT: Record<Variant, string> = {
   primary:
     "bg-ink text-paper border border-ink hover:bg-beacon hover:border-beacon hover:text-beacon-ink " +
-    "shadow-[0_1px_2px_rgba(22,21,15,0.16)] hover:shadow-[0_6px_20px_rgba(242,161,0,0.32)]",
+    "shadow-hair hover:shadow-glow",
   ghost:
     "bg-transparent text-ink border border-line-hard hover:border-ink hover:bg-ink hover:text-paper",
   quiet:
-    "bg-card text-ink border border-line hover:border-line-hard shadow-[0_1px_2px_rgba(22,21,15,0.05)]",
+    "bg-card text-ink border border-line hover:border-line-hard shadow-quiet",
 };
 
 const SIZE: Record<Size, string> = {

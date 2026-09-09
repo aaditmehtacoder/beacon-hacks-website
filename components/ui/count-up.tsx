@@ -40,7 +40,7 @@ export function CountUp({
         const t0 = performance.now();
         const step = (now: number) => {
           const p = Math.min(1, (now - t0) / durationMs);
-          // easeOutExpo — fast off the line, settles on the number
+          // easeOutExpo: fast off the line, settles on the number
           const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
           setShown(Math.round(value * eased));
           if (p < 1) requestAnimationFrame(step);

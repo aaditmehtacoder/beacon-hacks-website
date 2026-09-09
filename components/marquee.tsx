@@ -7,12 +7,16 @@ const ITEMS = [
   "Looking for sponsors",
 ];
 
-/** Endless ticker. Two identical groups slide left; at -50% it loops seamlessly. */
+/**
+ * Endless ticker. Two identical groups slide left; at -50% it loops seamlessly.
+ * The band is night in both themes, so it uses band/band-ink rather than
+ * ink/paper, which would invert with everything else.
+ */
 export function Marquee() {
   return (
     <div
       aria-hidden="true"
-      className="overflow-hidden border-y border-line bg-ink py-3.5"
+      className="overflow-hidden border-y border-line bg-band py-3.5"
     >
       <div className="flex w-max motion-safe:animate-drift">
         {[0, 1].map((group) => (
@@ -20,7 +24,7 @@ export function Marquee() {
             {ITEMS.map((item, i) => (
               <span key={`${group}-${item}`} className="flex items-center">
                 <span
-                  className={`label px-6 ${i === 0 ? "text-beacon" : "text-paper/70"}`}
+                  className={`label px-6 ${i === 0 ? "text-beacon" : "text-band-ink/70"}`}
                 >
                   {item}
                 </span>

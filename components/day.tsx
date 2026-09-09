@@ -14,14 +14,14 @@ export function Day() {
       <div className="grid gap-6 md:grid-cols-3">
         {STEPS.map((step, i) => (
           <Reveal key={step.num} delay={i * 90}>
-            <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-card transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-line-hard hover:shadow-[0_20px_50px_-24px_rgba(22,21,15,0.4)]">
+            <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-card transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-line-hard hover:shadow-lift">
               <div className="relative aspect-3/2 overflow-hidden bg-paper-warm">
                 <Image
                   src={step.photo}
                   alt={step.alt}
                   fill
                   sizes="(min-width: 768px) 33vw, 100vw"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                  className="photo object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                 />
                 <span className="absolute top-4 left-4 grid size-9 place-items-center rounded-full bg-paper/90 label text-[0.6875rem] font-semibold backdrop-blur">
                   {step.num}
