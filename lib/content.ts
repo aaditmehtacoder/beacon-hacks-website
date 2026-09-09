@@ -201,8 +201,6 @@ export const SPONSOR_TIERS: SponsorTier[] = [
     accent: "#c8894a",
     perks: [
       "Logo on the website",
-      "Listed on the room banner",
-      "An item on the sponsor table",
       "Thanked by name at closing",
       "Logo on the prize slides",
       "Logo on the opening slides",
@@ -213,7 +211,7 @@ export const SPONSOR_TIERS: SponsorTier[] = [
     name: "Silver",
     priceUsd: 1_000,
     accent: "#b9bcc4",
-    perks: ["A thirty minute workshop slot", "Logo on the shirt"],
+    perks: ["A thirty minute workshop slot"],
   },
   {
     id: "gold",
@@ -221,11 +219,10 @@ export const SPONSOR_TIERS: SponsorTier[] = [
     priceUsd: 2_000,
     accent: "#ffb228",
     perks: [
-      "A half-day table in the main room",
       "Up to two mentors on the floor",
       "Your name on a track prize",
       "Named on the Gold sponsor slide",
-      "Larger logo on the website and shirts",
+      "Larger logo on the website",
     ],
   },
   {
@@ -234,10 +231,9 @@ export const SPONSOR_TIERS: SponsorTier[] = [
     priceUsd: 4_000,
     accent: "#ece8dc",
     perks: [
-      "A table for the full day",
       "Up to four mentors on the floor",
       "A \u201cPresented by\u201d lockup",
-      "Largest logo, top of the wall",
+      "Largest logo on the website",
       "Three minutes at the opening",
       "Hand out an award at closing",
       "Name a prize category",
@@ -250,23 +246,17 @@ export const SPONSOR_TIERS: SponsorTier[] = [
 /** Not cash. Credited at whichever cash tier the value matches. */
 export const IN_KIND = {
   note: "Credited at the matching cash tier",
-  items: [
-    "Food or drink",
-    "API credits or licences",
-    "Hardware loans",
-    "Mentors only, no cash",
-    "Sponsor a specific meal",
-  ],
+  items: ["API credits or licences", "Mentors only, no cash"],
 };
 
 export const SPONSOR_NOTES = [
   {
     k: "What you get",
-    p: "Your mark on the shirt every attendee wears, on this site, and on the wall of the room. Nothing is printed until you have signed off on it.",
+    p: "Your mark on this site, on the opening and prize slides, and in the thank-yous at closing. Nothing carrying your name goes out until you have signed off on it.",
   },
   {
     k: "In the room",
-    p: "Send mentors, run a thirty minute workshop, or take a table and answer questions all day. Entirely optional.",
+    p: "Send mentors, run a thirty minute workshop, or sit on the judging panel. Entirely optional.",
   },
   {
     k: "Where it goes",

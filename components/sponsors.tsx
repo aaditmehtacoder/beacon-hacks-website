@@ -69,8 +69,8 @@ export function Sponsors() {
         <Reveal delay={110}>
           <p className="mt-4 max-w-2xl leading-relaxed text-ink-2">
             Every tier includes everything below it. Cash goes to food, space
-            and prizes for high schoolers; nothing carrying your name is
-            printed until you have signed off on it.
+            and prizes for high schoolers; nothing carrying your name goes out
+            until you have signed off on it.
           </p>
         </Reveal>
         <div className="mt-8">
