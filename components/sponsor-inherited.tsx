@@ -29,11 +29,12 @@ export function Inherited({ id, items }: { id: string; items: string[] }) {
         </span>
       </button>
 
+      {/* The row value is inline on purpose: as an arbitrary class it was not
+          reaching the element, and the list never opened. */}
       <div
         id={id}
-        className={`grid transition-[grid-template-rows] duration-300 ease-out ${
-          open ? "[grid-template-rows:1fr]" : "[grid-template-rows:0fr]"
-        }`}
+        className="grid transition-[grid-template-rows] duration-300 ease-out"
+        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
       >
         <ul className="min-h-0 overflow-hidden">
           {items.map((perk, i) => (
