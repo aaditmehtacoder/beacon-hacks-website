@@ -141,6 +141,16 @@ The same rule covers the host's own photography. Until they have signed off in
 writing *and* given permission to use their images, their building does not
 appear here, whether or not the picture is public on their site.
 
+## Brand
+
+`public/brand/` holds the mark (animated GIF at 512 and 128, PNG, SVG) and
+`banners/`: Discord server banner and invite splash (the splash also fits an
+MLH event page), LinkedIn profile banner, company cover and post image, and
+an X header. They are the hero's night with the tagline, drawn in the site's
+own type, and text stays clear of where LinkedIn and X overlay the avatar.
+Regenerate with `python3 scripts/render-banners.py` (Pillow and numpy; the
+fonts are fetched on first run).
+
 ## Applications, the notify list, and the admin page
 
 `/apply` takes an early application (six fields). "Get notified" takes an
