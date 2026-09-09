@@ -19,29 +19,33 @@ const sans = Geist({
   display: "swap",
 });
 
+const TITLE = "Beacon Hacks · Free hackathon for Bay Area high schoolers";
 const DESCRIPTION =
-  "A free one day hackathon being built for Bay Area high schoolers, targeting January 2027 in Belmont, CA. Early applications are open, and the site says exactly what is confirmed and what is not.";
+  "A free one day hackathon for Bay Area high schoolers, targeting January 30, 2027 in Belmont, CA. Grades 9 to 12, no experience needed. Early applications are open.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(EVENT.url),
   title: {
-    default: `Beacon Hacks · ${EVENT.tagline}`,
+    default: TITLE,
     template: "%s · Beacon Hacks",
   },
   description: DESCRIPTION,
   applicationName: "Beacon Hacks",
-  keywords: ["hackathon", "high school", "Bay Area", "Belmont", "students"],
-  alternates: { canonical: "/" },
+  creator: "Beacon Hacks",
+  keywords: ["hackathon", "high school hackathon", "Bay Area", "Belmont", "students"],
+  /* Canonical URLs are set per page; one here would be inherited by every
+     page and point them all at the home page. */
   openGraph: {
     type: "website",
-    url: EVENT.url,
+    locale: "en_US",
+    url: "/",
     siteName: "Beacon Hacks",
-    title: `Beacon Hacks · ${EVENT.tagline}`,
+    title: TITLE,
     description: DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: `Beacon Hacks · ${EVENT.tagline}`,
+    title: TITLE,
     description: DESCRIPTION,
   },
   robots: { index: true, follow: true },

@@ -59,7 +59,8 @@ export const EVENT = {
     sponsors: "team.beaconhacks@gmail.com",
   },
 
-  url: "https://beaconhacks.org",
+  /** The primary host. The apex redirects here, so canonicals point here. */
+  url: "https://www.beaconhacks.com",
 } as const;
 
 export const TARGET_DATE_MS = new Date(EVENT.targetDate).getTime();

@@ -5,10 +5,28 @@ import { ApplyForm } from "@/components/apply-form";
 import { BeaconMark } from "@/components/ui/beacon-mark";
 import { SiteFooter } from "@/components/site-footer";
 
+const DESCRIPTION =
+  "Apply early for Beacon Hacks, a free one day hackathon for Bay Area high schoolers. Grades 9 to 12. Spots are confirmed once the venue and the budget are locked.";
+
 export const metadata: Metadata = {
   title: "Apply",
-  description:
-    "Apply early for Beacon Hacks, a free one day hackathon for Bay Area high schoolers. Spots are confirmed once the venue and the budget are locked.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/apply" },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/apply",
+    siteName: "Beacon Hacks",
+    title: "Apply early · Beacon Hacks",
+    description: DESCRIPTION,
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Beacon Hacks. Build what lights the way." }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Apply early · Beacon Hacks",
+    description: DESCRIPTION,
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function Apply() {

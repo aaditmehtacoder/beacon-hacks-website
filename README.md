@@ -4,7 +4,7 @@ Next.js 16 (App Router) + React 19 + Tailwind v4, with a three.js lighthouse
 lens in the hero. Dark only, one accent colour, no component library.
 
 ```
-app/                 routes, fonts, metadata, generated OG card
+app/                 routes, fonts, metadata, generated OG card and icons
   apply/             the early application
   admin/             the dashboard: applications and the notify list
   api/apply/         stores an application
@@ -165,4 +165,3 @@ JSON. `.env.example` lists all of it.
 ## Still to fill in
 
 - A separate sponsors address. Everything routes to `team.beaconhacks@gmail.com` until one exists.
-- The domain in `EVENT.url`, which metadata and the OG card resolve against.

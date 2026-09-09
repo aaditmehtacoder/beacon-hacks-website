@@ -5,10 +5,28 @@ import { LinkButton } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site-footer";
 import { BeaconMark } from "@/components/ui/beacon-mark";
 
+const DESCRIPTION =
+  "The rules of the room at Beacon Hacks: what we expect, what is not acceptable, how to report something, and what happens after.";
+
 export const metadata: Metadata = {
   title: "Code of conduct",
-  description:
-    "The rules of the room at Beacon Hacks: what we expect, what is not acceptable, how to report something, and what happens after.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/code-of-conduct" },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/code-of-conduct",
+    siteName: "Beacon Hacks",
+    title: "Code of conduct · Beacon Hacks",
+    description: DESCRIPTION,
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Beacon Hacks. Build what lights the way." }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Code of conduct · Beacon Hacks",
+    description: DESCRIPTION,
+    images: ["/opengraph-image"],
+  },
 };
 
 export default function CodeOfConduct() {
