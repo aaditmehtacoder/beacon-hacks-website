@@ -163,6 +163,9 @@ those are set for you. Locally it writes `.data/entries.json` (gitignored). On
 Vercel without a database it keeps entries in `/tmp` and the admin page says
 loudly that nothing is being saved.
 
+`/api/health` reports which storage backend is live (and nothing else), so
+that can be checked without signing in.
+
 **`/admin`** shows everyone, newest first: filter, search, copy the emails,
 download a CSV, remove a row. It is behind one shared password,
 `ADMIN_PASSWORD`, which must be set in production (the development default is
