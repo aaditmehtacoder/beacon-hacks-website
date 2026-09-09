@@ -39,10 +39,6 @@ export function Venue() {
                 ["Name", "Announced after written approval"],
                 ["Address", "Announced after written approval"],
                 ["City", `${EVENT.venue.city}, ${EVENT.venue.region}`],
-                [
-                  "Target date",
-                  `${EVENT.targetDateLabel} · ${EVENT.hoursLabel}`,
-                ],
               ].map(([k, v]) => (
                 <div
                   key={k}

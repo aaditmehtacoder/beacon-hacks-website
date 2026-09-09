@@ -78,10 +78,6 @@ export function SiteHeader() {
           </span>
         </a>
 
-        <span className="label hidden border-l border-line pl-5 text-ink-3 xl:inline">
-          In the open, gate by gate
-        </span>
-
         <nav
           aria-label="Sections"
           className="ml-auto hidden items-center gap-1 lg:flex"

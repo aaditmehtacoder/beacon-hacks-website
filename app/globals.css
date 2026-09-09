@@ -61,7 +61,6 @@
   --animate-sweep:  sweep 7s linear infinite;
   --animate-pulse-dot: pulse-dot 2.8s ease-in-out infinite;
   --animate-drift: drift 34s linear infinite;
-  --animate-cue: cue 1.8s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
 /* Effects that are not single colours, so they cannot live in @theme.
@@ -111,12 +110,6 @@
 @keyframes sweep     { to { transform: rotate(360deg); } }
 @keyframes pulse-dot { 0%, 100% { opacity: 0.45; transform: scale(0.92); } 50% { opacity: 1; transform: scale(1); } }
 @keyframes drift     { to { transform: translateX(-50%); } }
-@keyframes cue {
-  0%   { transform: scaleY(0); transform-origin: top; }
-  50%  { transform: scaleY(1); transform-origin: top; }
-  51%  { transform-origin: bottom; }
-  100% { transform: scaleY(0); transform-origin: bottom; }
-}
 
 /* ------------------------------------------------------------ base */
 
@@ -230,23 +223,19 @@
 /* Photography, graded for the night. */
 @utility photo { filter: var(--photo-filter); }
 
-/* The hero stage. --stage-progress is how far the visitor has scrolled
-   through the pinned hero. The facts rise into place over the first third;
-   the scroll cue goes as soon as scrolling starts. Plain CSS, so it costs
-   nothing per frame. */
+/* The hero stage. --stage-progress (0..1, written by components/beacon)
+   is how far the visitor has scrolled through the pinned hero. The facts
+   rise into place over the first third, in plain CSS so it costs nothing
+   per frame. */
 @utility stage-facts {
   --stage-in: clamp(0, calc((var(--stage-progress, 0) - 0.12) / 0.3), 1);
   opacity: var(--stage-in);
   transform: translateY(calc((1 - var(--stage-in)) * 28px));
 }
-@utility stage-cue {
-  opacity: clamp(0, calc(1 - var(--stage-progress, 0) * 6), 1);
-}
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .stage-facts { opacity: 1 !important; transform: none !important; }
-  .stage-cue { display: none !important; }
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;

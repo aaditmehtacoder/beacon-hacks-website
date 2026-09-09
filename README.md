@@ -65,7 +65,8 @@ just after the headline has settled.
 - The hero is a full-viewport stage that pins for one screen of scrolling:
   the lens turns with the scroll, the camera rises and pushes in, the facts
   rise into place (`--stage-progress`, plain CSS), then the page lets go.
-  Under reduced motion it is one unpinned screen with the facts shown.
+  The countdown holds the bottom left. Under reduced motion it is one
+  unpinned screen with the facts shown.
 - It writes `--beam-facing` (0..1, how squarely a beam points at the visitor)
   onto `<html>` every frame; the hero background uses it to breathe with the
   light.

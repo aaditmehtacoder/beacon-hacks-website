@@ -1,15 +1,12 @@
 import { SiteHeader } from "@/components/site-header";
 import { Hero } from "@/components/hero";
-import { Marquee } from "@/components/marquee";
 import { StatusBoard } from "@/components/status-board";
-import { Stats } from "@/components/stats";
 import { Day } from "@/components/day";
 import { Tracks } from "@/components/tracks";
 import { Prizes } from "@/components/prizes";
 import { Timetable } from "@/components/timetable";
 import { Venue } from "@/components/venue";
 import { Sponsors } from "@/components/sponsors";
-import { NotifyBand } from "@/components/notify/notify-band";
 import { Faq } from "@/components/faq";
 import { Closing } from "@/components/closing";
 import { SiteFooter } from "@/components/site-footer";
@@ -25,16 +22,13 @@ export default function Home() {
       <SiteHeader />
       <main className="flex-1">
         <Hero />
-        <Marquee />
         <StatusBoard />
-        <Stats />
         <Day />
         <Tracks />
         <Prizes />
         <Timetable />
         <Venue />
         <Sponsors />
-        <NotifyBand />
         <Faq />
         <Closing />
       </main>

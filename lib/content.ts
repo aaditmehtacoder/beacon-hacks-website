@@ -3,32 +3,6 @@
  * `confirmed: false` and rendered as locked rather than stated as fact.
  */
 
-export type Stat = {
-  value: string;
-  label: string;
-  /** Small clarifier so a number is never read as something it is not. */
-  note: string;
-};
-
-export const STATS: Stat[] = [
-  {
-    value: "75-100",
-    label: "Planned capacity",
-    note: "What the day is designed for",
-  },
-  { value: "14h", label: "On the clock", note: "One day, nobody sleeps over" },
-  {
-    value: "$0",
-    label: "Of $10,500 raised",
-    note: "Outreach under way, nothing committed",
-  },
-  {
-    value: "Free",
-    label: "To attend",
-    note: "Once it is funded, it stays free",
-  },
-];
-
 export type Step = {
   num: string;
   title: string;
@@ -249,21 +223,6 @@ export const IN_KIND = {
   items: ["API credits or licences", "Mentors only, no cash"],
 };
 
-export const SPONSOR_NOTES = [
-  {
-    k: "What you get",
-    p: "Your mark on this site, on the opening and prize slides, and in the thank-yous at closing. Nothing carrying your name goes out until you have signed off on it.",
-  },
-  {
-    k: "In the room",
-    p: "Send mentors, run a thirty minute workshop, or sit on the judging panel. Entirely optional.",
-  },
-  {
-    k: "Where it goes",
-    p: "Food, space, and prizes for high schoolers, most of whom have never been to a hackathon. Tiers open at $500.",
-  },
-];
-
 export type Faq = { q: string; a: string };
 
 export const FAQS: Faq[] = [
@@ -276,10 +235,6 @@ export const FAQS: Faq[] = [
     a: "Yes, early. The application takes two minutes and puts you in the queue. Nobody is confirmed until the venue is signed and the budget is covered, and you will hear the day that happens. If it falls through, you will hear that too.",
   },
   {
-    q: "Where is it, and when?",
-    a: "Belmont, California, targeting Saturday January 30, 2027. The venue is in approval and we are not naming it until the space signs off in writing, so treat both the room and the date as a target rather than a promise.",
-  },
-  {
     q: "Do I need to know how to code?",
     a: "No. Plenty of attendees write their first real code at an event like this. Mentors are on the floor all day and the First Light track judges effort and learning, not polish.",
   },
@@ -290,10 +245,6 @@ export const FAQS: Faq[] = [
   {
     q: "Is it actually free?",
     a: "That is the plan, and it depends entirely on sponsorship. Nothing has been raised yet. If the money does not come together we will say so here rather than quietly charge for it.",
-  },
-  {
-    q: "What are the prizes?",
-    a: "Undecided, because they are unfunded. We are not going to list cash amounts or hardware we cannot hand over. Categories are planned; what sits behind them appears here as sponsors sign.",
   },
   {
     q: "Do I have to stay overnight?",

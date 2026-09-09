@@ -3,6 +3,7 @@ import { TextReveal } from "./ui/text-reveal";
 import { Magnetic } from "./ui/magnetic";
 import { LinkButton } from "./ui/button";
 import { Beacon } from "./beacon/beacon";
+import { Countdown } from "./countdown";
 import { EVENT } from "@/lib/event";
 
 const FACTS = [
@@ -88,42 +89,29 @@ export function Hero() {
               </div>
             </Reveal>
 
-            <Reveal delay={720}>
-              <p className="mt-5 text-sm text-band-ink/55">
-                <a
-                  href="#status"
-                  className="text-beacon underline underline-offset-4 hover:text-band-ink"
-                >
-                  See exactly what is locked and what is not
-                </a>
-              </p>
-            </Reveal>
           </div>
         </div>
 
-        {/* the facts rise into place as the visitor scrolls the stage */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">
-          <div className="wrap flex items-end justify-between gap-6 pb-5 sm:pb-7">
-            <div
-              aria-hidden="true"
-              className="stage-cue hidden shrink-0 flex-col items-center gap-2 pb-1 text-band-ink/50 sm:flex"
-            >
-              <span className="label">Scroll</span>
-              <span className="block h-8 w-px overflow-hidden bg-band-ink/15">
-                <span className="block size-full bg-beacon motion-safe:animate-cue" />
-              </span>
-            </div>
-
-            <div className="stage-facts hidden w-full lg:ml-auto lg:block lg:w-auto lg:max-w-3xl">
+        {/* the countdown holds the bottom left; the facts rise in as the
+            visitor scrolls the stage */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden lg:block">
+          <div className="wrap flex items-end justify-between gap-10 pb-7">
+            <Reveal delay={720} className="pointer-events-auto shrink-0">
+              <Countdown />
+            </Reveal>
+            <div className="stage-facts w-auto max-w-3xl">
               <Facts />
             </div>
           </div>
         </div>
       </div>
 
-      {/* On phones the stage is copy and lamp only; the facts follow in flow. */}
-      <div className="wrap py-6 lg:hidden">
+      {/* On phones the stage is copy and lamp only; the rest follows in flow. */}
+      <div className="wrap flex flex-col gap-6 py-6 lg:hidden">
         <Reveal>
+          <Countdown />
+        </Reveal>
+        <Reveal delay={80}>
           <Facts />
         </Reveal>
       </div>
