@@ -1,15 +1,17 @@
 import { IN_KIND, SPONSOR_TIERS } from "@/lib/content";
 import { Reveal } from "./ui/reveal";
+import { Inherited } from "./sponsor-inherited";
 
 /**
  * The offer. Four cash tiers, each showing what is new at that level with a
  * disclosure for everything inherited from below, and an in-kind card for
- * anyone who has something other than money.
+ * anyone who has something other than money. Cards hug their content: a
+ * tier with one perk is a short card, not a tall one with a hole in it.
  */
 export function SponsorTiers() {
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-4">
         {SPONSOR_TIERS.map((tier, i) => {
           const below = SPONSOR_TIERS.slice(0, i);
           const inherited = below.flatMap((t) => t.perks);
@@ -18,7 +20,7 @@ export function SponsorTiers() {
 
           return (
             <Reveal key={tier.id} delay={i * 80} variant="tilt">
-              <article className="flex h-full flex-col rounded-2xl border border-line bg-card p-6">
+              <article className="flex flex-col rounded-2xl border border-line bg-card p-6">
                 <div className="flex items-center justify-between gap-3">
                   <span className="flex items-center gap-2.5">
                     <span
@@ -56,28 +58,7 @@ export function SponsorTiers() {
                 </ul>
 
                 {inherited.length ? (
-                  <details className="group mt-auto border-t border-line-soft pt-4">
-                    <summary className="label flex cursor-pointer items-center justify-between gap-3 text-ink-3 transition-colors hover:text-ink">
-                      Also includes {inherited.length} from below
-                      <span
-                        aria-hidden="true"
-                        className="relative size-3 shrink-0 transition-transform duration-300 group-open:rotate-45"
-                      >
-                        <span className="absolute top-1/2 left-0 h-px w-full -translate-y-1/2 bg-current" />
-                        <span className="absolute top-0 left-1/2 h-full w-px -translate-x-1/2 bg-current" />
-                      </span>
-                    </summary>
-                    <ul className="mt-3 flex flex-col gap-2">
-                      {inherited.map((perk) => (
-                        <li
-                          key={perk}
-                          className="rounded-lg border border-dashed border-line px-3 py-2 text-sm leading-snug text-ink-3"
-                        >
-                          {perk}
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
+                  <Inherited id={`${tier.id}-inherited`} items={inherited} />
                 ) : null}
               </article>
             </Reveal>
@@ -87,14 +68,16 @@ export function SponsorTiers() {
 
       <Reveal delay={120} variant="tilt">
         <div className="mt-4 flex flex-col gap-5 rounded-2xl border border-dashed border-line-hard bg-card/60 p-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-2.5">
-            <span
-              aria-hidden="true"
-              className="size-2.5 rounded-full"
-              style={{ background: "#b39ddb" }}
-            />
-            <h4 className="text-xl">In kind</h4>
-            <span className="label ml-2 text-ink-4">{IN_KIND.note}</span>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="flex items-center gap-2.5">
+              <span
+                aria-hidden="true"
+                className="size-2.5 rounded-full"
+                style={{ background: "#b39ddb" }}
+              />
+              <h4 className="text-xl">In kind</h4>
+            </span>
+            <span className="label text-ink-4">{IN_KIND.note}</span>
           </div>
           <ul className="flex flex-wrap gap-2">
             {IN_KIND.items.map((item) => (

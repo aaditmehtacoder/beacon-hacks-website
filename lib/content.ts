@@ -300,15 +300,3 @@ export const FAQS: Faq[] = [
     a: "Never. Doors at 8:30am, awards done by 11pm, everyone sleeps in their own bed.",
   },
 ];
-
-export type Person = { name: string; role: string };
-
-/**
- * The actual organizers. Two people, named, because a sponsor should be able
- * to see who they would be dealing with. No judges are listed anywhere on the
- * site until someone has actually agreed to judge.
- */
-export const ORGANIZERS: Person[] = [
-  { name: "Aadit Mehta", role: "Co-organizer" },
-  { name: "Karsten", role: "Co-organizer" },
-];

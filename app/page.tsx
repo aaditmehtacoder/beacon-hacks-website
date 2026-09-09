@@ -9,7 +9,6 @@ import { Prizes } from "@/components/prizes";
 import { Timetable } from "@/components/timetable";
 import { Venue } from "@/components/venue";
 import { Sponsors } from "@/components/sponsors";
-import { Crew } from "@/components/crew";
 import { NotifyBand } from "@/components/notify/notify-band";
 import { Faq } from "@/components/faq";
 import { Closing } from "@/components/closing";
@@ -35,7 +34,6 @@ export default function Home() {
         <Timetable />
         <Venue />
         <Sponsors />
-        <Crew />
         <NotifyBand />
         <Faq />
         <Closing />
