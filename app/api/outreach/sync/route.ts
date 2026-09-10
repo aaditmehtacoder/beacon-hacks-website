@@ -48,5 +48,5 @@ export async function GET(request: NextRequest) {
   if (!cronAuthorised(request)) {
     return NextResponse.json({ ok: false, error: "Cron only." }, { status: 401 });
   }
-  return run(false);
+  return run(request.nextUrl.searchParams.get("force") === "1");
 }
