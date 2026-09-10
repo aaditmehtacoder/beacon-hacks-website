@@ -24,7 +24,7 @@ export type Backend = {
 const ENTRIES = "beacon:entries";
 const EMAILS = "beacon:emails";
 
-function upstash(): Redis | null {
+export function upstash(): Redis | null {
   const url = process.env.KV_REST_API_URL ?? process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.KV_REST_API_TOKEN ?? process.env.UPSTASH_REDIS_REST_TOKEN;
   return url && token ? new Redis({ url, token }) : null;

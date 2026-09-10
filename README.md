@@ -7,9 +7,11 @@ lens in the hero. Dark only, one accent colour, no component library.
 app/                 routes, fonts, metadata, generated OG card and icons
   apply/             the early application
   admin/             the dashboard: applications and the notify list
+  outreachdashboard/ the sponsor outreach ledger, read from the team Gmail
   api/apply/         stores an application
   api/notify/        stores a notify signup
   api/admin/         sign in, list, CSV, delete
+  api/outreach/sync/ pulls the mailbox into the ledger (dashboard button, daily cron)
   code-of-conduct/   the CoC page
 components/          one file per section, plus ui/ primitives
   beacon/            the three.js lens: scene, frame, CSS fallback
@@ -21,6 +23,8 @@ lib/content.ts       all page copy and data
 lib/status.ts        the three gates shown on the status board
 lib/store.ts         where signups live (Upstash Redis, or a local file)
 lib/admin-auth.ts    the shared admin password and its cookie
+lib/outreach/        the outreach ledger: Gmail client, rules, model, roster, sync
+scripts/gmail-auth.mjs  one-time Gmail authorisation for the ledger
 app/robots.ts        robots.txt
 app/sitemap.ts       sitemap.xml, the two public routes
 public/photos/       stock photography (see "Photos" below)
@@ -175,6 +179,57 @@ download a CSV, remove a row. It is behind one shared password,
 Optionally set `NOTIFY_WEBHOOK_URL` and every signup is also POSTed there as
 JSON. `.env.example` lists all of it.
 
+## The outreach ledger
+
+**`/outreachdashboard`** is the sponsor outreach record, modelled on the YC
+outreach ledger: every organisation `team.beaconhacks@gmail.com` has written
+to, grouped by outcome, with who answered, what they offered, what bounced,
+and what to do next. It sits behind the same `ADMIN_PASSWORD` as `/admin`,
+is `noindex`, and is excluded from `robots.txt`.
+
+It reads Gmail, it never writes to it. `lib/outreach/`:
+
+| File | What it does |
+| --- | --- |
+| `gmail.ts` | Refresh token to access token, list threads, flatten a thread. `gmail.readonly` only. |
+| `classify.ts` | The rules: which addresses bounced, which sent an automated receipt, which were answered by a person. The model call for answered threads. |
+| `roster.ts` | Who each organisation is, keyed by the domain we wrote to, plus human overrides. |
+| `sync.ts` | Gmail to ledger: group threads by organisation, apply the rules, ask the model only about threads a person answered and only when something changed, reapply overrides, store. |
+| `store.ts` | The ledger as one JSON document in Upstash (the signups database), or `.data/outreach.json` locally. |
+
+Only threads the mailbox **started** count as outreach, so a reply sent in
+someone else's thread never becomes a card. A thread with no human answer is
+described by the rules for free; a thread a person answered goes to the model
+(`OPENAI_API_KEY`, `gpt-4.1-mini` by default), which decides `active`,
+`rejected` or `waiting`, names who replied, and writes the summary and the
+next step. An unchanged thread is never sent again, so a sync of a mailbox
+nobody has answered since last time costs nothing.
+
+**Connecting Gmail.** A Google Cloud OAuth client with the `gmail.readonly`
+scope and `http://localhost:3000/api/auth/gmail/callback` as a redirect URI.
+Put its id and secret in `.env.local`, run `node scripts/gmail-auth.mjs`, and
+authorise as the team mailbox. The script checks *which* account authorised
+and revokes anything that is not `OUTREACH_MAILBOX`, then stores
+`GOOGLE_REFRESH_TOKEN`. If the browser cannot reach `localhost` (the 431
+problem above), paste the URL it landed on:
+`node scripts/gmail-auth.mjs "<that URL>"`. Copy the three `GOOGLE_*`
+variables to Vercel.
+
+**Syncing.** The "Sync now" button on the page, or `POST /api/outreach/sync`
+with the admin cookie. `vercel.json` also runs it once a day at 07:00 Pacific;
+Vercel signs that call with `CRON_SECRET`, which must be set. A sync reads
+every thread (a few seconds for a few dozen) and asks the model about the
+changed ones, so the route allows 60 seconds.
+
+**Overrides.** A reply that arrives by phone, form or LinkedIn is invisible
+to Gmail, and the sync would keep calling that thread "waiting". Add an
+`override` to the organisation's roster entry with a `reason`; it is reapplied
+after every sync. `converted: true` is the only way into "Working together",
+and means a signed agreement, not a promising thread. The honesty rule holds:
+nothing on this ledger reaches the public site.
+
 ## Still to fill in
 
 - A separate sponsors address, if wanted. Everything routes to `team@beaconhacks.com`.
+- Roster entries in `lib/outreach/roster.ts` for anyone new the mailbox writes to;
+  without one the card is named after the domain and has no description.

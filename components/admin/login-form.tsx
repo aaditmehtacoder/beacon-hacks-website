@@ -5,7 +5,15 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { fieldClass } from "@/components/ui/field";
 
-export function LoginForm({ configured }: { configured: boolean }) {
+export function LoginForm({
+  configured,
+  title = "Organizers only.",
+  lede = "Applications and the notify list live behind this.",
+}: {
+  configured: boolean;
+  title?: string;
+  lede?: string;
+}) {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -36,10 +44,8 @@ export function LoginForm({ configured }: { configured: boolean }) {
 
   return (
     <form onSubmit={onSubmit} className="mx-auto w-full max-w-sm rounded-2xl border border-line bg-card p-6 sm:p-8">
-      <h1 className="text-2xl">Organizers only.</h1>
-      <p className="mt-2 text-sm leading-relaxed text-ink-3">
-        Applications and the notify list live behind this.
-      </p>
+      <h1 className="text-2xl">{title}</h1>
+      <p className="mt-2 text-sm leading-relaxed text-ink-3">{lede}</p>
       {!configured ? (
         <p role="alert" className="mt-4 rounded-lg border border-danger-line bg-danger-wash px-3 py-2 text-sm text-danger">
           ADMIN_PASSWORD is not set on this deployment. Add it in Vercel and redeploy.
