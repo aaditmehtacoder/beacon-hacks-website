@@ -115,7 +115,13 @@ function buildCompany(key: string, threads: Thread[], me: string, previous: Comp
     (a.messages.at(-1)?.date ?? "") >= (b.messages.at(-1)?.date ?? "") ? a : b,
   );
   const lastMessageId = threads.map((t) => t.lastMessageId).join("+");
-  const domain = key.includes("@") ? key.split("@")[1] : key;
+  // A free-mail sender's domain says nothing about them; their roster
+  // website does.
+  const domain = roster?.website
+    ? new URL(roster.website).hostname.replace(/^www\./, "")
+    : key.includes("@")
+      ? key.split("@")[1]
+      : key;
 
   const company: Company = {
     id: key,

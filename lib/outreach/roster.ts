@@ -5,8 +5,9 @@ import type { Kind, Status } from "./types";
  * are, where they live on the web, and any human override.
  *
  * Keyed by the domain of the address we wrote to, or by the full address for
- * free-mail senders. An organisation missing from here still gets a card,
- * named after its domain, so a new outreach email never goes unlisted.
+ * free-mail senders (give those a `website`, which is where the card's domain
+ * and icon then come from). An organisation missing from here still gets a
+ * card, named after its domain, so a new outreach email never goes unlisted.
  *
  * `override` is the human's last word. A reply that arrived by phone,
  * LinkedIn or a form is invisible to a Gmail sync, which would otherwise call
@@ -32,6 +33,7 @@ export type RosterEntry = {
 export const ROSTER: Record<string, RosterEntry> = {
   "getcrackd@gmail.com": {
     name: "Crackd",
+    website: "https://getcrackd.com",
     kind: "company",
     description: "AI study tool for students; bought paid tiers at four high school hackathons in a year, including a custom landing page at Cove Hacks.",
   },
