@@ -49,6 +49,12 @@ export type Company = {
   /** ISO timestamps of the first message we sent and the latest in the thread. */
   contactedOn: string;
   lastActivity: string;
+  /** ISO time of the last message the team sent. */
+  teamLastAt: string;
+  /** Who wrote the latest message in the thread. Decides whose move it is. */
+  lastMessageFrom: "team" | "person" | "auto" | "bounce";
+  /** An automated receipt came back from somewhere, so the mail is in a queue. */
+  autoReceipt: boolean;
   gmailThread: string;
   /** Gmail id of the last message seen when this verdict was written. */
   lastMessageId: string;
@@ -75,5 +81,7 @@ export type SyncReport = {
   classified: number;
   reused: number;
   model: string | null;
+  /** The deployment that ran the sync, for telling builds apart. */
+  build: string | null;
   errors: string[];
 };

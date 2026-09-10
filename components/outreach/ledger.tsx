@@ -1,13 +1,15 @@
 import { Reveal } from "@/components/ui/reveal";
 import type { Backend } from "@/lib/store";
 import type { Company, Contact, Ledger } from "@/lib/outreach/types";
+import { COURT, STAGES, adviceFor, daysSince, sortForStage, stageOf, type Stage } from "@/lib/outreach/stages";
 import { SignOutButton, SyncButton } from "./sync-button";
 
 /**
  * The ledger page: the campaign in one headline, one row of ticks and five
- * numbers, then every organisation grouped by outcome. Everything on it is
- * derived from the companies themselves, so a status change can never leave
- * the summary disagreeing with the cards below it.
+ * numbers, then every organisation on the escalation ladder: whose move it
+ * is, most urgent group first, longest waiting first inside each group.
+ * Everything is derived from the companies themselves, so nothing up top can
+ * disagree with the cards below.
  */
 
 const TAG: Record<Company["status"], string> = {
@@ -49,6 +51,7 @@ const stamp = (iso: string) =>
     minute: "2-digit",
     timeZone: "America/Los_Angeles",
   }) + " PT";
+const ago = (days: number) => (days === 0 ? "today" : days === 1 ? "yesterday" : `${days} days ago`);
 
 const bouncesOf = (c: Company) => c.contacts.filter((x) => x.delivery === "bounced").length;
 const answered = (c: Company) => c.contacts.some((x) => x.delivery === "replied");
@@ -86,16 +89,42 @@ function ContactRow({ contact }: { contact: Contact }) {
   );
 }
 
-function Card({ company, index, mailbox, feature }: { company: Company; index: number; mailbox: string; feature: boolean }) {
+function Card({
+  company,
+  index,
+  mailbox,
+  feature,
+  stage,
+  now,
+}: {
+  company: Company;
+  index: number;
+  mailbox: string;
+  feature: boolean;
+  stage: Stage;
+  now: Date;
+}) {
   const bounces = bouncesOf(company);
   const tone =
     company.signalTone === "positive" ? "border-l-beacon" : company.signalTone === "rejected" ? "border-l-danger" : "border-l-line-hard";
   const favicon = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(company.domain)}&sz=64`;
+  const quiet = daysSince(company.lastActivity, now);
+  const yours = stage === "your-move" || stage === "follow-up" || stage === "new-route";
+  const next = company.verdictBy === "rules" ? adviceFor(stage, company, now) : company.nextStep;
+  const lastFrom = company.lastMessageFrom ?? "team";
+  const lastLine =
+    lastFrom === "person"
+      ? `${company.replyFrom ?? "They"} wrote ${ago(quiet)}`
+      : lastFrom === "team"
+        ? `Team wrote ${ago(quiet)}`
+        : lastFrom === "auto"
+          ? `Auto-reply ${ago(quiet)}`
+          : `Bounced ${ago(quiet)}`;
 
   return (
     <article
-      className={`relative flex flex-col gap-4 rounded-2xl border border-line p-6 transition-colors hover:border-line-hard ${
-        feature ? "bg-card" : "bg-paper-warm"
+      className={`relative flex flex-col gap-4 rounded-2xl border p-6 transition-colors hover:border-line-hard ${
+        yours ? "border-beacon/40 bg-card" : feature ? "border-line bg-card" : "border-line bg-paper-warm"
       }`}
     >
       <div className="flex items-start gap-3">
@@ -128,6 +157,7 @@ function Card({ company, index, mailbox, feature }: { company: Company; index: n
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-3">
         <span className="label text-ink-4">{KIND[company.kind]}</span>
         <span>Sent {day(company.contactedOn)}</span>
+        <span className={yours ? "text-beacon-deep" : ""}>{lastLine}</span>
         {company.messages > 1 ? <span>{plural(company.messages, "message", "messages")}</span> : null}
         {bounces ? <span className="text-danger">{plural(bounces, "bounce", "bounces")}</span> : null}
       </div>
@@ -148,10 +178,10 @@ function Card({ company, index, mailbox, feature }: { company: Company; index: n
         </div>
       ) : null}
 
-      {company.nextStep ? (
-        <div className="rounded-xl bg-paper-deep/60 px-4 py-3">
-          <p className="label mb-1 text-ink-4">Next</p>
-          <p className="text-sm leading-relaxed text-ink-2">{company.nextStep}</p>
+      {next ? (
+        <div className={`rounded-xl px-4 py-3 ${yours ? "bg-beacon-wash" : "bg-paper-deep/60"}`}>
+          <p className={`label mb-1 ${yours ? "text-beacon-deep" : "text-ink-4"}`}>Next</p>
+          <p className="text-sm leading-relaxed text-ink-2">{next}</p>
         </div>
       ) : null}
 
@@ -191,30 +221,33 @@ function Card({ company, index, mailbox, feature }: { company: Company; index: n
   );
 }
 
-function Block({
+function Rung({
   n,
-  heading,
+  stage,
   companies,
   mailbox,
-  feature = false,
+  now,
 }: {
   n: number;
-  heading: string;
+  stage: (typeof STAGES)[number];
   companies: Company[];
   mailbox: string;
-  feature?: boolean;
+  now: Date;
 }) {
   if (!companies.length) return null;
+  const feature = stage.court === "yours" || stage.key === "their-move" || stage.key === "working";
   return (
-    <section className="pt-16 sm:pt-20">
+    <section id={stage.key} className="scroll-mt-24 pt-16 sm:pt-20">
       <Reveal>
-        <div className="flex items-baseline gap-4 pb-6">
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2 pb-2">
           <span className="text-sm text-beacon-deep tabular-nums">{pad(n)}</span>
-          <h2 className="text-3xl leading-none tracking-tight sm:text-4xl">{heading}</h2>
+          <h2 className="text-3xl leading-none tracking-tight sm:text-4xl">{stage.heading}</h2>
+          <span className="label text-ink-4">{COURT[stage.court]}</span>
           <span className="ml-auto text-sm whitespace-nowrap text-ink-4">
             {plural(companies.length, "organisation", "organisations")}
           </span>
         </div>
+        <p className="max-w-2xl pb-6 text-sm leading-relaxed text-ink-3">{stage.blurb}</p>
       </Reveal>
       <div
         className={`grid gap-3 ${
@@ -222,7 +255,7 @@ function Block({
         }`}
       >
         {companies.map((c, i) => (
-          <Card key={c.id} company={c} index={i} mailbox={mailbox} feature={feature} />
+          <Card key={c.id} company={c} index={i} mailbox={mailbox} feature={feature} stage={stage.key} now={now} />
         ))}
       </div>
     </section>
@@ -242,6 +275,7 @@ export function OutreachLedger({
   model: boolean;
   backend: Backend;
 }) {
+  const now = new Date();
   const cos = ledger.companies;
   const replied = cos.filter(answered).length;
   const rate = cos.length ? Math.round((replied / cos.length) * 100) : 0;
@@ -255,6 +289,14 @@ export function OutreachLedger({
   const withBounces = cos.filter((c) => bouncesOf(c) > 0).length;
   const kinds = new Set(cos.map((c) => c.kind)).size;
   const names = (list: Company[]) => list.map((c) => c.name).join(", ");
+
+  // The ladder: every organisation on exactly one rung, sorted inside it.
+  const rungs = STAGES.map((stage) => ({
+    stage,
+    companies: cos.filter((c) => stageOf(c, now) === stage.key).sort(sortForStage(stage.key)),
+  }));
+  const ordered = rungs.flatMap((r) => r.companies);
+  const yours = rungs.filter((r) => r.stage.court === "yours").reduce((n, r) => n + r.companies.length, 0);
 
   const metrics = [
     { label: "Organisations written to", value: cos.length, note: `Across ${plural(kinds, "kind", "kinds")} of organisation`, tone: "text-ink" },
@@ -274,10 +316,10 @@ export function OutreachLedger({
     },
   ];
 
-  // One tick per organisation, tallest for the ones that answered. In the
-  // waiting tier the height tracks how many addresses were tried.
+  // One tick per organisation in ladder order, tallest for the ones that
+  // answered. In the waiting tier the height tracks how many addresses were tried.
   const maxReach = Math.max(1, ...cos.map((c) => c.contacts.length));
-  const ticks = cos.map((c) => {
+  const ticks = ordered.map((c) => {
     const bounce = c.status === "waiting" && bouncesOf(c) > 0;
     const height =
       c.status === "active" ? 100 : c.status === "rejected" ? 52 : 22 + Math.round((c.contacts.length / maxReach) * 24);
@@ -319,6 +361,16 @@ export function OutreachLedger({
             <p className="mt-7 max-w-xl text-base leading-relaxed text-ink-2">
               The real Gmail record for {ledger.mailbox}: every organisation the team has written to,
               every human answer, and every address that bounced.
+              {yours ? (
+                <>
+                  {" "}
+                  <a href={`#${rungs.find((r) => r.stage.court === "yours" && r.companies.length)?.stage.key}`} className="font-medium text-beacon-deep hover:text-beacon">
+                    {plural(yours, "thread needs", "threads need")} the team&apos;s move.
+                  </a>
+                </>
+              ) : (
+                " Nothing is waiting on the team right now."
+              )}
             </p>
           </Reveal>
         </div>
@@ -382,7 +434,7 @@ export function OutreachLedger({
         </div>
       ) : (
         <>
-          {/* the campaign, one tick per organisation */}
+          {/* the campaign, one tick per organisation, in ladder order */}
           <section aria-label="Every organisation, by outcome" className="mt-14">
             <div className="flex h-16 items-end gap-[3px] border-b border-line-hard pb-0.5">
               {ticks.map((t) => (
@@ -423,10 +475,35 @@ export function OutreachLedger({
             Nothing here reaches the public site: a sponsor is only ever named there once an agreement is signed.
           </p>
 
-          <Block n={1} heading="Working together" companies={working} mailbox={ledger.mailbox} feature />
-          <Block n={2} heading="In the works" companies={active} mailbox={ledger.mailbox} feature />
-          <Block n={3} heading="Rejections" companies={rejected} mailbox={ledger.mailbox} />
-          <Block n={4} heading="Waiting for a human reply" companies={waiting} mailbox={ledger.mailbox} />
+          {/* the ladder, at a glance */}
+          <nav aria-label="Escalation ladder" className="mt-12 rounded-2xl border border-line bg-card px-5 py-4">
+            <p className="label text-ink-4">Escalation ladder · most urgent first</p>
+            <ol className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              {rungs.map((r, i) => (
+                <li key={r.stage.key} className="inline-flex items-baseline gap-2">
+                  <span className="text-xs text-ink-4 tabular-nums">{pad(i + 1)}</span>
+                  {r.companies.length ? (
+                    <a href={`#${r.stage.key}`} className={`hover:text-beacon-deep ${r.stage.court === "yours" ? "font-medium text-ink" : "text-ink-2"}`}>
+                      {r.stage.heading}
+                    </a>
+                  ) : (
+                    <span className="text-ink-4">{r.stage.heading}</span>
+                  )}
+                  <span
+                    className={`rounded-full px-1.5 text-xs tabular-nums ${
+                      r.companies.length && r.stage.court === "yours" ? "bg-beacon text-beacon-ink" : "bg-paper-deep text-ink-3"
+                    }`}
+                  >
+                    {r.companies.length}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </nav>
+
+          {rungs.map((r, i) => (
+            <Rung key={r.stage.key} n={i + 1} stage={r.stage} companies={r.companies} mailbox={ledger.mailbox} now={now} />
+          ))}
 
           <footer className="mt-16 flex flex-wrap justify-between gap-x-6 gap-y-2 border-t border-line pt-6 text-xs text-ink-4">
             <span>{ledger.mailbox}</span>

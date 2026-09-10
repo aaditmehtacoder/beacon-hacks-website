@@ -16,6 +16,8 @@ const BOUNCE_FROM = /mailer-daemon|postmaster|delivery status notification|undel
 const BOUNCE_TEXT = /address not found|wasn'?t delivered|couldn'?t be delivered|undeliverable|delivery (has )?failed|550[- ]5\.1\.1|does not exist|user unknown/i;
 
 const AUTO_FROM = /no-?reply|donotreply|do-not-reply|notifications?@|\+noreply/i;
+/** A bot that talks like a person. Not a person. */
+const AI_AGENT = /\bAI agent\b|\bAI assistant\b|\bchatbot\b|virtual assistant|\bI'?m an AI\b/i;
 const AUTO_TEXT =
   /this is an automated (response|bot|message|reply|email)|automated bot|auto-?reply|autoreply|automatic reply|out of (the )?office|we('ve| have) received your (request|message|email|enquiry|inquiry)|thank you for (your interest|contacting|reaching out to)[^.]*\. (a member of our team|our team|someone) will|a member of our team will review|do not reply to this (email|message)|ticket (has been|was) created|a ticket \(\d+\) has been created/i;
 
@@ -32,11 +34,15 @@ export function isBounce(m: Message): boolean {
   return BOUNCE_FROM.test(m.from) || (BOUNCE_TEXT.test(m.subject) && /delivery|mail/i.test(m.from));
 }
 
-/** An automated receipt: a ticket system or an autoresponder, not a person. */
+/** An automated receipt: a ticket system, an autoresponder or an AI agent, not a person. */
 export function isAuto(m: Message): boolean {
   if (AUTO_FROM.test(m.from)) return true;
   const head = `${m.subject}\n${m.body.slice(0, 900)}`;
-  return AUTO_TEXT.test(head);
+  return AUTO_TEXT.test(head) || AI_AGENT.test(head);
+}
+
+export function isAiAgent(m: Message): boolean {
+  return AI_AGENT.test(`${m.from}\n${m.body.slice(0, 900)}`);
 }
 
 export function isHuman(m: Message, mailbox: string): boolean {
@@ -148,10 +154,15 @@ export function rulesVerdict(bouncedSet: Set<string>, recipients: string[], cont
   const sentence: string[] = [
     `No human reply yet. Sent to ${list(recipients)} on ${when(contactedOn)}.`,
   ];
-  if (autoFrom.length) {
+  const agents = autoFrom.filter((a) => a.endsWith("(AI agent)"));
+  const receipts = autoFrom.filter((a) => !a.endsWith("(AI agent)"));
+  if (receipts.length) {
     sentence.push(
-      `An automated receipt came back from ${list(autoFrom)}, so the message reached a queue that a person still has to read.`,
+      `An automated receipt came back from ${list(receipts)}, so the message reached a queue that a person still has to read.`,
     );
+  }
+  if (agents.length) {
+    sentence.push(`${list(agents)} answered, which is a bot, not a person. Open the thread to read what it said.`);
   }
   if (bounced.length) {
     sentence.push(
@@ -162,6 +173,8 @@ export function rulesVerdict(bouncedSet: Set<string>, recipients: string[], cont
   if (!alive.length) {
     nextStep =
       "Every address bounced. Find a working route before trying again: a named person, a sponsorship form, or a LinkedIn message.";
+  } else if (agents.length) {
+    nextStep = "Reply on the same thread and ask for a person; the bot said that is allowed.";
   } else if (autoFrom.length) {
     nextStep = "The request is in their queue. Give it a week, then reply on the same thread to keep the ticket alive.";
   } else if (bounced.length) {
@@ -195,6 +208,8 @@ status:
   active   — a person replied and something is genuinely open: they offered anything (cash, credits, API access, prizes, swag, mentorship, an intro), forwarded the request to the right team, asked a question, or proposed a call. A "no" to cash that comes with another offer is active.
   rejected — a person replied and closed the door, including soft closes such as "no budget", "not at this time", or "we only sponsor university events", and offered nothing else.
   waiting  — no person replied. Automated receipts, ticket numbers, bounce notices and calendar invitations are NOT human replies.
+
+A named support agent writing through a ticket system (a "request has been updated" email carrying a person's own note, signed with their name) IS a person; forwarding the request to the right team makes the thread active. An AI agent or chatbot (anything that introduces itself as an AI agent, a bot, or an assistant) is not a person. If it only acknowledges the request or hands it to a human, the status is waiting and replyFrom is null. If it states a firm policy on the company's behalf that closes the door (for example that the API may not be used commercially, so no sponsorship is possible), the status is rejected and replyFrom is the agent's name followed by " (AI agent)".
 
 signalTone: "positive" for active, "rejected" for rejected, null for waiting.
 replyFrom: the person who replied, as a name ("Tony Tsai", "Sophia at YRI"), or null if nobody did.

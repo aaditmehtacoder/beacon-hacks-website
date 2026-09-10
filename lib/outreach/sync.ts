@@ -14,6 +14,9 @@ import {
   extractAsk,
   firstAddress,
   greetingName,
+  isAiAgent,
+  isAuto,
+  isBounce,
   isOurs,
   modelConfigured,
   modelName,
@@ -70,7 +73,7 @@ function buildCompany(key: string, threads: Thread[], me: string, previous: Comp
     facts.humanReplies += f.humanReplies;
     for (const m of t.messages) {
       if (!isOurs(m, me) && f.auto.has(firstAddress(m.from))) {
-        const who = displayName(m.from) || firstAddress(m.from);
+        const who = (displayName(m.from) || firstAddress(m.from)) + (isAiAgent(m) ? " (AI agent)" : "");
         if (!autoFrom.includes(who)) autoFrom.push(who);
       }
     }
@@ -110,7 +113,16 @@ function buildCompany(key: string, threads: Thread[], me: string, previous: Comp
     }
   }
 
-  const all = threads.flatMap((t) => t.messages);
+  const all = threads.flatMap((t) => t.messages).sort((a, b) => a.date.localeCompare(b.date));
+  const last = all.at(-1) ?? opening;
+  const lastMessageFrom: Company["lastMessageFrom"] = isOurs(last, me)
+    ? "team"
+    : isBounce(last)
+      ? "bounce"
+      : isAuto(last)
+        ? "auto"
+        : "person";
+  const teamLastAt = all.filter((m) => isOurs(m, me)).at(-1)?.date ?? opening.date;
   const latest = threads.reduce((a, b) =>
     (a.messages.at(-1)?.date ?? "") >= (b.messages.at(-1)?.date ?? "") ? a : b,
   );
@@ -139,7 +151,10 @@ function buildCompany(key: string, threads: Thread[], me: string, previous: Comp
     signal: null,
     nextStep: null,
     contactedOn: opening.date,
-    lastActivity: all.map((m) => m.date).sort().at(-1) ?? opening.date,
+    lastActivity: last.date,
+    teamLastAt,
+    lastMessageFrom,
+    autoReceipt: autoFrom.length > 0,
     gmailThread: latest.id,
     lastMessageId,
     verdictBy: "rules",
@@ -163,6 +178,16 @@ function applyVerdict(company: Company, verdict: Verdict, by: Company["verdictBy
   company.signal = verdict.signal;
   company.nextStep = verdict.nextStep;
   company.verdictBy = by;
+  // The model only ever sees threads the rules found a person in. If it still
+  // calls one "waiting" (a support agent forwarding the request, say), the
+  // person is real and the door is open: keep the model's account of what
+  // happened, but the thread stays active and named.
+  if (by === "model" && verdict.status === "waiting") {
+    const who = company.contacts.find((c) => c.delivery === "replied");
+    company.status = "active";
+    company.signalTone = "positive";
+    company.replyFrom = verdict.replyFrom ?? who?.name ?? null;
+  }
 }
 
 function applyOverride(company: Company) {
@@ -258,6 +283,7 @@ export async function syncOutreach(opts: { force?: boolean } = {}): Promise<{ le
     classified,
     reused,
     model: useModel ? modelName() : null,
+    build: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null,
     errors,
   };
   const ledger: Ledger = { mailbox: me, syncedAt: finishedAt, companies, lastSync: report };

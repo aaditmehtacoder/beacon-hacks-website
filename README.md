@@ -183,9 +183,28 @@ JSON. `.env.example` lists all of it.
 
 **`/outreachdashboard`** is the sponsor outreach record, modelled on the YC
 outreach ledger: every organisation `team.beaconhacks@gmail.com` has written
-to, grouped by outcome, with who answered, what they offered, what bounced,
-and what to do next. It sits behind the same `ADMIN_PASSWORD` as `/admin`,
-is `noindex`, and is excluded from `robots.txt`.
+to, with who answered, what they offered, what bounced, and what to do next.
+It sits behind the same `ADMIN_PASSWORD` as `/admin`, is `noindex`, and is
+excluded from `robots.txt`.
+
+The page is an **escalation ladder** (`lib/outreach/stages.ts`): every
+organisation sits on exactly one rung, most urgent rung first, and inside a
+rung the longest wait comes first.
+
+| Rung | Court | Meaning |
+| --- | --- | --- |
+| Your move | yours | A person wrote last; the reply is owed by the team. |
+| Follow-up due | yours | Quiet for 7 days or more since the team last wrote. |
+| Needs a new route | yours | Every address bounced. |
+| Their move | theirs | A person engaged and the team answered last. |
+| In their queue | theirs | An automated receipt came back; a person still has to read it. |
+| Sent, no answer yet | theirs | Under 7 days old, nothing back. |
+| Working together | settled | `converted: true` in the roster. |
+| Closed | settled | A person said no and offered nothing else. |
+
+Rungs are worked out when the page renders, so a thread climbs to "Follow-up
+due" on its own as the days pass. The outcome (active, rejected, waiting)
+still drives the tick strip and the five numbers.
 
 It reads Gmail, it never writes to it. `lib/outreach/`:
 
