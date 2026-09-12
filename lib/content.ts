@@ -226,7 +226,7 @@ export const IN_KIND = {
 export type Backer = {
   name: string;
   website: string;
-  /** Under public/sponsors. Wordmarks are transparent; marks are square. */
+  /** Under public/sponsors: the company's own wordmark on a transparent ground. */
   logo: string;
   /** What they have committed, in plain words, close to their own. */
   gives: string;
@@ -251,7 +251,7 @@ export const BACKERS: Backer[] = [
   {
     name: "Perfect Corp",
     website: "https://www.perfectcorp.com",
-    logo: "/sponsors/perfect-corp.png",
+    logo: "/sponsors/perfect-corp.svg",
     gives:
       "YouCam AI and AR API units, free of charge, for every participant to build with on the day.",
     form: "In kind",
