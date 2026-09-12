@@ -127,8 +127,8 @@ Currently locked, and what unlocks it:
 | Venue name, address, photos of the building | Gate 1 | Written approval from the host's facilities team. Then fill in `EVENT.venue` and set `confirmed: true`. |
 | Prize cash, hardware, perks | Gate 2 | Money actually committed. Update `EVENT.budget.raisedUsd`; add amounts to `PLANNED_PRIZE_CATEGORIES` only once funded. |
 | Confirmed spots, countdown, deadlines | Gate 3 | Gates 1 and 2 done. Early applications are open now; confirmations wait for both. |
-| Judges | n/a | Someone agreeing in writing. There is no judges list until then. |
-| Sponsor logos | n/a | A signed sponsor. The tiers are empty dashed slots, labelled as open. |
+| Judges | n/a | Agreement in writing plus a bio and headshot from the judge. `JUDGES` in `lib/content.ts` lists exactly those people; two so far. |
+| Sponsor logos | n/a | A written commitment. `BACKERS` in `lib/content.ts` lists in-kind commitments (prizes, API credits); cash tiers stay dashed and `raisedUsd` stays at what is actually in the bank. |
 
 Also deliberately absent until Gate 1: the **schema.org `Event` block**. Publishing
 structured event data for an unconfirmed date and venue would push it into search

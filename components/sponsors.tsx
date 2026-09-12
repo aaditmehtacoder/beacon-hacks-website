@@ -1,17 +1,25 @@
 import { EVENT } from "@/lib/event";
+import { BACKERS, countInWords } from "@/lib/content";
 import { Section } from "./ui/section";
 import { Reveal } from "./ui/reveal";
 import { LinkButton } from "./ui/button";
+import { Backers } from "./backers";
 import { SponsorTiers } from "./sponsor-tiers";
 
 export function Sponsors() {
+  const n = BACKERS.length;
+  const backed = n
+    ? `${countInWords(n)} ${n === 1 ? "company has" : "companies have"} backed the day in kind so far.`
+    : "No company has agreed to back it yet.";
+
   return (
     <Section
       id="sponsors"
       eyebrow="Sponsors"
       title="Back Beacon."
-      lede="Nothing has been raised yet and no company has agreed to back it. Every tier is open, and each includes the ones below it."
+      lede={`No cash has been raised yet. ${backed} Every tier is open, and each includes the ones below it.`}
     >
+      <Backers />
       <SponsorTiers />
 
       <Reveal delay={80}>

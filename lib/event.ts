@@ -67,6 +67,7 @@ export const TARGET_DATE_MS = new Date(EVENT.targetDate).getTime();
 export const NAV = [
   { href: "#day", label: "The day" },
   { href: "#tracks", label: "Tracks" },
+  { href: "#judges", label: "Judges" },
   { href: "#status", label: "Status" },
   { href: "#sponsors", label: "Sponsor" },
   { href: "#faq", label: "FAQ" },

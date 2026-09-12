@@ -223,6 +223,90 @@ export const IN_KIND = {
   items: ["API credits or licences", "Mentors only, no cash"],
 };
 
+export type Backer = {
+  name: string;
+  website: string;
+  /** Under public/sponsors. Wordmarks are transparent; marks are square. */
+  logo: string;
+  /** What they have committed, in plain words, close to their own. */
+  gives: string;
+  /** How it was committed. Everything is in kind until money lands. */
+  form: "In kind";
+};
+
+/**
+ * Companies that have committed something in writing. None of this is cash,
+ * so EVENT.budget.raisedUsd does not move for it; it moves only for money in
+ * the bank. Add a company here only once they have said yes in writing.
+ */
+export const BACKERS: Backer[] = [
+  {
+    name: "YRI Fellowship",
+    website: "https://www.yriscience.com",
+    logo: "/sponsors/yri.png",
+    gives:
+      "Fellowship scholarships for winning team members, priority admission review for winners, and a mentorship prize for the overall winning team.",
+    form: "In kind",
+  },
+  {
+    name: "Perfect Corp",
+    website: "https://www.perfectcorp.com",
+    logo: "/sponsors/perfect-corp.png",
+    gives:
+      "YouCam AI and AR API units, free of charge, for every participant to build with on the day.",
+    form: "In kind",
+  },
+];
+
+/** In-kind prizes committed in writing that are not yet placed against a
+ *  category. They move into PLANNED_PRIZE_CATEGORIES once the paperwork is
+ *  signed, and not before. */
+export const COMMITTED_PRIZES: { by: string; what: string }[] = [
+  {
+    by: "YRI Fellowship",
+    what: "Fellowship scholarships for winning team members and a mentorship prize for the overall winning team. Placed against categories once the partnership agreement is signed.",
+  },
+];
+
+export type Judge = {
+  name: string;
+  role: string;
+  org: string;
+  /** Their own words, lightly trimmed. */
+  bio: string;
+  linkedin: string;
+  /** Under public/photos/judges. The headshot they sent us. */
+  photo: string;
+};
+
+/**
+ * Only people who have agreed in writing. Each judge sent their own bio and
+ * headshot; nobody is listed on a verbal maybe.
+ */
+export const JUDGES: Judge[] = [
+  {
+    name: "Swosti Panda",
+    role: "Lead PM/Analyst, Devices & Services",
+    org: "Google",
+    bio: "Works on the supply chain and logistics architecture behind Google\u2019s flagship retail stores. Previously at Walmart Technology. MS in Supply Chain Management.",
+    linkedin: "https://www.linkedin.com/in/swostipanda/",
+    photo: "/photos/judges/swosti-panda.jpg",
+  },
+  {
+    name: "Vasuki Uday Kiran Vudathala",
+    role: "Staff Performance Engineer, AI/ML",
+    org: "ServiceNow",
+    bio: "Specializes in GenAI performance, scalability and production reliability. Sixteen-plus years in industry, and a technical author, conference speaker, and hackathon judge and mentor.",
+    linkedin: "https://www.linkedin.com/in/vasukiudaykiran/",
+    photo: "/photos/judges/uday-vudathala.jpg",
+  },
+];
+
+const COUNT_WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
+
+/** Small counts read as words in copy: "Two companies", not "2 companies". */
+export const countInWords = (n: number) => COUNT_WORDS[n] ?? String(n);
+
 export type Faq = { q: string; a: string };
 
 export const FAQS: Faq[] = [
@@ -244,7 +328,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: "Is it actually free?",
-    a: "That is the plan, and it depends entirely on sponsorship. Nothing has been raised yet. If the money does not come together we will say so here rather than quietly charge for it.",
+    a: "That is the plan, and it depends entirely on sponsorship. No cash has been raised yet; what has been committed so far is in kind. If the money does not come together we will say so here rather than quietly charge for it.",
   },
   {
     q: "Do I have to stay overnight?",

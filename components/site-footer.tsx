@@ -17,9 +17,10 @@ export function SiteFooter() {
             </span>
           </div>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-ink-3">
-            Every photograph on this site is stock photography of other
-            people&rsquo;s events and workspaces. None of it shows the Beacon
-            venue, and no company shown is a sponsor.
+            The event photographs on this site are stock photography of other
+            people&rsquo;s events and workspaces; none of it shows the Beacon
+            venue. Judge portraits and sponsor logos were supplied by the
+            people and companies they show.
           </p>
         </div>
 

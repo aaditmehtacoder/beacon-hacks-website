@@ -1,4 +1,5 @@
 import { EVENT } from "./event";
+import { BACKERS, countInWords } from "./content";
 
 export type GateState = "done" | "active" | "blocked";
 
@@ -32,7 +33,7 @@ export const GATES: Gate[] = [
     order: "Gate 2",
     title: "Day funded",
     state: "active",
-    detail: `$${EVENT.budget.raisedUsd.toLocaleString()} of $${EVENT.budget.targetUsd.toLocaleString()} raised. Sponsor outreach is under way and nothing is committed yet. Food, space and prizes all come out of this.`,
+    detail: `$${EVENT.budget.raisedUsd.toLocaleString()} of $${EVENT.budget.targetUsd.toLocaleString()} raised. ${countInWords(BACKERS.length)} ${BACKERS.length === 1 ? "company has" : "companies have"} committed support in kind, in writing; no cash is committed yet. Food, space and prizes all come out of this.`,
     unlocks: "Unlocks prizes and keeps the day free to attend",
   },
   {

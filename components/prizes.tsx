@@ -1,4 +1,4 @@
-import { PLANNED_PRIZE_CATEGORIES } from "@/lib/content";
+import { COMMITTED_PRIZES, PLANNED_PRIZE_CATEGORIES } from "@/lib/content";
 import { EVENT } from "@/lib/event";
 import { Reveal } from "./ui/reveal";
 import { LockChip } from "./ui/locked";
@@ -36,7 +36,8 @@ export function Prizes() {
           </Reveal>
         </div>
 
-        <Reveal delay={80} variant="tilt">
+        <div>
+          <Reveal delay={80} variant="tilt">
           <div className="rounded-2xl border border-dashed border-line-hard bg-paper-warm/50 p-6 sm:p-8">
             <LockChip>Unlocks at Gate 2, funding</LockChip>
 
@@ -68,7 +69,29 @@ export function Prizes() {
               first builds rather than against a team that has done this before.
             </p>
           </div>
-        </Reveal>
+          </Reveal>
+
+          {COMMITTED_PRIZES.length ? (
+            <Reveal delay={140} variant="tilt">
+              <div className="mt-4 rounded-2xl border border-line bg-card p-6">
+                <p className="label text-beacon-deep">
+                  Committed in writing, not yet placed
+                </p>
+                <ul className="mt-2 divide-y divide-line-soft">
+                  {COMMITTED_PRIZES.map((prize) => (
+                    <li
+                      key={prize.by}
+                      className="py-3 text-[0.9375rem] leading-relaxed text-ink-2"
+                    >
+                      <span className="font-medium text-ink">{prize.by}.</span>{" "}
+                      {prize.what}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Reveal>
+          ) : null}
+        </div>
       </div>
     </section>
   );

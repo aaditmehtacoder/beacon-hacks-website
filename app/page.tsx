@@ -4,6 +4,7 @@ import { StatusBoard } from "@/components/status-board";
 import { Day } from "@/components/day";
 import { Tracks } from "@/components/tracks";
 import { Prizes } from "@/components/prizes";
+import { Judges } from "@/components/judges";
 import { Timetable } from "@/components/timetable";
 import { Venue } from "@/components/venue";
 import { Sponsors } from "@/components/sponsors";
@@ -60,6 +61,7 @@ export default function Home() {
         <Day />
         <Tracks />
         <Prizes />
+        <Judges />
         <Timetable />
         <Venue />
         <Sponsors />
