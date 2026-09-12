@@ -355,6 +355,108 @@ export const ROSTER: Record<string, RosterEntry> = {
     kind: "company",
     description: "Song lyrics and annotations, with an API.",
   },
+  "tavus.io": {
+    name: "Tavus",
+    website: "https://www.tavus.io",
+    kind: "company",
+    description: "APIs for conversational video; SF-based, hosts hackathons and publishes a hackathon cookbook that offers free credits.",
+  },
+  "agentmail.cc": {
+    name: "AgentMail",
+    website: "https://www.agentmail.to",
+    kind: "company",
+    description: "API that gives agents their own inboxes; YC S25, sponsored the Convex All Gas hackathon with OpenAI and Firecrawl.",
+  },
+  "firecrawl.dev": {
+    name: "Firecrawl",
+    website: "https://www.firecrawl.dev",
+    kind: "company",
+    description: "Web scraping and search API for agents; 20,000 credits per participant at Convex All Gas, backed ElevenHacks.",
+  },
+  "vapi.ai": {
+    name: "Vapi",
+    website: "https://vapi.ai",
+    kind: "company",
+    description: "Voice AI for developers; three-time UC Berkeley AI Hackathon sponsor with a hackathon coupon programme. Support inbox; real route is Discord and the partner form.",
+  },
+  "langfuse.com": {
+    name: "Langfuse",
+    website: "https://langfuse.com",
+    kind: "company",
+    description: "LLM observability; its research and education programme offers swag and support to hackathon organisers, written for universities.",
+  },
+  "roboflow.com": {
+    name: "Roboflow",
+    website: "https://roboflow.com",
+    kind: "company",
+    description: "Computer vision platform; its hackathon one-pager invites organisers to write for raised limits. Seen at HackMIT and HackTX.",
+  },
+  "blaxel.ai": {
+    name: "Blaxel",
+    website: "https://blaxel.ai",
+    kind: "company",
+    description: "Sandboxes for AI agents; SF-based YC X25. hello@ bounced on Sept 11; the contact form at blaxel.ai/contact is the route.",
+  },
+  "microsoft.com": {
+    name: "Microsoft Reactor",
+    website: "https://developer.microsoft.com/reactor",
+    kind: "community",
+    description: "Microsoft's developer community events team, the only monitored Microsoft inbox found for a student event; Microsoft for Startups excludes education.",
+  },
+  "sarvam.ai": {
+    name: "Sarvam AI",
+    website: "https://www.sarvam.ai",
+    kind: "company",
+    description: "Indian-language speech, translation and LLM APIs; has backed builder events in Bengaluru.",
+  },
+  "browser-use.com": {
+    name: "Browser Use",
+    website: "https://browser-use.com",
+    kind: "company",
+    description: "AI browser automation; ran the YC Web Agents hackathon with eighteen sponsors. Credits are usually handed out over X DM.",
+  },
+  "bolna.ai": {
+    name: "Bolna",
+    website: "https://www.bolna.ai",
+    kind: "company",
+    description: "Voice AI agents built for India; small YC-backed team.",
+  },
+  "sync.so": {
+    name: "sync.",
+    website: "https://sync.so",
+    kind: "company",
+    description: "AI lipsync; YC W24, puts credits behind creators through a partner programme.",
+  },
+  "razorpay.com": {
+    name: "Razorpay",
+    website: "https://razorpay.com",
+    kind: "company",
+    description: "Indian payments platform; runs a student AI Buildathon in Bengaluru. Partnerships desk is aimed at resellers, so a low-fit ask.",
+  },
+  "respan.ai": {
+    name: "Respan",
+    website: "https://www.respan.ai",
+    kind: "company",
+    description: "AI gateway, observability and evals; YC W24, formerly Keywords AI, with a $3K+ student deal.",
+  },
+  "greptile.com": {
+    name: "Greptile",
+    website: "https://www.greptile.com",
+    kind: "company",
+    description: "AI code review; began as a hackathon project and hosts hackathons (the MCP hackathon, Stripe FAST).",
+  },
+  "gumloop.com": {
+    name: "Gumloop",
+    website: "https://www.gumloop.com",
+    kind: "company",
+    description: "AI automation platform; its CEO co-hosted the MCP hackathon with Greptile. Support inbox; Luis Manrique runs growth.",
+  },
+  "corsair.dev": {
+    name: "Corsair",
+    website: "https://corsair.dev",
+    kind: "company",
+    description: "Connects an app to its users' other apps; two-person YC W25 team.",
+  },
 };
 
 const FREE_MAIL = /^(gmail|googlemail|yahoo|outlook|hotmail|live|icloud|me|proton|protonmail)\.(com|net|me)$/i;
