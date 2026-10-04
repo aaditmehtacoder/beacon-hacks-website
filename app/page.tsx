@@ -1,17 +1,15 @@
+import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
 import { Hero } from "@/components/hero";
-import { StatusBoard } from "@/components/status-board";
-import { Day } from "@/components/day";
+import { Facts, Ticker } from "@/components/strip";
+import { About } from "@/components/about";
 import { Tracks } from "@/components/tracks";
 import { Prizes } from "@/components/prizes";
+import { Schedule } from "@/components/schedule";
 import { Judges } from "@/components/judges";
-import { Timetable } from "@/components/timetable";
-import { Venue } from "@/components/venue";
 import { Sponsors } from "@/components/sponsors";
 import { Faq } from "@/components/faq";
-import { Closing } from "@/components/closing";
 import { SiteFooter } from "@/components/site-footer";
-import type { Metadata } from "next";
 import { EVENT } from "@/lib/event";
 
 export const metadata: Metadata = {
@@ -19,7 +17,9 @@ export const metadata: Metadata = {
 };
 
 /* Who publishes the site, and what the site is. Deliberately not an Event:
-   that waits for a locked date and venue (see the README). */
+   schema.org has no "tentative" status, and an Event with a start date
+   would put a target date into search results and calendars as if it were
+   scheduled. Add one when the date and venue are confirmed (see README). */
 const STRUCTURED_DATA = {
   "@context": "https://schema.org",
   "@graph": [
@@ -28,9 +28,11 @@ const STRUCTURED_DATA = {
       "@id": `${EVENT.url}/#organization`,
       name: EVENT.name,
       url: EVENT.url,
-      logo: `${EVENT.url}/brand/beacon-mark.png`,
+      logo: `${EVENT.url}/brand/mark-512.png`,
       email: EVENT.email.team,
+      description: EVENT.tagline,
       areaServed: "San Francisco Bay Area",
+      ...(EVENT.social.discord ? { sameAs: [EVENT.social.discord] } : {}),
     },
     {
       "@type": "WebSite",
@@ -42,11 +44,6 @@ const STRUCTURED_DATA = {
   ],
 };
 
-/**
- * No schema.org Event block until the date and venue are locked. Publishing
- * structured event data would put an unconfirmed event into search results
- * and calendar surfaces; restore it at Gate 1.
- */
 export default function Home() {
   return (
     <>
@@ -55,20 +52,19 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
       />
       <SiteHeader />
-      <main className="flex-1">
+      <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         <Hero />
-        <StatusBoard />
-        <Day />
+        <Ticker />
+        <Facts />
+        <About />
         <Tracks />
         <Prizes />
+        <Schedule />
         <Judges />
-        <Timetable />
-        <Venue />
         <Sponsors />
         <Faq />
-        <Closing />
       </main>
-      <SiteFooter />
+      <SiteFooter closing home />
     </>
   );
 }

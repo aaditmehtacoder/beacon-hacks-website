@@ -3,120 +3,102 @@
 /* ============================================================
    Beacon Hacks design system
 
-   Dark only. Warm near-black paper, warm off-white ink, and one amber
-   beacon that reads as a light rather than a highlighter. Everything
-   else is spacing and rules. Every colour, shadow and glow is a
-   variable, so the palette lives in exactly one place.
+   Warm cream paper, near-black ink, and one yellow: the lamp. Heavy
+   grotesque display type, ink-bordered cards with hard offset shadows,
+   dark bands for the hero and the schedule, and a full yellow band for
+   the tracks. Every colour is a variable here, so the palette lives in
+   exactly one place, and components name tokens, not colours.
+
+   Yellow is a fill (with ink text on it) or a colour on the dark bands.
+   It is never text on cream: 1.4:1 is unreadable. Small accent text on
+   cream uses ochre instead.
+
+   The admin and outreach pages share these tokens, so a token keeps its
+   meaning when its value changes: `paper` is the page, `ink` the text,
+   `beacon` the accent.
    ============================================================ */
 
 @theme {
   /* --- surfaces --- */
-  --color-paper:      #0f0e0c;  /* the page */
-  --color-paper-warm: #15140f;  /* alternating band */
-  --color-paper-deep: #292620;  /* recessed fills: tracks, empty bars */
-  --color-card:       #1a1813;  /* raised surface */
+  --color-paper:      #fbf6ec;  /* the page: warm cream */
+  --color-paper-warm: #f3e9d8;  /* dotted bands */
+  --color-paper-deep: #e9dcc6;  /* recessed fills, empty bars */
+  --color-card:       #fffdf8;  /* raised surface */
 
-  /* --- ink --- */
-  --color-ink:        #f5f2ea;
-  --color-ink-2:      #c4bfb2;
-  --color-ink-3:      #948e80;
-  --color-ink-4:      #8b8577;
+  /* --- ink (contrast on paper: 16.6, 11.4, 6.5, 5.4) --- */
+  --color-ink:   #1b1712;
+  --color-ink-2: #3b342b;
+  --color-ink-3: #62584a;
+  --color-ink-4: #6f6455;
 
-  /* --- the beacon --- */
-  --color-beacon:      #ffb228;  /* fills, dots, the light itself */
-  --color-beacon-hi:   #ffc75c;
-  --color-beacon-deep: #ffbe5c;  /* amber for text and small marks */
-  --color-beacon-ink:  #1a1200;  /* text sitting on a beacon fill */
-  --color-beacon-wash: #241a06;  /* amber tint behind chips */
+  /* --- the one accent: the lamp --- */
+  --color-beacon:      #ffc72c;  /* fills; text on the dark bands (11.4:1) */
+  --color-beacon-hi:   #ffd659;  /* hover on a yellow fill */
+  --color-beacon-deep: #7a5200;  /* ochre: accent text on cream (6.4:1) */
+  --color-beacon-ink:  #1b1712;  /* text on a yellow fill */
+  --color-beacon-wash: #fff0c2;  /* tint behind chips and notes */
 
   /* --- rules --- */
-  --color-line:      rgba(245, 242, 234, 0.13);
-  --color-line-soft: rgba(245, 242, 234, 0.07);
-  --color-line-hard: rgba(245, 242, 234, 0.28);
+  --color-line:      #dccdb6;
+  --color-line-soft: rgba(27, 23, 18, 0.1);
+  --color-line-hard: #1b1712;
 
-  /* --- the deep band ---
-     The hero stage, the marquee and the closing card sit a step below
-     the page. band-ink is the ink that goes with it. */
-  --color-band:     #070706;
-  --color-band-ink: #f0ede4;
+  /* --- the dark bands: hero, schedule, closing --- */
+  --color-band:       #1b1712;
+  --color-band-ink:   #fbf6ec;
+  --color-band-muted: #c3b8a6;  /* 9.1:1 on band */
+  --color-band-line:  #4a4136;
+  --color-band-lamp:  #ffc72c;
 
   /* --- overlays --- */
-  --color-scrim: rgba(4, 4, 3, 0.72);
+  --color-scrim: rgba(27, 23, 18, 0.6);
 
   /* --- form errors --- */
-  --color-danger:      #fca5a5;
-  --color-danger-wash: #2a1210;
-  --color-danger-line: rgba(252, 165, 165, 0.22);
+  --color-danger:      #b42318;
+  --color-danger-wash: #fdecea;
+  --color-danger-line: rgba(180, 35, 24, 0.35);
 
   /* --- type --- */
-  --font-display: var(--font-bricolage), "Space Grotesk", system-ui, sans-serif;
-  --font-sans:    var(--font-geist), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-bricolage), "Arial Black", Arial, sans-serif;
+  --font-sans:    var(--font-geist), ui-sans-serif, system-ui, -apple-system, sans-serif;
 
   /* --- layout --- */
-  --spacing-gut: 1.75rem;
+  --spacing-gut: 1.25rem;
 
   /* --- motion --- */
   --ease-out-soft: cubic-bezier(0.22, 0.7, 0.25, 1);
-
-  --animate-sweep:  sweep 7s linear infinite;
-  --animate-pulse-dot: pulse-dot 2.8s ease-in-out infinite;
-  --animate-drift: drift 34s linear infinite;
 }
 
-/* Effects that are not single colours, so they cannot live in @theme.
-   Kept out of the colour namespace on purpose: nothing generates a
-   utility for them except the @utility rules further down. */
+/* Hard shadows and the header height. Kept out of @theme so Tailwind
+   does not generate a utility for each; the @utility rules below use
+   them. */
 :root {
-  /* elevation */
-  --sh-hair:   0 1px 2px rgba(0, 0, 0, 0.55);
-  --sh-quiet:  0 1px 2px rgba(0, 0, 0, 0.45);
-  --sh-head:   0 1px 24px rgba(0, 0, 0, 0.55);
-  --sh-lift:   0 22px 60px -26px rgba(0, 0, 0, 0.85);
-  --sh-figure: 0 24px 60px -22px rgba(0, 0, 0, 0.80);
-  --sh-modal:  0 30px 90px rgba(0, 0, 0, 0.75);
+  --header-h: 4.5rem;
 
-  /* the light itself */
-  --sh-glow:      0 8px 26px rgba(255, 178, 40, 0.30);
-  --sh-glow-lift: 0 20px 54px -24px rgba(255, 178, 40, 0.50);
-  --sh-lamp:      0 0 0 4px rgba(255, 178, 40, 0.18), 0 0 18px rgba(255, 178, 40, 0.75);
-  --sh-lamp-lg:   0 0 0 10px rgba(255, 178, 40, 0.18), 0 0 52px rgba(255, 178, 40, 0.55);
-  --sh-ring:      0 0 0 3px rgba(255, 178, 40, 0.22);
+  --sh-hard-sm: 4px 4px 0 var(--color-ink);
+  --sh-hard:    6px 6px 0 var(--color-ink);
+  --sh-hard-lg: 10px 10px 0 var(--color-ink);
+  --sh-lamp:    12px 12px 0 var(--color-beacon);
 
-  /* amber washes used inside gradients */
-  --glow-lamp:    rgba(255, 178, 40, 0.22);  /* fallback lamp */
-  --glow-sweep:   rgba(255, 178, 40, 0.32);  /* sweeping beams */
-  --glow-soft:    rgba(255, 178, 40, 0.20);  /* notify band */
-  --glow-card:    rgba(255, 178, 40, 0.16);  /* track card hover */
-  --glow-closing: rgba(255, 178, 40, 0.26);  /* closing band */
+  /* organiser pages */
+  --sh-hair:  0 1px 2px rgba(27, 23, 18, 0.06);
+  --sh-quiet: 0 1px 2px rgba(27, 23, 18, 0.08);
+  --sh-lift:  0 18px 40px -24px rgba(27, 23, 18, 0.35);
+  --sh-modal: 10px 10px 0 var(--color-ink);
 
-  /* hairline grid drawn on the deep band */
-  --band-grid: rgba(245, 242, 234, 0.055);
-
-  /* photographs are lit for daylight; the night pulls them back a little */
-  --photo-filter: brightness(0.88) contrast(1.03) saturate(0.96);
-
-  /* how squarely the hero lamp's beam points at the visitor, 0..1, and how
-     far they have scrolled through the pinned hero stage, 0..1. Both are
-     written every frame by components/beacon/beacon.tsx. */
-  --beam-facing: 0;
-  --stage-progress: 0;
-
-  /* film grain over everything; enough to give flat colour some tooth */
-  --grain: 0.05;
-
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-@keyframes sweep     { to { transform: rotate(360deg); } }
-@keyframes pulse-dot { 0%, 100% { opacity: 0.45; transform: scale(0.92); } 50% { opacity: 1; transform: scale(1); } }
-@keyframes drift     { to { transform: translateX(-50%); } }
+@media (min-width: 640px)  { :root { --spacing-gut: 2rem; } }
+@media (min-width: 1024px) { :root { --spacing-gut: 2.5rem; } }
 
 /* ------------------------------------------------------------ base */
 
 @layer base {
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5.5rem;
+    /* Anchors land below the sticky header with room to breathe. */
+    scroll-padding-top: calc(var(--header-h) + 1rem);
     -webkit-text-size-adjust: 100%;
   }
 
@@ -124,121 +106,181 @@
     background: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-feature-settings: "ss01", "cv01";
+    font-size: 1.0625rem;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-  }
-
-  /* Grain. A fixed, tiled SVG noise with no blend mode, so the compositor
-     handles it and scrolling costs nothing. Sits above the modal on purpose:
-     it is a property of the screen, not of any one layer. */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 160px 160px;
-    opacity: var(--grain);
   }
 
   ::selection { background: var(--color-beacon); color: var(--color-beacon-ink); }
 
   :focus-visible {
-    outline: 2px solid var(--color-beacon-deep);
+    outline: 3px solid var(--color-ink);
     outline-offset: 3px;
-    border-radius: 4px;
   }
+  /* On the dark bands and on yellow, the ring flips to stay visible. */
+  .on-dark :focus-visible { outline-color: var(--color-beacon); }
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.025em;
+    font-weight: 800;
+    letter-spacing: -0.035em;
     text-wrap: balance;
   }
 
   p { text-wrap: pretty; }
 
-  /* Native accordion marker off; we draw our own. */
+  /* Native disclosure marker off; components draw their own. */
   summary::-webkit-details-marker { display: none; }
   summary { list-style: none; }
 }
 
 /* ------------------------------------------------------------ utilities */
 
+/* The content column: 1200px of content, gutters outside it. */
 @utility wrap {
   width: 100%;
-  max-width: 78rem;
+  max-width: calc(75rem + 2 * var(--spacing-gut));
   margin-inline: auto;
   padding-inline: var(--spacing-gut);
 }
 
-/* Eyebrow: the small label that opens every section. */
-@utility eyebrow {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-beacon-deep);
-}
-
-/* The small caps label used for metadata, keys and chips. */
-@utility label {
-  font-size: 0.6875rem;
-  font-weight: 500;
+/* Small bold label: fact keys, card heads, section tags. 12px at the
+   least, never used for running text. It sets no colour, so each use
+   names one (text-beacon-deep on cream, text-band-muted on dark). */
+@utility meta {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-/* Hairline grid paper, used behind the closing band. */
-@utility grid-paper {
-  background-image:
-    linear-gradient(to right, var(--color-line-soft) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--color-line-soft) 1px, transparent 1px);
-  background-size: 4.5rem 4.5rem;
+/* The big section heading. */
+@utility display-xl {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7vw, 5.75rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
 }
 
-/* Reveal: elements start here, <Reveal> animates them out of it. */
-@utility will-reveal {
-  opacity: 0;
-  transform: translateY(18px);
+/* An ink-bordered card with a hard offset shadow. */
+@utility brut {
+  border: 2px solid var(--color-ink);
+  background: var(--color-card);
+  box-shadow: var(--sh-hard);
 }
 
-/* Elevation. These read through variables rather than Tailwind's shadow
-   scale, which inlines colours, so the palette stays in one place. */
-@utility shadow-hair      { box-shadow: var(--sh-hair); }
-@utility shadow-quiet     { box-shadow: var(--sh-quiet); }
-@utility shadow-head      { box-shadow: var(--sh-head); }
-@utility shadow-lift      { box-shadow: var(--sh-lift); }
-@utility shadow-figure    { box-shadow: var(--sh-figure); }
-@utility shadow-modal     { box-shadow: var(--sh-modal); }
-@utility shadow-glow      { box-shadow: var(--sh-glow); }
-@utility shadow-glow-lift { box-shadow: var(--sh-glow-lift); }
-@utility shadow-lamp      { box-shadow: var(--sh-lamp); }
-@utility shadow-lamp-lg   { box-shadow: var(--sh-lamp-lg); }
-@utility shadow-ring-lamp { box-shadow: var(--sh-ring); }
+/* Lifts a brut card a little on hover. */
+@utility brut-hover {
+  transition: transform 180ms var(--ease-out-soft), box-shadow 180ms var(--ease-out-soft);
+  &:hover { transform: translate(-2px, -4px); box-shadow: 9px 10px 0 var(--color-ink); }
+}
 
-/* Photography, graded for the night. */
-@utility photo { filter: var(--photo-filter); }
+/* Dot paper. `dots` for cream bands, `dots-dark` for the dark ones. */
+@utility dots {
+  background-image: radial-gradient(circle, rgba(27, 23, 18, 0.13) 1px, transparent 1.5px);
+  background-size: 20px 20px;
+}
+@utility dots-dark {
+  background-image: radial-gradient(circle, rgba(255, 199, 44, 0.16) 1.2px, transparent 1.7px);
+  background-size: 26px 26px;
+}
+@utility dots-ink {
+  background-image: radial-gradient(circle, rgba(27, 23, 18, 0.16) 1px, transparent 1.5px);
+  background-size: 22px 22px;
+}
 
-/* The hero stage. --stage-progress (0..1, written by components/beacon)
-   is how far the visitor has scrolled through the pinned hero. The facts
-   rise into place over the first third, in plain CSS so it costs nothing
-   per frame. */
-@utility stage-facts {
-  --stage-in: clamp(0, calc((var(--stage-progress, 0) - 0.12) / 0.3), 1);
-  opacity: var(--stage-in);
-  transform: translateY(calc((1 - var(--stage-in)) * 28px));
+/* A huge outlined word behind a section, for texture. Decorative only.
+   Set --word-stroke for the outline colour. */
+@utility outline-word {
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.07em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--word-stroke, rgba(27, 23, 18, 0.1));
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The organiser pages' small caps label and eyebrow. */
+@utility eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-beacon-deep);
+}
+@utility label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Elevation for the organiser pages, through variables. */
+@utility shadow-hair  { box-shadow: var(--sh-hair); }
+@utility shadow-quiet { box-shadow: var(--sh-quiet); }
+@utility shadow-lift  { box-shadow: var(--sh-lift); }
+@utility shadow-modal { box-shadow: var(--sh-modal); }
+
+/* An ink text link with a yellow underline that fills in on hover. */
+@utility link {
+  color: inherit;
+  font-weight: 600;
+  text-decoration-line: underline;
+  text-decoration-color: var(--color-beacon);
+  text-decoration-thickness: 0.18em;
+  text-underline-offset: 0.16em;
+  transition: background-color 150ms, text-decoration-color 150ms;
+
+  &:hover { background-color: var(--color-beacon); color: var(--color-ink); text-decoration-color: var(--color-ink); }
+}
+
+/* ------------------------------------------------------------ motion
+
+   One light-up for the lamp's beam and a short rise for the hero copy.
+   Both only run for visitors who have not asked for reduced motion, and
+   nothing starts hidden in the markup. */
+
+/* Only `transform` animates: Tailwind's translate utilities use the
+   separate `translate` property, which composes with it. */
+@keyframes beam-in {
+  from { opacity: 0; transform: scaleX(0.35); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .beam-in { animation: beam-in 1.1s var(--ease-out-soft) 0.3s both; transform-origin: left center; }
+  .rise-in { animation: rise-in 0.6s var(--ease-out-soft) both; }
+  .rise-in-2 { animation-delay: 0.06s; }
+  .rise-in-3 { animation-delay: 0.12s; }
+  .fade-in { animation: fade-in 0.2s ease-out both; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .stage-facts { opacity: 1 !important; transform: none !important; }
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
 }

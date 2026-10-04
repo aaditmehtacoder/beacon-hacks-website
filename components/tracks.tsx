@@ -1,40 +1,45 @@
-import { TRACKS } from "@/lib/content";
+import { AT_A_GLANCE, TRACKS } from "@/lib/content";
 import { Section } from "./ui/section";
-import { Reveal } from "./ui/reveal";
+import { Spark } from "./ui/button";
 
+/** The three tracks, on the yellow band, and who the day is for. */
 export function Tracks() {
   return (
     <Section
       id="tracks"
-      eyebrow="Tracks"
-      title="Three ways to point a light."
-      lede="Pick one at kickoff or let the judging sort it out at the end. A project can be judged in more than one."
+      tone="yellow"
+      word="TRACKS"
+      title="Pick a track."
+      lede="Three ways to point a light. Choose one at kickoff; a project can be judged in more than one."
     >
-      <div className="grid gap-6 lg:grid-cols-3">
-        {TRACKS.map((track, i) => (
-          <Reveal key={track.name} delay={i * 90} variant="tilt">
-            <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-card p-7 transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-1 hover:border-beacon hover:shadow-glow-lift">
-              {/* Wash that lifts on hover, so the card feels lit rather than moved. */}
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_50%_-10%,var(--glow-card),transparent_60%)] opacity-0 transition-opacity duration-400 group-hover:opacity-100"
-              />
-
-              <span className="label relative text-ink-4">{track.tag}</span>
-              <h3 className="relative mt-5 font-display text-4xl tracking-tight">
-                {track.name}
-              </h3>
-              <p className="relative mt-4 flex-1 leading-relaxed text-ink-2">
-                {track.body}
-              </p>
-
-              <p className="relative mt-6 border-t border-line-soft pt-5 text-sm leading-relaxed text-ink-3 italic">
-                {track.fit}
-              </p>
-            </article>
-          </Reveal>
+      <ul className="grid gap-5 lg:grid-cols-3">
+        {TRACKS.map((track) => (
+          <li key={track.name} className="brut brut-hover flex flex-col p-7">
+            <span className="meta text-ink-2">{track.tag}</span>
+            <h3 className="mt-4 text-[2.5rem] leading-[0.95] tracking-[-0.045em]">{track.name}</h3>
+            <p className="mt-4 flex-1 leading-relaxed text-ink-3">{track.body}</p>
+            <p className="mt-6 flex gap-2.5 border-t-2 border-ink pt-4 text-[0.9375rem] leading-relaxed font-medium text-ink">
+              <Spark className="mt-1.5 size-3 text-ink" />
+              {track.fit}
+            </p>
+          </li>
         ))}
-      </div>
+      </ul>
+
+      <dl className="mt-10 grid border-2 border-ink bg-card sm:grid-cols-2 lg:grid-cols-4">
+        {AT_A_GLANCE.map((fact, i) => (
+          <div
+            key={fact.label}
+            className={`flex flex-col gap-1 border-ink px-5 py-5 ${i > 0 ? "border-t-2 sm:border-t-0" : ""} ${
+              i % 2 === 1 ? "sm:border-l-2" : ""
+            } ${i >= 2 ? "sm:border-t-2 lg:border-t-0" : ""} ${i === 2 ? "lg:border-l-2" : ""}`}
+          >
+            <dt className="meta text-ink-2">{fact.label}</dt>
+            <dd className="font-display text-[1.5rem] leading-tight font-extrabold tracking-[-0.03em]">{fact.value}</dd>
+            <dd className="text-[0.875rem] leading-snug text-ink-3">{fact.note}</dd>
+          </div>
+        ))}
+      </dl>
     </Section>
   );
 }

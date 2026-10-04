@@ -11,6 +11,7 @@ type Filter = "all" | "application" | "notify";
 
 const ROLE: Record<string, string> = {
   student: "Student",
+  parent: "Parent or guardian",
   mentor: "Mentor or judge",
   sponsor: "Sponsor",
   other: "Other",

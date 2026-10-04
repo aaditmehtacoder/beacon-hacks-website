@@ -1,134 +1,123 @@
-import { Reveal } from "./ui/reveal";
-import { TextReveal } from "./ui/text-reveal";
-import { Magnetic } from "./ui/magnetic";
-import { LinkButton } from "./ui/button";
-import { Beacon } from "./beacon/beacon";
-import { Countdown } from "./countdown";
 import { EVENT } from "@/lib/event";
-
-const FACTS = [
-  ["Target date", EVENT.targetDateLabel, "Not locked yet"],
-  ["Place", EVENT.venue.label, "Venue in approval"],
-  ["Build time", "14 hours", "One day, no overnight"],
-  ["Team size", "1 to 4", "Come alone, that is fine"],
-  ["Cost", "Free", "If sponsorship lands"],
-] as const;
+import { PARTNERS } from "@/lib/content";
+import { Lamp } from "./ui/lamp";
+import { Arrow, LinkButton } from "./ui/button";
+import { BeaconMark } from "./ui/beacon-mark";
+import { PartnerLogo } from "./ui/partner-logo";
+import { NotifyLink } from "./notify/notify-button";
 
 /**
- * The stage. A full-viewport night that pins while the visitor scrolls one
- * screen's worth: the lens turns with the scroll, the camera rises and
- * pushes in, the facts rise into place, then the page lets go into the
- * marquee. The section is twice the viewport tall; the inside is sticky.
- * Under reduced motion it is one screen, unpinned, with the facts shown.
- *
- * The section pulls up under the sticky header (its 4rem plus the 1px
- * border) so the night is behind the header at the top of the page; the
- * header is light on dark there and needs something dark to sit on.
+ * The opening screen, on the dark band: the name, what it is, the two
+ * actions and the partners backing the day, with the date card beside it.
+ * The full stop of the name is the lamp; its beam runs out to the right.
  */
 export function Hero() {
   return (
-    <section id="top" className="relative -mt-[calc(4rem+1px)] motion-safe:lg:h-[200svh]">
-      <div className="sticky top-0 h-[100svh] overflow-hidden bg-band text-band-ink">
-        <Beacon frame={false} className="absolute inset-0" />
+    <section
+      id="top"
+      aria-labelledby="hero-title"
+      className="on-dark relative overflow-hidden bg-band text-band-ink dots-dark"
+    >
+      {/* a quiet ring of light in the corner, for depth */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-56 -right-56 size-[36rem] rounded-full border-[3.5rem] border-beacon/[0.07]"
+      />
 
-        {/* keeps the copy readable when a beam sweeps behind it */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(5,5,8,0.88),rgba(5,5,8,0.4)_42%,transparent_68%)] lg:bg-[linear-gradient(to_right,rgba(5,5,8,0.82),rgba(5,5,8,0.42)_36%,transparent_60%)]"
-        />
+      <div className="wrap relative grid items-center gap-14 pt-10 pb-14 sm:pt-14 sm:pb-16 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,25rem)] lg:gap-14 lg:pt-14 lg:pb-16">
+        <div className="min-w-0">
+          <h1
+            id="hero-title"
+            className="text-[clamp(4.25rem,11.5vw,9.75rem)] leading-[0.88] font-extrabold tracking-[-0.055em]"
+          >
+            <span className="text-beacon">Beacon</span>
+            <br />
+            Hacks
+            <Lamp onDark />
+          </h1>
 
-        <div className="wrap relative z-10 flex h-full flex-col justify-center pt-16 pb-28 sm:pb-24">
-          <div className="max-w-2xl">
-            <Reveal>
-              <p className="inline-flex items-center gap-2 rounded-full border border-band-ink/15 bg-band-ink/10 py-1.5 pr-4 pl-3 text-band-ink/85 backdrop-blur">
-                <span aria-hidden="true" className="size-1.5 rounded-full bg-beacon shadow-lamp" />
-                <span className="label">Early applications open</span>
-              </p>
-            </Reveal>
+          <div className="rise-in">
+            <p className="mt-7 max-w-xl text-xl leading-relaxed text-band-ink sm:text-[1.375rem]">
+              {EVENT.tagline} One Saturday in Belmont to build something from
+              scratch. No experience needed.
+            </p>
 
-            <h1 className="mt-7 text-[clamp(3.5rem,12vw,8.5rem)] leading-[0.86] font-bold tracking-[-0.045em]">
-              <TextReveal delay={120}>Beacon</TextReveal>
-              <TextReveal delay={240} className="text-beacon">
-                Hacks
-              </TextReveal>
-            </h1>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <LinkButton href="/apply" variant="lamp" size="lg" className="group">
+                Apply early
+                <Arrow />
+              </LinkButton>
+              <LinkButton href="#sponsors" variant="ghost-dark" size="lg">
+                Sponsor Beacon
+              </LinkButton>
+            </div>
 
-            <Reveal delay={420}>
-              <p className="mt-7 flex items-center gap-4">
-                <span
-                  aria-hidden="true"
-                  className="h-px w-12 shrink-0 bg-beacon"
-                />
-                <span className="font-display text-xl font-medium tracking-tight sm:text-2xl">
-                  {EVENT.tagline}
-                </span>
-              </p>
-            </Reveal>
+            <p className="mt-6 text-band-muted">
+              Parent, mentor or judge? <NotifyLink>Get updates by email</NotifyLink>
+            </p>
 
-            <Reveal delay={520}>
-              <p className="mt-6 max-w-lg text-lg leading-relaxed text-band-ink/75">
-                A free one day hackathon being built for Bay Area high
-                schoolers, targeting January 2027 in Belmont. It is not funded
-                yet and the room is not signed yet. This page says exactly
-                where it stands.
-              </p>
-            </Reveal>
-
-            <Reveal delay={620}>
-              <div className="mt-9 flex flex-wrap gap-3">
-                <Magnetic>
-                  <LinkButton href="/apply" variant="beacon" size="lg">
-                    Apply early →
-                  </LinkButton>
-                </Magnetic>
-                <Magnetic>
-                  <LinkButton href="#sponsors" variant="ghost" size="lg">
-                    Sponsor Beacon
-                  </LinkButton>
-                </Magnetic>
-              </div>
-            </Reveal>
-
-          </div>
-        </div>
-
-        {/* the countdown holds the bottom left; the facts rise in as the
-            visitor scrolls the stage */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden lg:block">
-          <div className="wrap flex items-end justify-between gap-10 pb-7">
-            <Reveal delay={720} className="pointer-events-auto shrink-0">
-              <Countdown />
-            </Reveal>
-            <div className="stage-facts w-auto max-w-3xl">
-              <Facts />
+            <div className="mt-9">
+              <p className="meta text-band-muted">Backed by</p>
+              <ul className="mt-4 flex flex-wrap items-center gap-x-9 gap-y-5">
+                {PARTNERS.map((p) => (
+                  <li key={p.id}>
+                    <a
+                      href={p.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block rounded-sm opacity-90 transition-[opacity,transform] duration-200 hover:-translate-y-0.5 hover:opacity-100"
+                    >
+                      <PartnerLogo logo={p.logoOnDark} scale={(p.logoScale ?? 1) * 0.92} area={4200} />
+                      <span className="sr-only">{p.name} (opens in a new tab)</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* On phones the stage is copy and lamp only; the rest follows in flow. */}
-      <div className="wrap flex flex-col gap-6 py-6 lg:hidden">
-        <Reveal>
-          <Countdown />
-        </Reveal>
-        <Reveal delay={80}>
-          <Facts />
-        </Reveal>
+        <DateCard />
       </div>
     </section>
   );
 }
 
-function Facts() {
+/**
+ * The date, as a card rather than a countdown: it is a target until the
+ * venue signs off, and a ticking clock would read as a promise.
+ */
+function DateCard() {
   return (
-    <dl className="pointer-events-auto grid grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-band-ink/12 bg-band/60 p-5 backdrop-blur-md sm:grid-cols-5">
-      {FACTS.map(([k, v, note]) => (
-        <div key={k} className="flex flex-col gap-1">
-          <dt className="label text-band-ink/50">{k}</dt>
-          <dd className="text-[0.9375rem] font-medium">{v}</dd>
-          <dd className="text-xs text-band-ink/55">{note}</dd>
-        </div>
-      ))}
-    </dl>
+    <div className="relative mx-auto w-full max-w-[25rem] px-2 pt-6 pb-3 lg:mx-0 lg:justify-self-end">
+      <div className="relative -rotate-[1.5deg] border-[3px] border-ink bg-card px-8 pt-12 pb-9 text-ink shadow-[12px_12px_0_var(--color-beacon)] sm:px-10">
+        <span aria-hidden="true" className="pointer-events-none absolute inset-2.5 border border-dashed border-line" />
+
+        <span className="absolute -top-5 left-1/2 -translate-x-1/2 rotate-[3deg] border-2 border-ink bg-beacon px-4 py-1.5 font-display text-[0.75rem] font-extrabold tracking-[0.14em] whitespace-nowrap text-ink uppercase">
+          Target date
+        </span>
+
+        <span
+          aria-hidden="true"
+          className="absolute -top-4 -right-4 grid size-12 rotate-[8deg] place-items-center border-2 border-ink bg-beacon"
+        >
+          <BeaconMark className="size-7 text-ink" />
+        </span>
+
+        <p className="relative">
+          <span className="sr-only">{EVENT.date.label}</span>
+          <span aria-hidden="true" className="block font-display text-[clamp(4.75rem,9vw,6.5rem)] leading-[0.82] font-extrabold tracking-[-0.06em]">
+            Jan 30
+          </span>
+          <span aria-hidden="true" className="mt-2 block font-display text-[2.5rem] leading-none font-extrabold tracking-[-0.04em] text-ink-3">
+            2027
+          </span>
+        </p>
+        <p className="meta relative mt-7 text-ink">Saturday · {EVENT.venue.city}, {EVENT.venue.region}</p>
+        <p className="relative mt-2 text-[0.9375rem] leading-snug text-ink-3">
+          Confirmed with the venue. Everyone who applied hears first.
+        </p>
+      </div>
+    </div>
   );
 }

@@ -304,7 +304,7 @@ export function OutreachLedger({
       label: "Active relationships",
       value: byStatus("active").length,
       note: working.length ? `${names(working)} working · ${names(active)} in the works` : names(active) || "Nobody yet",
-      tone: "text-beacon",
+      tone: "text-beacon-deep",
     },
     { label: "Rejections", value: rejected.length, note: names(rejected) || "None so far", tone: "text-danger" },
     { label: "Waiting", value: waiting.length, note: "No human reply in the thread", tone: "text-ink" },
@@ -353,7 +353,7 @@ export function OutreachLedger({
             <h1 className="mt-6 text-[clamp(2.75rem,7.5vw,6.25rem)] leading-[0.95] tracking-[-0.03em]">
               {cos.length} letters.
               <br />
-              <span className="text-beacon">{replied}</span>{" "}
+              <span className="text-beacon-deep">{replied}</span>{" "}
               <span className="text-ink-4">came back.</span>
             </h1>
           </Reveal>
@@ -364,7 +364,7 @@ export function OutreachLedger({
               {yours ? (
                 <>
                   {" "}
-                  <a href={`#${rungs.find((r) => r.stage.court === "yours" && r.companies.length)?.stage.key}`} className="font-medium text-beacon-deep hover:text-beacon">
+                  <a href={`#${rungs.find((r) => r.stage.court === "yours" && r.companies.length)?.stage.key}`} className="font-medium text-beacon-deep hover:text-beacon-deep">
                     {plural(yours, "thread needs", "threads need")} the team&apos;s move.
                   </a>
                 </>
@@ -379,7 +379,7 @@ export function OutreachLedger({
             <div>
               <p className="font-display text-[clamp(4rem,9vw,8rem)] leading-[0.85] font-semibold tracking-[-0.05em] tabular-nums">
                 {rate}
-                <span className="text-[0.35em] text-beacon">%</span>
+                <span className="text-[0.35em] text-beacon-deep">%</span>
               </p>
               <p className="mt-4 border-t border-line-hard pt-3 text-sm text-ink-3">
                 reply rate · {replied} of {cos.length}

@@ -1,53 +1,90 @@
 import type { ReactNode } from "react";
-import { Reveal } from "./reveal";
-import { TextReveal } from "./text-reveal";
 
-type Props = {
-  id?: string;
-  eyebrow: string;
-  title: ReactNode;
-  lede?: ReactNode;
-  aside?: ReactNode;
-  children: ReactNode;
-  className?: string;
+export type Tone = "paper" | "warm" | "yellow" | "dark";
+
+const TONE: Record<Tone, string> = {
+  paper: "bg-paper text-ink",
+  warm: "bg-paper-warm dots text-ink border-y border-line",
+  yellow: "bg-beacon dots-ink text-ink border-y-2 border-ink",
+  dark: "on-dark bg-band dots-dark text-band-ink",
 };
 
-/** Section shell: eyebrow, title, optional lede, then the body. */
-export function Section({
-  id,
-  eyebrow,
-  title,
-  lede,
-  aside,
-  children,
-  className = "",
-}: Props) {
+const LEDE: Record<Tone, string> = {
+  paper: "text-ink-3",
+  warm: "text-ink-3",
+  yellow: "text-ink-2",
+  dark: "text-band-muted",
+};
+
+type Props = {
+  id: string;
+  title: ReactNode;
+  lede?: ReactNode;
+  /** Sits under the lede: a link or a small action. */
+  aside?: ReactNode;
+  tone?: Tone;
+  /** A huge outlined word behind the heading, for texture. */
+  word?: string;
+  children: ReactNode;
+};
+
+/**
+ * Section shell: a huge heading on the left and the lede on the right on
+ * wide screens, stacked on phones. The tone sets the band: cream, dotted
+ * cream, dotted yellow or the dark night.
+ */
+export function Section({ id, title, lede, aside, tone = "paper", word, children }: Props) {
   return (
-    <section
-      id={id}
-      className={`wrap scroll-mt-24 py-20 sm:py-28 ${className}`}
-    >
-      <div className="mb-12 flex flex-col gap-6 sm:mb-16 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
-        <div className="max-w-2xl">
-          <Reveal>
-            <p className="eyebrow">{eyebrow}</p>
-          </Reveal>
-          <h2 className="mt-4 text-4xl leading-[1.05] sm:text-5xl lg:text-[3.5rem]">
-            <TextReveal inView delay={60}>
-              {title}
-            </TextReveal>
+    <section id={id} aria-labelledby={`${id}-title`} className={`relative overflow-hidden ${TONE[tone]}`}>
+      {word ? (
+        <span
+          aria-hidden="true"
+          className={`outline-word absolute -top-3 -right-4 text-[min(19vw,13.5rem)] sm:-top-6 ${
+            tone === "dark" ? "[--word-stroke:rgba(251,246,236,0.09)]" : "[--word-stroke:rgba(27,23,18,0.11)]"
+          }`}
+        >
+          {word}
+        </span>
+      ) : null}
+      <div className="wrap relative py-20 sm:py-28 lg:py-32">
+        <div className="mb-12 grid gap-7 sm:mb-16 lg:grid-cols-12 lg:items-end lg:gap-10">
+          <h2 id={`${id}-title`} className="display-xl lg:col-span-7">
+            {title}
           </h2>
-          {lede ? (
-            <Reveal delay={110}>
-              <p className="mt-5 max-w-xl text-lg leading-relaxed text-ink-2">
-                {lede}
-              </p>
-            </Reveal>
+          {lede || aside ? (
+            <div className="flex flex-col gap-5 lg:col-span-5 lg:pb-2">
+              {lede ? <p className={`max-w-xl text-lg leading-relaxed ${LEDE[tone]}`}>{lede}</p> : null}
+              {aside}
+            </div>
           ) : null}
         </div>
-        {aside ? <Reveal delay={140}>{aside}</Reveal> : null}
+        {children}
       </div>
-      {children}
     </section>
+  );
+}
+
+/** A small status pill: confirmed, pending, planned, in kind. */
+export function Tag({
+  tone = "neutral",
+  children,
+}: {
+  tone?: "neutral" | "accent" | "pending" | "dark";
+  children: ReactNode;
+}) {
+  const style =
+    tone === "accent"
+      ? "border-ink bg-beacon text-ink"
+      : tone === "pending"
+        ? "border-dashed border-ink-3 bg-transparent text-ink-2"
+        : tone === "dark"
+          ? "border-band-line bg-transparent text-band-ink"
+          : "border-ink bg-card text-ink";
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-2.5 py-0.5 font-display text-[0.75rem] leading-5 font-extrabold tracking-[0.08em] whitespace-nowrap uppercase ${style}`}
+    >
+      {children}
+    </span>
   );
 }

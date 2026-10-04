@@ -6,13 +6,13 @@ const email = z
   .transform((v) => v.trim().toLowerCase());
 
 /**
- * The notify list. For people who are not applying: mentors, judges,
- * sponsors, parents. One field required.
+ * The notify list. For people who are not applying: parents, mentors,
+ * judges, sponsors. One field required.
  */
 export const notifySchema = z.object({
   email,
   school: z.string().trim().max(160).optional().default(""),
-  role: z.enum(["student", "mentor", "sponsor", "other"]).default("other"),
+  role: z.enum(["student", "parent", "mentor", "sponsor", "other"]).default("other"),
 });
 
 /**

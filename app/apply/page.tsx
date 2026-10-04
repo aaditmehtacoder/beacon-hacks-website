@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { EVENT } from "@/lib/event";
 import { ApplyForm } from "@/components/apply-form";
-import { BeaconMark } from "@/components/ui/beacon-mark";
+import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
 const DESCRIPTION =
-  "Apply early for Beacon Hacks, a free one day hackathon for Bay Area high schoolers. Grades 9 to 12. Spots are confirmed once the venue and the budget are locked.";
+  "Apply early for Beacon Hacks, a free one-day hackathon for Bay Area high school students in grades 9 to 12. Spots are confirmed once the venue and the budget are set.";
 
 export const metadata: Metadata = {
-  title: "Apply",
+  title: "Apply early",
   description: DESCRIPTION,
   alternates: { canonical: "/apply" },
   openGraph: {
@@ -19,7 +18,7 @@ export const metadata: Metadata = {
     siteName: "Beacon Hacks",
     title: "Apply early · Beacon Hacks",
     description: DESCRIPTION,
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Beacon Hacks. Build what lights the way." }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Beacon Hacks. A free hackathon for Bay Area high school builders." }],
   },
   twitter: {
     card: "summary_large_image",
@@ -29,55 +28,66 @@ export const metadata: Metadata = {
   },
 };
 
+const FACTS = [
+  ["Date", EVENT.date.label, EVENT.date.note],
+  ["Location", EVENT.venue.label, EVENT.venue.note],
+  ["Who", "Grades 9 to 12", "From anywhere in the Bay Area"],
+  ["Cost", "Free", "No fee to apply or attend"],
+] as const;
+
+const NEXT = [
+  "We save your application and you see a confirmation right away.",
+  "When the venue and budget are set, we email everyone who applied to confirm spots.",
+  "Confirmed students then get the address and the final schedule.",
+];
+
 export default function Apply() {
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-line bg-paper/85 shadow-head backdrop-blur-xl">
-        <div className="wrap flex h-16 items-center gap-5">
-          <Link href="/" className="flex items-center gap-2.5">
-            <BeaconMark className="size-6 text-beacon drop-shadow-[0_0_6px_rgba(255,178,40,0.55)]" />
-            <span className="font-display text-[0.9375rem] font-bold tracking-tight">
-              BEACON HACKS
-            </span>
-          </Link>
-          <span className="label hidden border-l border-line pl-5 text-ink-3 sm:inline">
-            Early application
-          </span>
-          <Link href="/" className="ml-auto text-[0.9375rem] text-ink-3 hover:text-ink">
-            Back to the site
-          </Link>
-        </div>
-      </header>
+      <SiteHeader home={false} showApply={false} />
 
-      <main className="flex-1">
-        <div className="wrap grid gap-12 py-14 sm:py-20 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-          <div>
-            <p className="eyebrow">Apply</p>
-            <h1 className="mt-4 text-4xl leading-[1.05] sm:text-5xl">Apply early.</h1>
-            <p className="mt-5 text-lg leading-relaxed text-ink-2">
-              Applications are open before the day is fully locked, so you can
-              be first in line. Nobody is confirmed until the venue and the
-              budget are both real; when they are, everyone who applied hears
-              the same day.
+      <main id="main" tabIndex={-1} className="dots flex-1 bg-paper-warm focus:outline-none">
+        <div className="wrap grid gap-14 py-12 sm:py-16 lg:grid-cols-12 lg:gap-10 lg:py-24">
+          <div className="lg:col-span-5">
+            <p className="meta text-beacon-deep">Early application</p>
+            <h1 className="display-xl mt-4">Apply early.</h1>
+            <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-3">
+              Applications open before the date and venue are final, so you
+              can get in line now. It takes about two minutes.
             </p>
-            <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 rounded-2xl border border-line bg-card p-5">
-              {[
-                ["Target date", EVENT.targetDateLabel, "Not locked yet"],
-                ["Place", EVENT.venue.label, "Venue in approval"],
-                ["Who", "Grades 9 to 12", "Anywhere in the Bay Area"],
-                ["Cost", "Free", "If sponsorship lands"],
-              ].map(([k, v, note]) => (
-                <div key={k} className="flex flex-col gap-1">
-                  <dt className="label text-ink-4">{k}</dt>
-                  <dd className="text-[0.9375rem] font-medium">{v}</dd>
-                  <dd className="text-xs text-ink-3">{note}</dd>
+
+            <dl className="mt-10 border-y-2 border-ink">
+              {FACTS.map(([k, v, note], i) => (
+                <div key={k} className={`grid grid-cols-[7rem_1fr] gap-x-4 py-4 ${i > 0 ? "border-t border-line" : ""}`}>
+                  <dt className="meta pt-1 text-beacon-deep">{k}</dt>
+                  <dd className="flex flex-col gap-0.5">
+                    <span className="font-display text-[1.125rem] font-extrabold tracking-[-0.02em]">{v}</span>
+                    <span className="text-[0.875rem] text-ink-3">{note}</span>
+                  </dd>
                 </div>
               ))}
             </dl>
+
+            <h2 className="mt-10 text-[1.75rem] leading-none tracking-[-0.035em]">What happens next</h2>
+            <ol className="mt-5 flex flex-col gap-3.5">
+              {NEXT.map((step, i) => (
+                <li key={step} className="grid grid-cols-[2rem_1fr] gap-2 leading-relaxed text-ink-2">
+                  <span className="grid size-6 place-items-center rounded-full border-2 border-ink bg-beacon font-display text-[0.75rem] font-extrabold">
+                    {i + 1}
+                  </span>
+                  {step}
+                </li>
+              ))}
+            </ol>
           </div>
 
-          <div className="rounded-2xl border border-line bg-card p-6 sm:p-8">
-            <ApplyForm />
+          <div className="lg:col-span-7 lg:col-start-6 xl:col-span-6 xl:col-start-7">
+            <div className="relative border-[3px] border-ink bg-card shadow-[10px_10px_0_var(--color-ink)]">
+              <span aria-hidden="true" className="block h-3 border-b-[3px] border-ink bg-beacon" />
+              <div className="p-6 sm:p-9">
+                <ApplyForm />
+              </div>
+            </div>
           </div>
         </div>
       </main>

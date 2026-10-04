@@ -7,7 +7,8 @@ const eslintConfig = defineConfig([
   ...nextTs,
   // Override default ignores of eslint-config-next.
   globalIgnores([
-    ".next-verify/**",
+    // Side-by-side build directories (NEXT_DIST_DIR=.next-check etc.)
+    ".next-*/**",
     // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",

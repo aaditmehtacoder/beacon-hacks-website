@@ -3,7 +3,19 @@ import { ImageResponse } from "next/og";
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
-/** The lamp on a dark tile, for home screens and Safari bookmarks. */
+/* The mark in yellow on the night, as in app/icon.svg. iOS rounds the
+   corners itself, so the tile is square. */
+const MARK = `data:image/svg+xml;utf8,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+    <circle cx="16" cy="16" r="10.25" fill="none" stroke="#ffc72c" stroke-opacity=".35" stroke-width="1.5"/>
+    <g transform="rotate(-24 16 16)">
+      <path d="M16 16 28.5 11.6v8.8Z" fill="#ffc72c" fill-opacity=".55"/>
+      <path d="M16 16 3.5 20.4v-8.8Z" fill="#ffc72c" fill-opacity=".55"/>
+    </g>
+    <circle cx="16" cy="16" r="4.6" fill="#ffc72c"/>
+  </svg>`,
+)}`;
+
 export default function AppleIcon() {
   return new ImageResponse(
     <div
@@ -13,30 +25,10 @@ export default function AppleIcon() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0f0e0c",
+        background: "#1b1712",
       }}
     >
-      <div
-        style={{
-          width: 96,
-          height: 96,
-          borderRadius: 9999,
-          border: "3px solid rgba(255,178,40,0.35)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <div
-          style={{
-            width: 52,
-            height: 52,
-            borderRadius: 9999,
-            background: "#ffb228",
-            boxShadow: "0 0 36px rgba(255,178,40,0.85)",
-          }}
-        />
-      </div>
+      <img src={MARK} width={150} height={150} alt="" />
     </div>,
     size,
   );

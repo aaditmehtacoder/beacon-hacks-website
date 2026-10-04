@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR ?? ".next",
   images: {
     formats: ["image/avif", "image/webp"],
+    /* 85 for the judges' portraits, which are faces at small sizes;
+       everything else uses the default 75. */
+    qualities: [75, 85],
   },
 };
 

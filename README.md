@@ -1,33 +1,37 @@
 # Beacon Hacks website
 
-Next.js 16 (App Router) + React 19 + Tailwind v4, with a three.js lighthouse
-lens in the hero. Dark only, one accent colour, no component library.
+Next.js 16 (App Router) + React 19 + Tailwind v4. Cream paper, near-black
+ink and one yellow, heavy grotesque type, ink-bordered cards with hard
+offset shadows, and dark bands for the hero, the schedule and the close.
+No component library, no 3D.
 
 ```
 app/                 routes, fonts, metadata, generated OG card and icons
   apply/             the early application
+  code-of-conduct/   the CoC page
   admin/             the dashboard: applications and the notify list
   outreachdashboard/ the sponsor outreach ledger, read from the team Gmail
   api/apply/         stores an application
   api/notify/        stores a notify signup
   api/admin/         sign in, list, CSV, delete
   api/outreach/sync/ pulls the mailbox into the ledger (dashboard button, daily cron)
-  code-of-conduct/   the CoC page
 components/          one file per section, plus ui/ primitives
-  beacon/            the three.js lens: scene, frame, CSS fallback
-  ui/reveal.tsx      the one scroll entrance (rise, or tilt for cards)
-  ui/text-reveal.tsx masked display type rising from its baseline
-  ui/magnetic.tsx    buttons that lean toward the cursor
+  hero.tsx           name, actions, backers, the date card
+  strip.tsx          the yellow band and the four-fact strip under the hero
+  about.tsx, tracks.tsx, prizes.tsx, schedule.tsx, judges.tsx,
+  sponsors.tsx, faq.tsx, site-header.tsx, site-footer.tsx
+  notify/            the updates dialog, the inline form, their shared hook
+  ui/lamp.tsx        the lamp: the full stop of a heading and its beam
 lib/event.ts         every fact about the event that appears twice
-lib/content.ts       all page copy and data
-lib/status.ts        the three gates shown on the status board
+lib/content.ts       all page copy and data: tracks, schedule, partners,
+                     prizes, judges, packages, FAQ
 lib/store.ts         where signups live (Upstash Redis, or a local file)
 lib/admin-auth.ts    the shared admin password and its cookie
 lib/outreach/        the outreach ledger: Gmail client, rules, model, roster, sync
-scripts/gmail-auth.mjs  one-time Gmail authorisation for the ledger
-app/robots.ts        robots.txt
-app/sitemap.ts       sitemap.xml, the two public routes
-public/photos/       stock photography (see "Photos" below)
+assets/og/           font subsets for the generated share card (OFL)
+public/sponsors/     partner logos, dark and light versions
+public/photos/judges the headshots judges sent
+public/brand/        the mark (mark.svg, mark-512.png) and the older brand kit
 ```
 
 ## Run it
@@ -39,125 +43,95 @@ npm run dev            # http://localhost:3000
 
 If `localhost` returns **HTTP 431**, another local app has left oversized cookies
 on it. Use `http://127.0.0.1:3000` instead. `next.config.ts` already allows that
-origin for dev assets.
+origin for dev assets. If 3000 is taken, `npx next dev -p 3200`.
 
 ```bash
-npm run build && npm start
+npm run lint
 npx tsc --noEmit       # typecheck
+npm run build && npm start
+NEXT_DIST_DIR=.next-check npm run build   # build beside a running dev server
 ```
 
-`three` is pinned to 0.185: `postprocessing` 6.39 caps it below 0.186. Bump
-them together.
+## Design
 
-## The beacon
+The layout follows the language of student hackathon sites like Sentinel
+Hacks: a dark hero with a tilted date card, a yellow word band, a dotted fact
+strip, a full yellow section, a dark schedule, cards with ink borders and hard
+shadows, pill buttons. The copy, the colours and the motif are Beacon's own.
 
-`components/beacon/` is a Fresnel lighthouse lens built from the parts a real
-one has: a lamp, two bullseye panels that focus it into beams, dioptric rings,
-glass barrel arcs and brass astragals. The cage turns; the lamp does not. Dust
-in the air lights up only inside a beam, which is what makes the beam read as
-light. It ignites with a real lamp flicker, and the first sweep hits the camera
-just after the headline has settled.
-
-`beacon.tsx` is the frame and makes every call the page cares about:
-
-- The CSS lamp in `beacon-fallback.tsx` is always rendered, so the panel is
-  never empty: before hydration, while three.js downloads, or without WebGL2.
-- The scene mounts a beat after hydration, stops rendering when scrolled off
-  screen or the tab is hidden, and renders one still frame for
-  `prefers-reduced-motion`.
-- Phones and small laptops get fewer motes and a lower pixel ratio.
-- The hero is a full-viewport stage that pins for one screen of scrolling:
-  the lens turns with the scroll, the camera rises and pushes in, the facts
-  rise into place (`--stage-progress`, plain CSS), then the page lets go.
-  The countdown holds the bottom left. Under reduced motion it is one
-  unpinned screen with the facts shown.
-- It writes `--beam-facing` (0..1, how squarely a beam points at the visitor)
-  onto `<html>` every frame; the hero background uses it to breathe with the
-  light.
-- It never shows a black box. A running loop is not proof of a visible lamp,
-  so once lit it reads the centre pixel a few times and hands over to the CSS
-  lamp if that stays dark. A lost WebGL context, a thrown error, or a machine
-  without half-float framebuffers ends up on the CSS lamp too.
-
-The stage sits on `band`, a step below the page, and pulls up under the
-sticky header so the night is behind the header at the very top.
-
-Inside `beacon-scene.tsx`, everything the frame loop touches is declared in
-JSX and reached through a ref. The React Compiler lint forbids mutating
-anything created during render, and that is the idiomatic way around it.
+- **Colour.** Every colour is a token at the top of `app/globals.css`.
+  Yellow (`beacon`, #ffc72c) is a fill with ink text on it, or a colour on
+  the dark bands. It is never text on cream (1.4:1); small accent text on
+  cream uses ochre (`beacon-deep`, 6.4:1). All text tokens pass WCAG AA.
+- **Type.** Bricolage Grotesque for headings, buttons and labels (with its
+  optical size axis), Geist for running text and form fields, both through
+  `next/font`. The references used "antiqua", which is TheAntiqua B by
+  LucasFonts: a commercial face, and the only copies on this machine are
+  trial files marked "for evaluation purposes only", so it is not used.
+- **The lamp.** The full stop of "Beacon Hacks." and "See you in Belmont."
+  is a yellow lamp with a beam running off to the right (`components/ui/lamp.tsx`).
+  The mark (`components/ui/beacon-mark.tsx`) is the same lamp from above.
+- **Utilities.** `brut` (bordered card, hard shadow), `brut-hover`, `dots`,
+  `dots-dark`, `display-xl`, `meta` (small bold label, sets no colour),
+  `outline-word` (the huge outlined word behind a section), `link`.
 
 ## Motion
 
-Three pieces, all of which are no-ops under `prefers-reduced-motion`:
-
-- `<Reveal>` fires once on the way in. `variant="rise"` fades up;
-  `variant="tilt"` also settles flat from a slight lean, and is what card
-  grids get.
-- `<TextReveal>` lifts display type out from behind its own baseline. On mount
-  in the hero, `inView` everywhere else. It observes the outer, unclipped span:
-  the inner one starts translated outside the clip region, and an observer on
-  it would never report it visible.
-- `<Magnetic>` lets the primary buttons lean a few pixels toward the mouse.
-
-## The palette
-
-Dark only. Every colour, rule, shadow and glow is a variable at the top of
-`app/globals.css`, and components name tokens rather than colours. Two of the
-names need a word:
-
-- `band` / `band-ink` are the deep band a step below the page: the hero
-  stage, the marquee and the closing card, and the ink that goes with them.
-- Shadows and glows are variables (`--sh-*`, `--glow-*`) applied through the
-  `@utility` rules at the bottom of the file, because Tailwind inlines colours
-  in its own shadow scale and the palette should live in one place.
+Short and optional. The hero copy rises once and the beam lights up once on
+load; cards and buttons lift on hover. Nothing starts hidden in the markup,
+nothing scrolls on its own (the yellow band holds still: a moving ticker
+would need a pause control under WCAG 2.2.2), and under
+`prefers-reduced-motion` all of it is off.
 
 ## The honesty rule
 
 **Nothing on this site may state something that has not actually been secured.**
 
-`lib/event.ts`, `lib/content.ts` and `lib/status.ts` are the only places facts
-live, and each unconfirmed thing is rendered through `<Locked>` / `<LockChip>`
-(`components/ui/locked.tsx`) instead of being asserted. The status board
-(`components/status-board.tsx`) is the single source of truth for what is real.
+`lib/event.ts` and `lib/content.ts` are the only places facts live, and each
+unconfirmed thing says so in its own data and on the page.
 
-Currently locked, and what unlocks it:
-
-| Locked | Gate | Unlock by |
+| Fact | State | Unlock by |
 |---|---|---|
-| Venue name, address, photos of the building | Gate 1 | Written approval from the host's facilities team. Then fill in `EVENT.venue` and set `confirmed: true`. |
-| Prize cash, hardware, perks | Gate 2 | Money actually committed. Update `EVENT.budget.raisedUsd`; add amounts to `PLANNED_PRIZE_CATEGORIES` only once funded. |
-| Confirmed spots, countdown, deadlines | Gate 3 | Gates 1 and 2 done. Early applications are open now; confirmations wait for both. |
-| Judges | n/a | Agreement in writing plus a bio and headshot from the judge. `JUDGES` in `lib/content.ts` lists exactly those people; two so far. |
-| Sponsor logos | n/a | A written commitment. `BACKERS` in `lib/content.ts` lists in-kind commitments (prizes, API credits); cash tiers stay dashed and `raisedUsd` stays at what is actually in the bank. |
+| Date | Target, Saturday, January 30, 2027 | Confirmed with the venue. Set `EVENT.date.confirmed`, then add a schema.org `Event` block in `app/page.tsx`. |
+| Venue | In approval; Belmont, CA only | Written approval from the host's facilities team. Fill in `EVENT.venue`, set `confirmed: true`. Their photos need separate permission. |
+| Applications | Open early, nobody confirmed | Venue and budget set. |
+| Budget | $0 of $10,500 in cash (`EVENT.budget`) | Money actually committed. In-kind support never moves `raisedUsd`. |
+| Partners | CodeCrafters, Perfect Corp, YRI Fellowship, all in kind (`PARTNERS`) | A written yes. Cash sponsors go in `PARTNERS` with `form: "Cash"` and get their own logo row. |
+| Prizes | Confirmed: CodeCrafters, YRI. For everyone: Perfect Corp. Pending: Render | Render moves to confirmed when the credit link and redemption rules arrive (`PENDING_OFFERS`). |
+| Judges | Swosti Panda, Vasuki Uday Kiran Vudathala (`JUDGES`) | Agreement in writing plus a bio and headshot. |
 
-Also deliberately absent until Gate 1: the **schema.org `Event` block**. Publishing
-structured event data for an unconfirmed date and venue would push it into search
-results and calendar surfaces. Restore it in `app/page.tsx` once the date is locked.
+No prize-pool total is ever shown: memberships, scholarships and credits are
+not cash and do not add up.
 
-## Photos
+## Sponsorship
 
-`public/photos/` is stock photography from Unsplash (free to use commercially, no
-attribution required), used only for the three cards in the Day section.
-**None of it is the Beacon venue.** The footer says so, and that line must
-stay until the photos are replaced with real ones we took ourselves.
+Four packages in `PACKAGES` (`lib/content.ts`): Supporter $250, Community
+$500, Partner $1,000, Presenting $2,500, each listing what is new at that
+level. Nothing promises attendee contact data, recruiting access, merchandise,
+judging seats or exclusivity. In kind is its own option and is not priced
+against a package. Every "Inquire" button opens an email to
+`EVENT.email.sponsors` with the package in the subject; there is no payment
+flow. Outreach emails sent before October 2026 quoted the older
+Bronze/Silver/Gold/Platinum prices; quote these instead from now on.
 
-The same rule covers the host's own photography. Until they have signed off in
-writing *and* given permission to use their images, their building does not
-appear here, whether or not the picture is public on their site.
+## Discord
+
+`EVENT.social.discord` in `lib/event.ts` is empty, which hides every Discord
+link. Paste the invite (`https://discord.gg/...`) and the logo appears in the
+header, the phone menu, the FAQ, the footer and as a floating button.
 
 ## Brand
 
-`public/brand/` holds the mark (animated GIF at 512 and 128, PNG, SVG) and
-`banners/`: Discord server banner and invite splash (the splash also fits an
-MLH event page), LinkedIn profile banner, company cover and post image, and
-an X header. They are the hero's night with the tagline, drawn in the site's
-own type, and text stays clear of where LinkedIn and X overlay the avatar.
-Regenerate with `python3 scripts/render-banners.py` (Pillow and numpy; the
-fonts are fetched on first run).
+`public/brand/mark.svg` and `mark-512.png` are the current mark (yellow lamp
+on the night); the favicon (`app/icon.svg`), the Apple icon and the share card
+(`app/opengraph-image.tsx`) are generated from the same drawing. The older kit
+in `public/brand/` (the amber GIFs and `banners/`, made by
+`scripts/render-banners.py`) predates the redesign and still uses the amber
+night look.
 
 ## Applications, the notify list, and the admin page
 
-`/apply` takes an early application (six fields). "Get notified" takes an
+`/apply` takes an early application (six fields). "Get updates" (the dialog, or the form at the bottom of the home page) takes an
 email from anyone who is not applying. Both land in the same store, one row
 per email, newest wins, and both are rate limited per IP.
 
@@ -249,6 +223,8 @@ nothing on this ledger reaches the public site.
 
 ## Still to fill in
 
+- The Discord invite (see above).
+- Render's credit link, redemption rules and logo, then move the offer to confirmed.
 - A separate sponsors address, if wanted. Everything routes to `team@beaconhacks.com`.
 - Roster entries in `lib/outreach/roster.ts` for anyone new the mailbox writes to;
   without one the card is named after the domain and has no description.
