@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { EVENT } from "@/lib/event";
 
-/** The public pages. /admin is deliberately not here. */
+/** The public pages. */
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: EVENT.url, changeFrequency: "weekly", priority: 1 },

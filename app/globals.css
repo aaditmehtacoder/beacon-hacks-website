@@ -3,107 +3,89 @@
 /* ============================================================
    Beacon Hacks design system
 
-   Warm cream paper, near-black ink, and one yellow: the lamp. Heavy
-   grotesque display type, ink-bordered cards with hard offset shadows,
-   dark bands for the hero and the schedule, and a full yellow band for
-   the tracks. Every colour is a variable here, so the palette lives in
-   exactly one place, and components name tokens, not colours.
+   A lighthouse at night. The hero, the closing and the header are the
+   night over the bay; the content sits on fog-white "day" sections with
+   hairline rules. One accent, the lamp: yellow light on the night, and a
+   yellow fill (with ink text on it) by day. Yellow is never text on the
+   fog: small accent text there uses the deep lamp tone instead.
 
-   Yellow is a fill (with ink text on it) or a colour on the dark bands.
-   It is never text on cream: 1.4:1 is unreadable. Small accent text on
-   cream uses ochre instead.
-
-   The admin and outreach pages share these tokens, so a token keeps its
-   meaning when its value changes: `paper` is the page, `ink` the text,
-   `beacon` the accent.
+   Every colour lives here as a token; components name tokens, not
+   colours. Contrast on the grounds they are used on:
+     moon 17.6, moon-2 12.7, moon-3 7.8, lamp 12.5 on night
+     ink 16.6, ink-2 9.7, ink-3 6.1, lamp-deep 5.3 on fog
    ============================================================ */
 
 @theme {
-  /* --- surfaces --- */
-  --color-paper:      #fbf6ec;  /* the page: warm cream */
-  --color-paper-warm: #f3e9d8;  /* dotted bands */
-  --color-paper-deep: #e9dcc6;  /* recessed fills, empty bars */
-  --color-card:       #fffdf8;  /* raised surface */
+  /* --- night: hero, closing, header, footer --- */
+  --color-night:   oklch(0.16 0.032 262);   /* #060d1b */
+  --color-night-2: oklch(0.205 0.04 262);   /* #0d1729, raised on night */
+  --color-night-3: oklch(0.27 0.05 262);    /* #19263f, panels on night */
+  --color-moon:    oklch(0.965 0.012 85);   /* text on night */
+  --color-moon-2:  oklch(0.86 0.02 255);    /* secondary text on night */
+  --color-moon-3:  oklch(0.72 0.03 255);    /* quiet text on night */
 
-  /* --- ink (contrast on paper: 16.6, 11.4, 6.5, 5.4) --- */
-  --color-ink:   #1b1712;
-  --color-ink-2: #3b342b;
-  --color-ink-3: #62584a;
-  --color-ink-4: #6f6455;
+  /* --- the scene: sky, hills, water, the lighthouse --- */
+  --color-sky:      oklch(0.13 0.028 262);  /* the top of the sky */
+  --color-horizon:  oklch(0.31 0.068 262);  /* the glow along the water */
+  --color-hill-far: oklch(0.215 0.045 262); /* the hills across the bay */
+  --color-hill:     oklch(0.165 0.035 262); /* the near hills */
+  --color-land:     oklch(0.115 0.025 262); /* the headland */
+  --color-sea:      oklch(0.235 0.05 260);  /* the water at the horizon */
+  --color-tower:    oklch(0.6 0.032 255);   /* the moonlit tower */
+  --color-tower-2:  oklch(0.44 0.035 258);  /* its shaded side */
 
-  /* --- the one accent: the lamp --- */
-  --color-beacon:      #ffc72c;  /* fills; text on the dark bands (11.4:1) */
-  --color-beacon-hi:   #ffd659;  /* hover on a yellow fill */
-  --color-beacon-deep: #7a5200;  /* ochre: accent text on cream (6.4:1) */
-  --color-beacon-ink:  #1b1712;  /* text on a yellow fill */
-  --color-beacon-wash: #fff0c2;  /* tint behind chips and notes */
+  /* --- day: the content --- */
+  --color-fog:   oklch(0.976 0.005 247);    /* the page */
+  --color-fog-2: oklch(0.948 0.008 247);    /* recessed fills */
+  --color-card:  oklch(0.995 0.002 247);    /* raised surface */
+  --color-ink:   oklch(0.21 0.035 262);
+  --color-ink-2: oklch(0.37 0.035 260);
+  --color-ink-3: oklch(0.48 0.03 258);
+  --color-line:   oklch(0.905 0.01 252);    /* hairlines */
+  --color-line-2: oklch(0.85 0.014 252);    /* field borders, stronger rules */
 
-  /* --- rules --- */
-  --color-line:      #dccdb6;
-  --color-line-soft: rgba(27, 23, 18, 0.1);
-  --color-line-hard: #1b1712;
+  /* --- the lamp --- */
+  --color-lamp:      #ffc72c;               /* fills; light on the night */
+  --color-lamp-hi:   #ffd659;               /* hover on a lamp fill */
+  --color-lamp-deep: oklch(0.52 0.115 72);  /* accent text on fog */
+  --color-lamp-wash: oklch(0.975 0.045 92); /* tint behind notes */
 
-  /* --- the dark bands: hero, schedule, closing --- */
-  --color-band:       #1b1712;
-  --color-band-ink:   #fbf6ec;
-  --color-band-muted: #c3b8a6;  /* 9.1:1 on band */
-  --color-band-line:  #4a4136;
-  --color-band-lamp:  #ffc72c;
-
-  /* --- overlays --- */
-  --color-scrim: rgba(27, 23, 18, 0.6);
+  /* --- the day passing, for the schedule --- */
+  --color-morning:   oklch(0.945 0.02 240);
+  --color-afternoon: oklch(0.955 0.06 88);
 
   /* --- form errors --- */
   --color-danger:      #b42318;
   --color-danger-wash: #fdecea;
-  --color-danger-line: rgba(180, 35, 24, 0.35);
+  --color-danger-night: #ffb4a8;
 
-  /* --- type --- */
-  --font-display: var(--font-bricolage), "Arial Black", Arial, sans-serif;
-  --font-sans:    var(--font-geist), ui-sans-serif, system-ui, -apple-system, sans-serif;
-
-  /* --- layout --- */
-  --spacing-gut: 1.25rem;
+  /* --- type: Mona Sans for everything; width does the hierarchy --- */
+  --font-sans: var(--font-mona), ui-sans-serif, system-ui, -apple-system, sans-serif;
 
   /* --- motion --- */
-  --ease-out-soft: cubic-bezier(0.22, 0.7, 0.25, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo:  cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Hard shadows and the header height. Kept out of @theme so Tailwind
-   does not generate a utility for each; the @utility rules below use
-   them. */
 :root {
-  --header-h: 4.5rem;
-
-  --sh-hard-sm: 4px 4px 0 var(--color-ink);
-  --sh-hard:    6px 6px 0 var(--color-ink);
-  --sh-hard-lg: 10px 10px 0 var(--color-ink);
-  --sh-lamp:    12px 12px 0 var(--color-beacon);
-
-  /* organiser pages */
-  --sh-hair:  0 1px 2px rgba(27, 23, 18, 0.06);
-  --sh-quiet: 0 1px 2px rgba(27, 23, 18, 0.08);
-  --sh-lift:  0 18px 40px -24px rgba(27, 23, 18, 0.35);
-  --sh-modal: 10px 10px 0 var(--color-ink);
-
+  --header-h: 4rem;
+  --gut: 1.25rem;
   color-scheme: light;
 }
-
-@media (min-width: 640px)  { :root { --spacing-gut: 2rem; } }
-@media (min-width: 1024px) { :root { --spacing-gut: 2.5rem; } }
+@media (min-width: 640px)  { :root { --gut: 2rem; } }
+@media (min-width: 1024px) { :root { --gut: 3rem; } }
 
 /* ------------------------------------------------------------ base */
 
 @layer base {
   html {
     scroll-behavior: smooth;
-    /* Anchors land below the sticky header with room to breathe. */
-    scroll-padding-top: calc(var(--header-h) + 1rem);
+    scroll-padding-top: calc(var(--header-h) + 1.5rem);
     -webkit-text-size-adjust: 100%;
   }
 
   body {
-    background: var(--color-paper);
+    background: var(--color-fog);
     color: var(--color-ink);
     font-family: var(--font-sans);
     font-size: 1.0625rem;
@@ -112,25 +94,24 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  ::selection { background: var(--color-beacon); color: var(--color-beacon-ink); }
+  ::selection { background: var(--color-lamp); color: var(--color-ink); }
 
   :focus-visible {
-    outline: 3px solid var(--color-ink);
+    outline: 2px solid var(--color-ink);
     outline-offset: 3px;
+    border-radius: 6px;
   }
-  /* On the dark bands and on yellow, the ring flips to stay visible. */
-  .on-dark :focus-visible { outline-color: var(--color-beacon); }
+  .night :focus-visible { outline-color: var(--color-lamp); }
 
   h1, h2, h3, h4 {
-    font-family: var(--font-display);
-    font-weight: 800;
-    letter-spacing: -0.035em;
+    font-stretch: 125%;
+    font-weight: 750;
+    letter-spacing: -0.025em;
     text-wrap: balance;
   }
 
   p { text-wrap: pretty; }
 
-  /* Native disclosure marker off; components draw their own. */
   summary::-webkit-details-marker { display: none; }
   summary { list-style: none; }
 }
@@ -140,135 +121,109 @@
 /* The content column: 1200px of content, gutters outside it. */
 @utility wrap {
   width: 100%;
-  max-width: calc(75rem + 2 * var(--spacing-gut));
+  max-width: calc(75rem + 2 * var(--gut));
   margin-inline: auto;
-  padding-inline: var(--spacing-gut);
+  padding-inline: var(--gut);
 }
 
-/* Small bold label: fact keys, card heads, section tags. 12px at the
-   least, never used for running text. It sets no colour, so each use
-   names one (text-beacon-deep on cream, text-band-muted on dark). */
-@utility meta {
-  font-family: var(--font-display);
+/* The night ground. Marks a subtree as dark so focus rings flip. */
+@utility night {
+  background-color: var(--color-night);
+  color: var(--color-moon);
+}
+
+/* Section headings: expanded and heavy. */
+@utility heading {
+  font-stretch: 125%;
+  font-weight: 780;
+  font-size: clamp(2.375rem, 5.4vw, 4.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+/* A small label. Used sparingly: on a fact, a status, a group. It sets
+   no colour, so each use names one. */
+@utility kicker {
+  font-stretch: 112.5%;
   font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-/* The big section heading. */
-@utility display-xl {
-  font-family: var(--font-display);
-  font-size: clamp(3rem, 7vw, 5.75rem);
-  font-weight: 800;
-  line-height: 0.95;
-  letter-spacing: -0.045em;
-}
-
-/* An ink-bordered card with a hard offset shadow. */
-@utility brut {
-  border: 2px solid var(--color-ink);
-  background: var(--color-card);
-  box-shadow: var(--sh-hard);
-}
-
-/* Lifts a brut card a little on hover. */
-@utility brut-hover {
-  transition: transform 180ms var(--ease-out-soft), box-shadow 180ms var(--ease-out-soft);
-  &:hover { transform: translate(-2px, -4px); box-shadow: 9px 10px 0 var(--color-ink); }
-}
-
-/* Dot paper. `dots` for cream bands, `dots-dark` for the dark ones. */
-@utility dots {
-  background-image: radial-gradient(circle, rgba(27, 23, 18, 0.13) 1px, transparent 1.5px);
-  background-size: 20px 20px;
-}
-@utility dots-dark {
-  background-image: radial-gradient(circle, rgba(255, 199, 44, 0.16) 1.2px, transparent 1.7px);
-  background-size: 26px 26px;
-}
-@utility dots-ink {
-  background-image: radial-gradient(circle, rgba(27, 23, 18, 0.16) 1px, transparent 1.5px);
-  background-size: 22px 22px;
-}
-
-/* A huge outlined word behind a section, for texture. Decorative only.
-   Set --word-stroke for the outline colour. */
-@utility outline-word {
-  font-family: var(--font-display);
-  font-weight: 800;
-  line-height: 0.8;
-  letter-spacing: -0.07em;
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--word-stroke, rgba(27, 23, 18, 0.1));
-  white-space: nowrap;
-  pointer-events: none;
-  user-select: none;
-}
-
-/* The organiser pages' small caps label and eyebrow. */
-@utility eyebrow {
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 650;
   letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-beacon-deep);
-}
-@utility label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
-/* Elevation for the organiser pages, through variables. */
-@utility shadow-hair  { box-shadow: var(--sh-hair); }
-@utility shadow-quiet { box-shadow: var(--sh-quiet); }
-@utility shadow-lift  { box-shadow: var(--sh-lift); }
-@utility shadow-modal { box-shadow: var(--sh-modal); }
-
-/* An ink text link with a yellow underline that fills in on hover. */
+/* A text link: ink, with a lamp underline that thickens on hover. */
 @utility link {
   color: inherit;
   font-weight: 600;
   text-decoration-line: underline;
-  text-decoration-color: var(--color-beacon);
-  text-decoration-thickness: 0.18em;
-  text-underline-offset: 0.16em;
-  transition: background-color 150ms, text-decoration-color 150ms;
+  text-decoration-color: var(--color-lamp);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.22em;
+  transition: text-decoration-thickness 150ms var(--ease-out-quart), text-decoration-color 150ms;
 
-  &:hover { background-color: var(--color-beacon); color: var(--color-ink); text-decoration-color: var(--color-ink); }
+  &:hover { text-decoration-thickness: 0.32em; text-decoration-color: var(--color-lamp); }
 }
 
-/* ------------------------------------------------------------ motion
+/* ------------------------------------------------------------ the night scene
 
-   One light-up for the lamp's beam and a short rise for the hero copy.
-   Both only run for visitors who have not asked for reduced motion, and
-   nothing starts hidden in the markup. */
+   The lighthouse's beam sweeps back and forth: scaleX from -1 (inland, over
+   the title) through 0 (turned toward you, when the lamp flashes) to 1
+   (out to sea) and back. The ease-in-out timing makes the projection read
+   as a turning light rather than a wiper. Only transform and opacity
+   animate. Under reduced motion the beam holds still, pointing inland. */
 
-/* Only `transform` animates: Tailwind's translate utilities use the
-   separate `translate` property, which composes with it. */
-@keyframes beam-in {
-  from { opacity: 0; transform: scaleX(0.35); }
+@keyframes sweep {
+  0%   { transform: scaleX(-1); }
+  50%  { transform: scaleX(1); }
+  100% { transform: scaleX(-1); }
+}
+
+/* Turned away from you, the beam is hidden by the tower. */
+@keyframes sweep-fade {
+  0%, 68%, 82%, 100% { opacity: 1; }
+  75% { opacity: 0.15; }
+}
+
+@keyframes flash {
+  0%, 18%, 32%, 100% { opacity: 0; transform: scale(0.55); }
+  25% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: none; }
 }
 
-@keyframes rise-in {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: none; }
-}
-
-@keyframes fade-in {
+@keyframes fade {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
+.beam {
+  transform: scaleX(-1);
+  transform-origin: 0 50%;
+}
+
+/* The glare as the beam faces you. Zero-sized and anchored on the lamp,
+   so it scales out from the lantern. */
+.lamp-flash {
+  opacity: 0;
+  transform-origin: 0 0;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  .beam-in { animation: beam-in 1.1s var(--ease-out-soft) 0.3s both; transform-origin: left center; }
-  .rise-in { animation: rise-in 0.6s var(--ease-out-soft) both; }
-  .rise-in-2 { animation-delay: 0.06s; }
-  .rise-in-3 { animation-delay: 0.12s; }
-  .fade-in { animation: fade-in 0.2s ease-out both; }
+  .beam {
+    animation:
+      sweep 16s cubic-bezier(0.45, 0, 0.55, 1) infinite,
+      sweep-fade 16s linear infinite;
+    will-change: transform;
+  }
+  .lamp-flash { animation: flash 16s linear infinite; }
+  .rise { animation: rise 0.7s var(--ease-out-expo) both; }
+  .rise-2 { animation-delay: 0.08s; }
+  .rise-3 { animation-delay: 0.16s; }
+  .fade { animation: fade 0.9s var(--ease-out-quart) both; }
 }
 
 @media (prefers-reduced-motion: reduce) {

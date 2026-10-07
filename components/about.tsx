@@ -1,40 +1,50 @@
-import { STEPS } from "@/lib/content";
-import { BeaconMark } from "./ui/beacon-mark";
+import { EVENT } from "@/lib/event";
+import { BulbIcon, ClockIcon, TrophyIcon, UsersIcon } from "./ui/icons";
 
-/** What the day is and who it is for, then the four steps of the day. */
+const HIGHLIGHTS = [
+  { Icon: UsersIcon, title: "Teams of up to four", body: "Bring friends, or find a team at kickoff." },
+  { Icon: ClockIcon, title: `${EVENT.hours.hackingHours} hours to build`, body: `Hacking runs ${EVENT.hours.hacking}.` },
+  { Icon: BulbIcon, title: "Workshops and mentors", body: "Short workshops are planned, and mentors are being recruited." },
+  { Icon: TrophyIcon, title: "Judges and prizes", body: "Demo what you made to industry judges." },
+];
+
+/** What the day is and who it is for. */
 export function About() {
   return (
-    <section id="about" aria-labelledby="about-title" className="relative overflow-hidden bg-paper">
-      <BeaconMark className="pointer-events-none absolute -right-16 -bottom-20 size-[26rem] text-beacon opacity-25" />
-
-      <div className="wrap relative py-20 sm:py-28 lg:py-32">
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
-          <h2 id="about-title" className="display-xl lg:col-span-6">
-            Build what lights the way.
-          </h2>
-          <div className="flex flex-col gap-5 text-lg leading-relaxed text-ink-3 lg:col-span-5 lg:col-start-8 lg:pt-3">
-            <p>
-              Beacon Hacks is a free, one-day hackathon for high school students
-              across the Bay Area. Come with a team of up to four, or find one
-              on the day.
-            </p>
-            <p>
-              Never written code before? You are welcome here. Spend the day
-              making an app, a game, a website or a hardware hack with people
-              who want to build too, then show it to the judges.
-            </p>
-          </div>
+    <section id="about" aria-labelledby="about-title" className="bg-fog">
+      <div className="wrap grid gap-10 py-24 sm:py-32 lg:grid-cols-12 lg:gap-x-16 lg:py-40">
+        <h2 id="about-title" className="heading max-w-[13ch] lg:col-span-9">
+          Build what lights the way
+        </h2>
+        <div className="flex max-w-2xl flex-col gap-5 text-lg leading-relaxed text-ink-2 lg:col-span-7 lg:col-start-5 lg:mt-4">
+          <p>
+            Beacon Hacks is a free, one-day hackathon for high school students
+            from across the Bay Area. Come with a team of up to four, or find
+            one on the day.
+          </p>
+          <p>
+            Never written code before? You are welcome here. Spend the day
+            making an app, a game, a website or a hardware hack with people who
+            want to build too, then show it to the judges.
+          </p>
+          <p className="text-ink-3">
+            We are planning for {EVENT.capacityLabel} students
+            {EVENT.venue.place ? ` at ${EVENT.venue.place}` : ""} in {EVENT.venue.city}, and
+            recruiting mentors from the local tech community.
+          </p>
         </div>
 
-        <ol className="mt-16 grid gap-5 sm:mt-20 sm:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map((step, i) => (
-            <li key={step.title} className="brut brut-hover flex flex-col p-6">
-              <span className="meta text-beacon-deep">Step {String(i + 1).padStart(2, "0")}</span>
-              <h3 className="mt-3 text-[1.75rem] leading-none tracking-[-0.035em]">{step.title}</h3>
-              <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-3">{step.body}</p>
+        <ul className="mt-6 grid gap-x-10 gap-y-8 border-t border-line pt-12 sm:grid-cols-2 lg:col-span-12 lg:mt-10 lg:grid-cols-4">
+          {HIGHLIGHTS.map(({ Icon, title, body }) => (
+            <li key={title}>
+              <span className="grid size-11 place-items-center rounded-full bg-lamp-wash text-lamp-deep ring-1 ring-lamp/50">
+                <Icon className="size-[1.375rem]" />
+              </span>
+              <p className="mt-4 text-[1.0625rem] font-semibold">{title}</p>
+              <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-ink-3">{body}</p>
             </li>
           ))}
-        </ol>
+        </ul>
       </div>
     </section>
   );

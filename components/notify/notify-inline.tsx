@@ -2,13 +2,14 @@
 
 import { useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FieldError, fieldDarkClass } from "@/components/ui/field";
+import { FieldError, fieldNightClass } from "@/components/ui/field";
+import { EVENT } from "@/lib/event";
 import { ROLES, loadNotifySchema, useNotifySignup, type Role } from "./use-notify-signup";
 
 /**
- * The updates list as an inline form, for the dark closing band. Same
- * endpoint and states as the dialog; the schema loads when the email field
- * is first focused.
+ * The updates list, for everyone who is not applying: parents, mentors,
+ * judges, sponsors. One required field, on the night at the end of the
+ * page. The schema loads when the email field is first focused.
  */
 export function NotifyInline() {
   const { sending, done, emailError, error, setEmailError, submit } = useNotifySignup();
@@ -28,63 +29,70 @@ export function NotifyInline() {
 
   if (done) {
     return (
-      <div className="border-2 border-band-line p-6">
-        <p ref={status} tabIndex={-1} className="font-display text-[1.75rem] leading-none font-extrabold tracking-[-0.035em] focus:outline-none">
+      <div>
+        <p ref={status} tabIndex={-1} className="text-[1.5rem] leading-tight font-bold font-stretch-[118%] tracking-[-0.025em] focus:outline-none">
           You are on the list.
         </p>
-        <p className="mt-3 leading-relaxed text-band-muted">
-          We have <span className="font-semibold text-band-ink">{email.trim().toLowerCase()}</span>. One
-          email when the date and venue are confirmed, then only real news.
+        <p className="mt-3 leading-relaxed text-moon-2">
+          We have <span className="font-semibold text-moon">{email.trim().toLowerCase()}</span>. One
+          email when the {EVENT.venue.confirmed ? "date is" : "date and venue are"} confirmed, then
+          only real news.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4" aria-labelledby={`${emailId}-title`}>
-      <p id={`${emailId}-title`} className="meta text-beacon">
-        Not a student? Get updates
+    <form onSubmit={onSubmit} noValidate aria-labelledby={`${emailId}-title`}>
+      <p id={`${emailId}-title`} className="text-[1.25rem] leading-tight font-bold font-stretch-[118%] tracking-[-0.02em]">
+        Not a student? Get updates.
       </p>
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor={emailId} className="font-display text-[0.9375rem] font-extrabold text-band-ink">
-          Email
-        </label>
-        <input
-          id={emailId}
-          ref={emailField}
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          className={fieldDarkClass}
-          value={email}
-          onFocus={() => void loadNotifySchema()}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            if (emailError) setEmailError(null);
-          }}
-          aria-invalid={emailError ? true : undefined}
-          aria-describedby={emailError ? `${emailId}-error` : undefined}
-          required
-        />
-        {emailError ? (
-          <FieldError id={`${emailId}-error`} onDark>
-            {emailError}
-          </FieldError>
-        ) : null}
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor={roleId} className="font-display text-[0.9375rem] font-extrabold text-band-ink">
-          I am a
-        </label>
+      <p className="mt-2 text-[0.9375rem] leading-relaxed text-moon-3">
+        For parents, mentors, judges and sponsors. Beacon Hacks news only.
+      </p>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-start">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor={emailId} className="sr-only">
+            Email
+          </label>
+          <input
+            id={emailId}
+            ref={emailField}
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            className={fieldNightClass}
+            value={email}
+            onFocus={() => void loadNotifySchema()}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailError) setEmailError(null);
+            }}
+            aria-invalid={emailError ? true : undefined}
+            aria-describedby={emailError ? `${emailId}-error` : undefined}
+            required
+          />
+          {emailError ? (
+            <FieldError id={`${emailId}-error`} onNight>
+              {emailError}
+            </FieldError>
+          ) : null}
+        </div>
+
         <div className="relative">
+          <label htmlFor={roleId} className="sr-only">
+            I am a
+          </label>
           <select
             id={roleId}
-            className={`${fieldDarkClass} appearance-none pr-10`}
+            className={`${fieldNightClass} appearance-none pr-10`}
             value={role}
             onChange={(e) => setRole(e.target.value as Role)}
           >
             {ROLES.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-band text-band-ink">
+              <option key={opt.value} value={opt.value} className="bg-night text-moon">
                 {opt.label}
               </option>
             ))}
@@ -93,23 +101,22 @@ export function NotifyInline() {
             viewBox="0 0 16 16"
             aria-hidden="true"
             fill="none"
-            className="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-band-ink"
+            className="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-moon-2"
           >
-            <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
+
+        <Button type="submit" size="lg" loading={sending} className="h-[3.125rem]">
+          {sending ? "Saving…" : "Send me updates"}
+        </Button>
       </div>
 
       {error ? (
-        <p role="alert" className="border-2 border-[#ff8a7a] px-3.5 py-2.5 text-[0.9375rem] text-[#ffb4a8]">
+        <p role="alert" className="mt-4 rounded-xl border border-danger-night/50 px-4 py-3 text-[0.9375rem] text-danger-night">
           {error}
         </p>
       ) : null}
-
-      <Button type="submit" variant="lamp" size="lg" loading={sending} className="mt-1 w-full">
-        {sending ? "Saving…" : "Send me updates"}
-      </Button>
-      <p className="text-[0.8125rem] text-band-muted">For parents, mentors, judges and sponsors. Beacon Hacks news only.</p>
     </form>
   );
 }

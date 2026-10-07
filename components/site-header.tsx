@@ -9,10 +9,10 @@ import { BeaconMark, DiscordIcon } from "./ui/beacon-mark";
 /** Sections that light up a nav item while they fill the middle of the screen. */
 const SECTION_TO_NAV: Record<string, string> = {
   about: "#about",
+  tracks: "#about",
   schedule: "#schedule",
   judges: "#judges",
   sponsors: "#sponsors",
-  sponsorship: "#sponsors",
   faq: "#faq",
 };
 
@@ -24,9 +24,10 @@ type Props = {
 };
 
 /**
- * The sticky header. The phone menu is a native <details> disclosure, so it
- * opens and closes even before (or without) JavaScript; script only adds
- * the niceties: Escape, a click outside, or following a link closes it.
+ * The sticky header, on the night. The phone menu is a native <details>
+ * disclosure, so it opens and closes even before (or without) JavaScript;
+ * script only adds the niceties: Escape, a click outside, or following a
+ * link closes it.
  */
 export function SiteHeader({ home = true, showApply = true }: Props) {
   const menu = useRef<HTMLDetailsElement>(null);
@@ -99,20 +100,18 @@ export function SiteHeader({ home = true, showApply = true }: Props) {
 
   return (
     <header
-      className={`on-dark sticky top-0 z-50 border-b bg-band text-band-ink transition-[border-color] duration-200 ${
-        scrolled || open ? "border-band-line" : "border-transparent"
+      className={`night sticky top-0 z-50 border-b transition-[border-color] duration-300 ${
+        scrolled || open ? "border-moon/10" : "border-transparent"
       }`}
     >
-      <div className="wrap flex h-[4.5rem] items-center gap-6">
+      <div className="wrap flex h-16 items-center gap-6">
         <Link
           href={home ? "#top" : "/"}
-          className="-mx-1 flex shrink-0 items-center gap-2.5 rounded-full px-1 py-1"
+          className="-mx-1.5 flex shrink-0 items-center gap-2.5 rounded-full px-1.5 py-1"
           aria-label="Beacon Hacks, home"
         >
-          <BeaconMark className="size-8 text-beacon" />
-          <span className="font-display text-[1.25rem] leading-none font-extrabold tracking-[-0.035em]">
-            Beacon Hacks
-          </span>
+          <BeaconMark className="size-7 text-lamp" />
+          <span className="text-[1.0625rem] leading-none font-bold font-stretch-125% tracking-[-0.02em]">Beacon Hacks</span>
         </Link>
 
         <nav aria-label="Main" className="ml-auto hidden items-center gap-1 lg:flex">
@@ -123,29 +122,23 @@ export function SiteHeader({ home = true, showApply = true }: Props) {
                 key={item.href}
                 href={href(item.href)}
                 aria-current={current ? "true" : undefined}
-                className={`relative rounded-full px-3 py-2 font-display text-[0.9375rem] font-bold transition-colors ${
-                  current ? "text-beacon" : "text-band-ink hover:text-beacon"
+                className={`rounded-full px-3.5 py-2 text-[0.9375rem] font-medium transition-colors duration-200 ${
+                  current ? "text-lamp" : "text-moon-2 hover:text-moon"
                 }`}
               >
                 {item.label}
-                <span
-                  aria-hidden="true"
-                  className={`absolute inset-x-3 bottom-0.5 h-0.5 rounded-full bg-beacon transition-opacity duration-200 ${
-                    current ? "opacity-100" : "opacity-0"
-                  }`}
-                />
               </a>
             );
           })}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 lg:ml-2">
+        <div className="ml-auto flex items-center gap-2 lg:ml-3">
           {discord ? (
             <a
               href={discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden size-10 place-items-center rounded-full text-band-ink transition-colors hover:bg-band-ink/10 hover:text-beacon sm:grid"
+              className="hidden size-10 place-items-center rounded-full text-moon-2 transition-colors hover:bg-moon/10 hover:text-moon sm:grid"
             >
               <DiscordIcon className="size-5" />
               <span className="sr-only">Beacon Hacks on Discord (opens in a new tab)</span>
@@ -153,47 +146,42 @@ export function SiteHeader({ home = true, showApply = true }: Props) {
           ) : null}
 
           {showApply ? (
-            <LinkButton href="/apply" variant="lamp-flat" size="sm">
+            <LinkButton href="/apply" size="sm">
               Apply early
             </LinkButton>
           ) : null}
 
-          <details
-            ref={menu}
-            className="group lg:hidden"
-            onToggle={(e) => setOpen(e.currentTarget.open)}
-          >
-            <summary className="grid size-10 cursor-pointer place-items-center rounded-full border-2 border-band-ink/40 text-band-ink transition-colors hover:border-band-ink">
+          <details ref={menu} className="group lg:hidden" onToggle={(e) => setOpen(e.currentTarget.open)}>
+            <summary className="grid size-10 cursor-pointer place-items-center rounded-full text-moon transition-colors hover:bg-moon/10">
               <span className="sr-only">Menu</span>
-              <svg viewBox="0 0 16 16" className="size-4" aria-hidden="true" fill="none">
+              <svg viewBox="0 0 16 16" className="size-[1.125rem]" aria-hidden="true" fill="none">
                 <path
                   className="group-open:hidden"
-                  d="M2 4.5h12M2 8h12M2 11.5h12"
+                  d="M2 5h12M2 11h12"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="1.6"
                   strokeLinecap="round"
                 />
                 <path
                   className="hidden group-open:block"
                   d="M3.5 3.5l9 9M12.5 3.5l-9 9"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="1.6"
                   strokeLinecap="round"
                 />
               </svg>
             </summary>
 
-            <div className="absolute inset-x-0 top-full border-b-2 border-beacon bg-band">
-              <nav aria-label="Main" className="wrap flex flex-col py-3">
+            <div className="night absolute inset-x-0 top-full border-b border-moon/10">
+              <nav aria-label="Main" className="wrap flex flex-col pt-2 pb-6">
                 {NAV.map((item) => (
                   <a
                     key={item.href}
                     href={href(item.href)}
                     onClick={() => closeMenu(false)}
-                    className="flex items-center justify-between border-b border-band-line py-4 font-display text-2xl font-extrabold tracking-[-0.03em] text-band-ink last:border-b-0 hover:text-beacon"
+                    className="border-b border-moon/10 py-4 text-[1.375rem] font-bold font-stretch-125% tracking-[-0.02em] text-moon transition-colors hover:text-lamp"
                   >
                     {item.label}
-                    <span aria-hidden="true" className="text-beacon">↗</span>
                   </a>
                 ))}
                 {discord ? (
@@ -202,9 +190,9 @@ export function SiteHeader({ home = true, showApply = true }: Props) {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => closeMenu(false)}
-                    className="flex items-center gap-3 py-4 font-display text-2xl font-extrabold tracking-[-0.03em] text-band-ink hover:text-beacon"
+                    className="flex items-center gap-3 py-4 text-[1.375rem] font-bold font-stretch-125% tracking-[-0.02em] text-moon hover:text-lamp"
                   >
-                    <DiscordIcon className="size-6 text-beacon" />
+                    <DiscordIcon className="size-6 text-lamp" />
                     Join the Discord
                     <span className="sr-only">(opens in a new tab)</span>
                   </a>

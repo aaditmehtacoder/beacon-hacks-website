@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
 import { Hero } from "@/components/hero";
-import { Facts, Ticker } from "@/components/strip";
 import { About } from "@/components/about";
 import { Tracks } from "@/components/tracks";
 import { Prizes } from "@/components/prizes";
@@ -54,8 +53,6 @@ export default function Home() {
       <SiteHeader />
       <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         <Hero />
-        <Ticker />
-        <Facts />
         <About />
         <Tracks />
         <Prizes />

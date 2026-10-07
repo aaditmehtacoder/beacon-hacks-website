@@ -17,9 +17,9 @@ let schema: Promise<typeof import("@/lib/notify-schema")> | null = null;
 export const loadNotifySchema = () => (schema ??= import("@/lib/notify-schema"));
 
 /**
- * Submits to the updates list (/api/notify). Validation, the request, and
- * honest loading, error and success states, shared by the dialog and the
- * inline form at the bottom of the page.
+ * Submits to the updates list (/api/notify): validation, the request, and
+ * honest loading, error and success states for the form at the end of the
+ * home page.
  */
 export function useNotifySignup() {
   const [sending, setSending] = useState(false);

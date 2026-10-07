@@ -3,62 +3,31 @@
  * so in its own data (`status: "pending"`, a "Planned" tag, a note) and
  * the page shows that rather than stating it as fact.
  */
+import { EVENT } from "./event";
 
-/* ------------------------------------------------------------ the day */
-
-export type Step = { title: string; body: string };
-
-/** How the day goes, in order. */
-export const STEPS: Step[] = [
-  {
-    title: "Check in",
-    body: "Doors open at 8:30 AM. Find a seat, meet people, and join team matching if you came on your own.",
-  },
-  {
-    title: "Build",
-    body: "Hacking runs from 10 AM to 9 PM. Make an app, a game, a website or a hardware hack. If you can demo it, it counts.",
-  },
-  {
-    title: "Learn",
-    body: "Short optional workshops are planned through the day, and we are recruiting mentors from the local tech community.",
-  },
-  {
-    title: "Demo",
-    body: "At 9 PM the judges walk the room. Show them what you made and how it works. No slides, no stage.",
-  },
-];
-
-export type Fact = { label: string; value: string; note: string };
-
-/** The strip under the tracks. Capacity is the plan, not a signup count. */
-export const AT_A_GLANCE: Fact[] = [
-  { label: "Who", value: "Grades 9–12", note: "High school students from across the Bay Area" },
-  { label: "Experience", value: "None needed", note: "First Light is for first-timers" },
-  { label: "Team size", value: "1–4", note: "Bring friends or find a team at kickoff" },
-  { label: "Capacity", value: "75–100", note: "Planned capacity, not a signup count" },
-];
-
-export type Track = { tag: string; name: string; body: string; fit: string };
+export type Track = {
+  name: string;
+  body: string;
+  /** Finishes the sentence "Good fit if ..." */
+  fit: string;
+};
 
 /** Track names and briefs are ours to define. */
 export const TRACKS: Track[] = [
   {
-    tag: "Track 01",
     name: "Signal",
     body: "Cut through noise. Search, summarize, sort, surface: anything that helps a person find the thing that matters to them.",
-    fit: "You have a folder, feed or inbox you wish would sort itself.",
+    fit: "you have a folder, feed or inbox you wish would sort itself.",
   },
   {
-    tag: "Track 02",
     name: "Landfall",
     body: "Build for Belmont and the Peninsula. Civic data, schools, transit, small business: anything that makes the place around you work better.",
-    fit: "You already have a complaint about how something in your town works.",
+    fit: "you already have a complaint about how something in your town works.",
   },
   {
-    tag: "Track 03",
     name: "First Light",
     body: "Beginners only. Judged on what you learned and what you finished, not on how clean the code is.",
-    fit: "This is your first hackathon and you are not sure you belong. You do.",
+    fit: "this is your first hackathon and you are not sure you belong. You do.",
   },
 ];
 
@@ -110,35 +79,62 @@ export const SCHEDULE: Phase[] = [
 
 /* ------------------------------------------------------------ partners */
 
+export type Logo = { src: string; width: number; height: number };
+
 export type Partner = {
   id: string;
   name: string;
   /** Where the logo links. YRI asked for its referral link everywhere. */
   website: string;
   /** Under public/sponsors, on a transparent ground, with its real size. */
-  logo: { src: string; width: number; height: number };
-  /** The light version of the same logo, for the dark hero. */
-  logoOnDark: { src: string; width: number; height: number };
+  logo: Logo;
+  /** The light version, for the "Sponsored by" row on the night. */
+  logoOnNight: Logo;
   /** Optical size correction on top of the computed logo size. */
   logoScale?: number;
   /** What they give, in a few words. */
   gives: string;
-  /** Everything so far is in kind; cash sponsors get "Cash". */
-  form: "In kind" | "Cash";
+  /** The same in a word or two, under the logo in the hero. */
+  short: string;
+};
+
+export type VenueSponsor = {
+  name: string;
+  website: string;
+  logo: Logo;
+  /** The light version, for the "Sponsored by" row on the night. */
+  logoOnNight: Logo;
+  /** "pending" shows the logo with a "Being finalized" tag; "confirmed"
+      adds the line and the address. */
+  status: "pending" | "confirmed";
+  /** One line under the label, e.g. "Hosting Beacon Hacks at ..." */
+  line?: string;
+  address?: string;
 };
 
 /**
- * Companies that have committed in writing. None of it is cash, so
- * EVENT.budget.raisedUsd does not move for them. Add a company only once
- * they have said yes in writing; offers still being finalised live in
- * PENDING_OFFERS below and have no logo here.
+ * The venue sponsor, shown first in the sponsors section. RingCentral is
+ * being finalized: the logo shows with a "Being finalized" tag, and the
+ * venue stays unnamed elsewhere (EVENT.venue in lib/event.ts) until the
+ * written approval. Logo from the header of ringcentral.com.
+ */
+export const VENUE_SPONSOR: VenueSponsor | null = {
+  name: "RingCentral",
+  website: "https://www.ringcentral.com",
+  logo: { src: "/sponsors/ringcentral.svg", width: 961, height: 146 },
+  logoOnNight: { src: "/sponsors/ringcentral-white.svg", width: 961, height: 146 },
+  status: "pending",
+};
+
+/**
+ * Companies that have committed in writing, all in kind. Add a company
+ * only once they have said yes in writing; offers still being finalised
+ * live in PENDING_OFFERS below and have no logo here.
  *
  *  - CodeCrafters: prizes offered and accepted by email, Sept 28, 2026.
  *    Logo from the kit they sent; they asked for a link to codecrafters.io.
- *  - Perfect Corp: API units offered Sept 9, accepted the same day.
- *  - YRI Fellowship: partnership agreed by email, Sept 11, 2026. Logos
- *    (dark text for cream, white text for the dark hero) from
- *    yriscience.com/marketing-kit; the link is their referral link.
+ *  - YRI Fellowship: partnership agreed by email, Sept 11, 2026. Logo
+ *    from yriscience.com/marketing-kit; the link is their referral link.
  */
 export const PARTNERS: Partner[] = [
   {
@@ -146,29 +142,19 @@ export const PARTNERS: Partner[] = [
     name: "CodeCrafters",
     website: "https://codecrafters.io",
     logo: { src: "/sponsors/codecrafters.svg", width: 1280, height: 164 },
-    logoOnDark: { src: "/sponsors/codecrafters-white.svg", width: 1280, height: 164 },
+    logoOnNight: { src: "/sponsors/codecrafters-white.svg", width: 1280, height: 164 },
     gives: "VIP memberships for the top three teams",
-    form: "In kind",
-  },
-  {
-    id: "perfect-corp",
-    name: "Perfect Corp",
-    website: "https://www.perfectcorp.com",
-    logo: { src: "/sponsors/perfect-corp.svg", width: 150, height: 29 },
-    logoOnDark: { src: "/sponsors/perfect-corp.svg", width: 150, height: 29 },
-    logoScale: 0.8,
-    gives: "YouCam AI and AR API units for participants",
-    form: "In kind",
+    short: "Prizes",
   },
   {
     id: "yri",
     name: "YRI Fellowship",
     website: "https://yriscience.com?ref=BEACONHACKS",
     logo: { src: "/sponsors/yri-fellowship.png", width: 1200, height: 241 },
-    logoOnDark: { src: "/sponsors/yri-fellowship-white.png", width: 1200, height: 205 },
+    logoOnNight: { src: "/sponsors/yri-fellowship-white.png", width: 1200, height: 205 },
     logoScale: 1.18,
     gives: "Research scholarships and a mentorship prize",
-    form: "In kind",
+    short: "Scholarships",
   },
 ];
 
@@ -197,16 +183,6 @@ export const CONFIRMED_PRIZES: Offer[] = [
     title: "Research scholarships and mentorship",
     who: "Winning teams",
     detail: "Winning team members receive scholarships of up to $1,500 toward YRI’s research mentorship program, and all winners get guaranteed application review with priority admission consideration. The overall winning team also receives a featured mentorship prize.",
-  },
-];
-
-/** For everyone who takes part, committed in writing. */
-export const PARTICIPANT_PERKS: Offer[] = [
-  {
-    from: "Perfect Corp",
-    title: "YouCam AI and AR APIs",
-    who: "Every participant",
-    detail: "Free API units to build with during the event. Access details are shared before the day.",
   },
 ];
 
@@ -349,27 +325,6 @@ export const PACKAGES: Package[] = [
   },
 ];
 
-/** Not cash, and not priced against a cash package by retail value. */
-export const IN_KIND = {
-  summary: "Food, equipment, prizes, software and services.",
-  body: "Tell us what you would like to offer and we will agree on recognition together. In-kind support is welcome at any size and is not matched to a cash package by its retail value.",
-};
-
-export const SPONSOR_VALUE = [
-  {
-    title: "Keep it free",
-    body: "Sponsorship pays for food, the venue and prizes, so every student attends at no cost.",
-  },
-  {
-    title: "Meet new builders",
-    body: "Put your name in front of Bay Area high school students who are learning to build.",
-  },
-  {
-    title: "Put your tools to work",
-    body: "Offer credits, an API or a workshop that teams can use on the day.",
-  },
-];
-
 /* ------------------------------------------------------------ FAQ */
 
 export type Faq = {
@@ -398,7 +353,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: "Can I apply now?",
-    a: "Yes. Early applications are open and take about two minutes. Applying does not guarantee a spot: we confirm spots once the venue and budget are set, and we will email everyone who applied.",
+    a: `Yes. Early applications are open and take about two minutes. Applying does not guarantee a spot: we confirm spots once ${EVENT.applications.until}, and we will email everyone who applied.`,
     link: { href: "/apply", label: "Apply early" },
   },
   {
@@ -415,11 +370,13 @@ export const FAQS: Faq[] = [
   },
   {
     q: "Where is it?",
-    a: "In Belmont, California. We will publish the venue name and address once our host approves in writing, and applicants will hear first.",
+    a: EVENT.venue.place
+      ? `At ${EVENT.venue.place}, ${EVENT.venue.address}. There is parking, and Belmont Caltrain is within walking distance.`
+      : "In Belmont, California. The venue is being finalized; we will publish the address once it is confirmed, and applicants will hear first.",
   },
   {
     q: "How can my company sponsor?",
-    a: "Pick a package above or write to us. We also welcome in-kind support: food, equipment, prizes, software and services.",
+    a: "Pick a package in the sponsors section or write to us. In-kind support is welcome too: food, equipment, prizes, software and services.",
     link: { href: "mailto", label: "Email the team" },
   },
   {

@@ -1,48 +1,34 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 
-type Variant = "beacon" | "primary" | "ghost" | "quiet" | "lamp" | "lamp-flat" | "ghost-dark";
+type Variant = "lamp" | "ink" | "outline" | "outline-night";
 type Size = "sm" | "md" | "lg";
 
-/* Pills with a heavy label. The hard shadow sits under the button and the
-   button presses down into it on click. */
+/* Pills with a semi-expanded label. Hover lifts a hair; press settles. */
 const BASE =
-  "relative inline-flex items-center justify-center gap-2.5 rounded-full whitespace-nowrap font-display font-extrabold tracking-[-0.01em] select-none " +
-  "transition-[background-color,border-color,color,box-shadow,transform] duration-150 " +
-  "disabled:cursor-not-allowed disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:opacity-55";
+  "relative inline-flex items-center justify-center gap-2 rounded-full whitespace-nowrap font-semibold font-stretch-[112.5%] tracking-[-0.005em] select-none " +
+  "transition-[background-color,border-color,color,box-shadow,transform] duration-200 ease-out-quart " +
+  "hover:-translate-y-px active:translate-y-0 " +
+  "disabled:cursor-not-allowed disabled:opacity-55 disabled:hover:translate-y-0";
 
 /**
- * beacon: the yellow action on cream (Apply, Send).
- * lamp: the yellow action on a dark band; lamp-flat is the same without
- * the shadow, for the header.
- * primary: an ink pill, for organiser pages.
- * ghost / ghost-dark: the outlined secondary action, on cream / on dark.
- * quiet: a soft control for toolbars.
+ * lamp: the main action, on night or fog (Apply, Send).
+ * ink: a solid secondary action on fog.
+ * outline / outline-night: the quiet secondary action on fog / on night.
  */
 const VARIANT: Record<Variant, string> = {
-  beacon:
-    "bg-beacon text-beacon-ink border-2 border-ink shadow-[4px_4px_0_var(--color-ink)] " +
-    "hover:-translate-y-0.5 hover:shadow-[6px_6px_0_var(--color-ink)] active:translate-y-0.5 active:shadow-[1px_1px_0_var(--color-ink)] " +
-    "disabled:translate-y-0 disabled:shadow-[4px_4px_0_var(--color-ink)]",
   lamp:
-    "bg-beacon text-beacon-ink border-2 border-beacon shadow-[5px_5px_0_var(--color-paper)] " +
-    "hover:-translate-y-0.5 hover:shadow-[7px_7px_0_var(--color-paper)] active:translate-y-0.5 active:shadow-[1px_1px_0_var(--color-paper)]",
-  "lamp-flat":
-    "bg-beacon text-beacon-ink border-2 border-beacon hover:bg-beacon-hi hover:border-beacon-hi hover:-translate-y-px active:translate-y-px",
-  primary:
-    "bg-ink text-paper border-2 border-ink hover:bg-ink-2 hover:border-ink-2 active:translate-y-px",
-  ghost:
-    "bg-transparent text-ink border-2 border-ink hover:bg-ink hover:text-paper active:translate-y-px",
-  "ghost-dark":
-    "bg-transparent text-band-ink border-2 border-band-ink/45 hover:border-band-ink hover:bg-band-ink hover:text-band active:translate-y-px",
-  quiet:
-    "bg-card text-ink border-2 border-line hover:border-ink active:translate-y-px",
+    "bg-lamp text-ink shadow-[0_1px_0_rgb(255_255_255/0.45)_inset,0_10px_30px_-12px_rgb(255_199_44/0.7)] " +
+    "hover:bg-lamp-hi hover:shadow-[0_1px_0_rgb(255_255_255/0.45)_inset,0_14px_36px_-12px_rgb(255_199_44/0.85)]",
+  ink: "bg-ink text-fog hover:bg-ink-2",
+  outline: "border border-line-2 bg-card text-ink hover:border-ink",
+  "outline-night": "border border-moon/25 text-moon hover:border-moon/60 hover:bg-moon/5",
 };
 
 const SIZE: Record<Size, string> = {
-  sm: "h-9 px-3.5 text-[0.875rem] sm:px-4",
+  sm: "h-9 px-4 text-[0.875rem]",
   md: "h-11 px-5 text-[0.9375rem]",
-  lg: "h-[3.25rem] px-5 text-base sm:px-6",
+  lg: "h-13 px-7 text-base",
 };
 
 function classes(variant: Variant, size: Size, extra?: string) {
@@ -58,7 +44,7 @@ type ButtonProps = ComponentProps<"button"> & {
 };
 
 export function Button({
-  variant = "primary",
+  variant = "lamp",
   size = "md",
   loading = false,
   className,
@@ -84,18 +70,13 @@ type LinkButtonProps = ComponentProps<typeof Link> & {
   size?: Size;
 };
 
-export function LinkButton({
-  variant = "primary",
-  size = "md",
-  className,
-  ...rest
-}: LinkButtonProps) {
+export function LinkButton({ variant = "lamp", size = "md", className, ...rest }: LinkButtonProps) {
   return <Link className={classes(variant, size, className)} {...rest} />;
 }
 
 /** For mailto: and other non-route links that should look like buttons. */
 export function AnchorButton({
-  variant = "primary",
+  variant = "lamp",
   size = "md",
   className,
   ...rest
@@ -112,25 +93,30 @@ function Spinner() {
   );
 }
 
-/** A north-east arrow that nudges on hover of its parent `group`. */
+/** A right arrow that slides a little on hover of its parent `group`. */
 export function Arrow({ className = "" }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 16 16"
-      className={`size-4 shrink-0 transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ${className}`}
+      className={`size-4 shrink-0 transition-transform duration-200 ease-out-quart group-hover:translate-x-0.5 ${className}`}
       aria-hidden="true"
       fill="none"
     >
-      <path d="M4.5 11.5l7-7M5.5 4.5h6v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M2.5 8h10.5M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-/** A ✦, the small star used as a bullet and a divider. Decorative. */
-export function Spark({ className = "" }: { className?: string }) {
+/** An arrow up and out, for links that leave the site. */
+export function OutArrow({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 16 16" className={`shrink-0 ${className}`} aria-hidden="true" fill="currentColor">
-      <path d="M8 0c.5 4.2 3.8 7.5 8 8-4.2.5-7.5 3.8-8 8-.5-4.2-3.8-7.5-8-8 4.2-.5 7.5-3.8 8-8Z" />
+    <svg
+      viewBox="0 0 16 16"
+      className={`size-3.5 shrink-0 transition-transform duration-200 ease-out-quart group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ${className}`}
+      aria-hidden="true"
+      fill="none"
+    >
+      <path d="M4.5 11.5l7-7M5.5 4.5h6v6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }

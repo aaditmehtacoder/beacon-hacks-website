@@ -1,45 +1,57 @@
-import { AT_A_GLANCE, TRACKS } from "@/lib/content";
+import { TRACKS } from "@/lib/content";
 import { Section } from "./ui/section";
-import { Spark } from "./ui/button";
 
-/** The three tracks, on the yellow band, and who the day is for. */
+/** A small drawing for each track, in the language of the scene. */
+const GLYPHS = [
+  /* Signal: a light and the rings it sends out */
+  <svg key="signal" viewBox="0 0 48 48" fill="none" className="size-14">
+    <circle cx="24" cy="24" r="4.5" className="fill-lamp" />
+    <path d="M15.5 15.5a12 12 0 0 0 0 17M32.5 15.5a12 12 0 0 1 0 17M10 10a19.8 19.8 0 0 0 0 28M38 10a19.8 19.8 0 0 1 0 28" className="stroke-ink" strokeWidth="2" strokeLinecap="round" />
+  </svg>,
+  /* Landfall: a coast coming up over the water */
+  <svg key="landfall" viewBox="0 0 48 48" fill="none" className="size-14">
+    <path d="M6 30c5-1 7-8 13-9 5-1 7 4 11 3 4-1 6-7 12-7v13H6Z" className="fill-lamp" />
+    <path d="M4 34h40M8 39h10M24 39h16" className="stroke-ink" strokeWidth="2" strokeLinecap="round" />
+  </svg>,
+  /* First Light: the sun just over the horizon */
+  <svg key="first-light" viewBox="0 0 48 48" fill="none" className="size-14">
+    <path d="M14 32a10 10 0 0 1 20 0Z" className="fill-lamp" />
+    <path d="M4 32h40M24 12v5M10.5 18.5l3.5 3.5M37.5 18.5 34 22M10 38h28" className="stroke-ink" strokeWidth="2" strokeLinecap="round" />
+  </svg>,
+];
+
+/** The three tracks, as rows. */
 export function Tracks() {
   return (
     <Section
       id="tracks"
-      tone="yellow"
-      word="TRACKS"
-      title="Pick a track."
-      lede="Three ways to point a light. Choose one at kickoff; a project can be judged in more than one."
+      title="Three tracks"
+      lede="Choose one at kickoff. A project can be judged in more than one."
     >
-      <ul className="grid gap-5 lg:grid-cols-3">
-        {TRACKS.map((track) => (
-          <li key={track.name} className="brut brut-hover flex flex-col p-7">
-            <span className="meta text-ink-2">{track.tag}</span>
-            <h3 className="mt-4 text-[2.5rem] leading-[0.95] tracking-[-0.045em]">{track.name}</h3>
-            <p className="mt-4 flex-1 leading-relaxed text-ink-3">{track.body}</p>
-            <p className="mt-6 flex gap-2.5 border-t-2 border-ink pt-4 text-[0.9375rem] leading-relaxed font-medium text-ink">
-              <Spark className="mt-1.5 size-3 text-ink" />
-              {track.fit}
-            </p>
+      <ol className="border-t border-line">
+        {TRACKS.map((track, i) => (
+          <li
+            key={track.name}
+            className="group grid gap-x-10 gap-y-5 border-b border-line py-10 sm:py-12 lg:grid-cols-12 lg:items-start"
+          >
+            <div className="flex items-center gap-5 lg:col-span-5">
+              <span aria-hidden="true" className="shrink-0">
+                {GLYPHS[i]}
+              </span>
+              <h3 className="text-[2rem] leading-none font-bold font-stretch-125% tracking-[-0.035em] sm:text-[2.5rem]">
+                {track.name}
+              </h3>
+            </div>
+            <div className="lg:col-span-7 lg:pt-1">
+              <p className="max-w-2xl text-lg leading-relaxed text-ink-2">{track.body}</p>
+              <p className="mt-4 max-w-2xl leading-relaxed text-ink-3">
+                <span className="font-semibold text-lamp-deep">Good fit if </span>
+                {track.fit}
+              </p>
+            </div>
           </li>
         ))}
-      </ul>
-
-      <dl className="mt-10 grid border-2 border-ink bg-card sm:grid-cols-2 lg:grid-cols-4">
-        {AT_A_GLANCE.map((fact, i) => (
-          <div
-            key={fact.label}
-            className={`flex flex-col gap-1 border-ink px-5 py-5 ${i > 0 ? "border-t-2 sm:border-t-0" : ""} ${
-              i % 2 === 1 ? "sm:border-l-2" : ""
-            } ${i >= 2 ? "sm:border-t-2 lg:border-t-0" : ""} ${i === 2 ? "lg:border-l-2" : ""}`}
-          >
-            <dt className="meta text-ink-2">{fact.label}</dt>
-            <dd className="font-display text-[1.5rem] leading-tight font-extrabold tracking-[-0.03em]">{fact.value}</dd>
-            <dd className="text-[0.875rem] leading-snug text-ink-3">{fact.note}</dd>
-          </div>
-        ))}
-      </dl>
+      </ol>
     </Section>
   );
 }

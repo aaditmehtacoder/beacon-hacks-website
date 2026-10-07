@@ -6,17 +6,50 @@
  * false` and a note saying what confirms it, and the site renders that
  * note next to the fact instead of asserting it.
  */
+type Venue = {
+  /** True once the host has approved in writing; names it everywhere. */
+  confirmed: boolean;
+  city: string;
+  label: string;
+  /** Shown where the venue would be named, until it is. */
+  note: string;
+  /** The host, its building and address: set together with `confirmed`. */
+  name?: string;
+  place?: string;
+  address?: string;
+  /** A map link for the address. */
+  map?: string;
+};
+
+/**
+ * The venue is being finalized. The venue sponsor's logo shows in the
+ * sponsors section (VENUE_SPONSOR in lib/content.ts), but the venue is not
+ * named or addressed anywhere else until the host approves in writing.
+ * Then fill in `name`, `place`, `address` and `map`, set `confirmed: true`,
+ * and set VENUE_SPONSOR's status to "confirmed" with its line and address.
+ * The hero, schedule, FAQ, apply page, footer and share card follow.
+ */
+const VENUE: Venue = {
+  confirmed: false,
+  city: "Belmont",
+  label: "Belmont, California",
+  note: "Venue being finalized",
+};
+
 export const EVENT = {
   name: "Beacon Hacks",
   tagline: "A free hackathon for Bay Area high school builders.",
 
-  /** The target date. It is confirmed together with the venue. */
+  /** The target date. Set `confirmed: true` once it is final; every
+      "target date" note on the site keys off this flag. */
   date: {
     iso: "2027-01-30",
+    /** When doors open, Pacific time: what the countdown counts to. */
+    starts: "2027-01-30T08:30:00-08:00",
     label: "Saturday, January 30, 2027",
     short: "Sat, Jan 30, 2027",
     confirmed: false,
-    note: "Target date, confirmed with the venue",
+    note: "Target date",
   },
 
   /**
@@ -29,44 +62,17 @@ export const EVENT = {
     hackingHours: 11,
   },
 
-  /**
-   * The venue is in approval and the host has asked us not to use their
-   * name publicly yet, so nothing here identifies them. Fill in `name`
-   * and `address` and set `confirmed: true` only after written approval.
-   */
-  venue: {
-    confirmed: false,
-    city: "Belmont",
-    region: "CA",
-    label: "Belmont, California",
-    note: "Venue announced after the host’s written approval",
-  },
-
-  eligibility: {
-    label: "High school students",
-    detail: "Grades 9 to 12, no experience needed",
-  },
-
-  teamSize: "1 to 4",
+  venue: VENUE,
 
   /** Planned capacity, not a count of signups. */
   capacityLabel: "75 to 100",
 
-  /** Cash only. In-kind support never moves `raisedUsd`. */
-  budget: {
-    targetUsd: 10_500,
-    raisedUsd: 0,
-  },
-
   /**
-   * Early applications are open: anyone can apply now. Spots are
-   * confirmed once the venue and the budget are set.
+   * Early applications are open: anyone can apply now. `until` finishes
+   * the sentence "Spots are confirmed once ...".
    */
   applications: {
-    open: true,
-    early: true,
-    label: "Open early",
-    note: "Spots confirmed once the venue and budget are set",
+    until: VENUE.confirmed ? "the date and budget are final" : "the venue and budget are set",
   },
 
   /**

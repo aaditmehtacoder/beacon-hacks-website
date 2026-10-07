@@ -1,7 +1,7 @@
 /**
  * The mark: a lamp seen from above, its lens ring, and the two beams a
  * lighthouse throws. Static. Colour comes from currentColor, so
- * `text-beacon` on the element lights it.
+ * `text-lamp` on the element lights it.
  */
 export function BeaconMark({ className = "size-6" }: { className?: string }) {
   return (
@@ -13,16 +13,6 @@ export function BeaconMark({ className = "size-6" }: { className?: string }) {
       </g>
       <circle cx="16" cy="16" r="4.6" fill="currentColor" />
     </svg>
-  );
-}
-
-/** The mark as a yellow sticker with an ink edge, for light grounds,
-    where a bare yellow mark would disappear into the cream. */
-export function BeaconSticker({ className = "size-9" }: { className?: string }) {
-  return (
-    <span aria-hidden="true" className={`grid shrink-0 place-items-center border-2 border-ink bg-beacon ${className}`}>
-      <BeaconMark className="size-[70%] text-ink" />
-    </span>
   );
 }
 

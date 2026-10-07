@@ -1,11 +1,12 @@
 import Image from "next/image";
-import type { Partner } from "@/lib/content";
+import type { Logo } from "@/lib/content";
 
 /**
  * A partner logo at a size set by area rather than height, so a long
  * wordmark and a compact lockup carry about the same visual weight. The
  * width is capped by its container and the height follows the aspect
- * ratio, so a narrow cell scales the whole logo down evenly.
+ * ratio, so a narrow cell scales the whole logo down evenly. The name is
+ * always in the text nearby, so the image itself is decorative.
  */
 export function PartnerLogo({
   logo,
@@ -13,7 +14,7 @@ export function PartnerLogo({
   area = 6400,
   className = "",
 }: {
-  logo: Partner["logo"];
+  logo: Logo;
   scale?: number;
   area?: number;
   className?: string;

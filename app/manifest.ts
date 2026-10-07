@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "A free hackathon for Bay Area high school builders.",
     start_url: "/",
     display: "standalone",
-    background_color: "#fbf6ec",
-    theme_color: "#1b1712",
+    background_color: "#f4f7fa",
+    theme_color: "#060d1b",
     icons: [
       { src: "/icon.svg", sizes: "any", type: "image/svg+xml" },
       { src: "/brand/mark-512.png", sizes: "512x512", type: "image/png" },

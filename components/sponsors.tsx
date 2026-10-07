@@ -1,222 +1,163 @@
-import { IN_KIND, PACKAGES, PARTNERS, SPONSOR_VALUE, type Partner } from "@/lib/content";
+import { PACKAGES, PARTNERS, VENUE_SPONSOR } from "@/lib/content";
 import { EVENT, mailto } from "@/lib/event";
-import { AnchorButton, Arrow, Spark } from "./ui/button";
-import { Tag } from "./ui/section";
+import { AnchorButton, Arrow, OutArrow } from "./ui/button";
+import { Section, Tag } from "./ui/section";
 import { PartnerLogo } from "./ui/partner-logo";
-import { NotifyLink } from "./notify/notify-button";
+import { HourglassIcon } from "./ui/icons";
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
 
 /**
- * Sponsorship and the partners backing the day. Four cash packages, each
- * listing only what is new at that level; an in-kind option for anything
- * that is not money; inquiry links that open an email with the package in
- * the subject. There is no payment flow on purpose: every sponsorship
- * starts as a conversation. Cash sponsors and in-kind partners are shown
- * apart, and nobody is shown at a paid tier they did not buy.
+ * Who backs the day, and how to join them. The venue sponsor first, then
+ * the in-kind partners, then four cash packages, each listing only what is
+ * new at that level. Every inquiry opens an email with the package in the
+ * subject: there is no payment flow, and every sponsorship starts as a
+ * conversation.
  */
 export function Sponsors() {
-  const { targetUsd, raisedUsd } = EVENT.budget;
-  const cash = PARTNERS.filter((p) => p.form === "Cash");
-  const inKind = PARTNERS.filter((p) => p.form === "In kind");
-
   return (
-    <section id="sponsors" aria-labelledby="sponsors-title" className="relative overflow-hidden border-y border-line bg-paper-warm dots">
-      <span
-        aria-hidden="true"
-        className="outline-word absolute -top-4 -right-6 text-[min(19vw,13.5rem)] [--word-stroke:rgba(27,23,18,0.08)] sm:-top-8"
-      >
-        BACK US
-      </span>
-
-      <div className="wrap relative py-20 sm:py-28 lg:py-32">
-        <div className="grid gap-12 lg:grid-cols-12 lg:items-end lg:gap-10">
-          <div className="lg:col-span-7">
-            <h2 id="sponsors-title" className="display-xl">
-              Sponsor Beacon Hacks.
-            </h2>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-3">
-              Help keep a full day of building free for Bay Area high school
-              students. The day’s budget is {usd(targetUsd)} for food, the venue
-              and prizes.{" "}
-              {raisedUsd > 0
-                ? `${usd(raisedUsd)} in cash is committed so far.`
-                : "No cash sponsors have joined yet, so early support goes a long way."}
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-6 lg:col-span-5 lg:pb-2">
-            <CtaCard
-              href={mailto("Sponsoring Beacon Hacks", undefined, EVENT.email.sponsors)}
-              kicker="Interested in sponsoring?"
-              title="Email the team"
-              yellow
-            />
-            <CtaCard
-              href={mailto("Beacon Hacks in-kind support", undefined, EVENT.email.sponsors)}
-              kicker="Food, prizes, tools or services?"
-              title="Support in kind"
-            />
-          </div>
+    <Section
+      id="sponsors"
+      tone="band"
+      title="Sponsors"
+      lede="Beacon Hacks is free for every student because companies back it. Thank you to the partners making the day happen."
+    >
+      {VENUE_SPONSOR ? (
+        <div>
+          <p className="kicker text-lamp-deep">Venue sponsor</p>
+          {VENUE_SPONSOR.line ? <p className="mt-2 text-ink-2">{VENUE_SPONSOR.line}</p> : null}
+          <a
+            href={VENUE_SPONSOR.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`group mt-5 flex flex-col gap-6 rounded-3xl border border-line bg-card p-8 transition-[border-color,box-shadow] duration-300 hover:border-line-2 hover:shadow-[0_24px_50px_-30px_rgb(15_24_40/0.35)] sm:flex-row sm:justify-between sm:p-10 ${
+              VENUE_SPONSOR.address ? "sm:items-end" : "sm:items-center"
+            }`}
+          >
+            <span className="flex flex-col gap-4">
+              <PartnerLogo logo={VENUE_SPONSOR.logo} area={22000} />
+              {VENUE_SPONSOR.address ? (
+                <span className="text-[0.9375rem] font-medium text-ink-3">{VENUE_SPONSOR.address}</span>
+              ) : null}
+            </span>
+            <span className="flex items-center gap-4">
+              {VENUE_SPONSOR.status === "pending" ? (
+                <Tag tone="pending">
+                  <HourglassIcon className="size-3.5" />
+                  Being finalized
+                </Tag>
+              ) : null}
+              <span className="inline-flex items-center gap-1.5 text-[0.9375rem] font-semibold text-ink-2 group-hover:text-ink">
+                {VENUE_SPONSOR.name}
+                <OutArrow />
+              </span>
+            </span>
+            <span className="sr-only">(opens in a new tab)</span>
+          </a>
         </div>
+      ) : null}
 
-        <ul className="mt-16 grid gap-x-8 gap-y-6 sm:mt-20 sm:grid-cols-3">
-          {SPONSOR_VALUE.map((point) => (
-            <li key={point.title} className="flex gap-3">
-              <Spark className="mt-1.5 size-3.5 text-beacon-deep" />
-              <div>
-                <h3 className="text-[1.25rem] leading-tight tracking-[-0.03em]">{point.title}</h3>
-                <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-ink-3">{point.body}</p>
-              </div>
+      <div className="mt-14">
+        <p className="kicker text-ink-3">In-kind partners</p>
+        <ul className="mt-5 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2">
+          {PARTNERS.map((partner) => (
+            <li key={partner.id} className="bg-card">
+              <a
+                href={partner.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex h-full flex-col gap-8 p-8 transition-colors duration-300 hover:bg-fog/60"
+              >
+                <span className="flex h-12 items-center">
+                  <PartnerLogo logo={partner.logo} scale={partner.logoScale} area={5600} />
+                </span>
+                <span className="mt-auto flex items-end justify-between gap-4">
+                  <span className="flex flex-col gap-1">
+                    <span className="font-semibold text-ink">{partner.name}</span>
+                    <span className="text-[0.9375rem] leading-snug text-ink-3">{partner.gives}</span>
+                  </span>
+                  <OutArrow className="mb-1 text-ink-3 group-hover:text-ink" />
+                  <span className="sr-only">(opens in a new tab)</span>
+                </span>
+              </a>
             </li>
           ))}
         </ul>
+      </div>
 
-        <div id="packages" className="relative isolate mt-16 scroll-mt-28 sm:mt-20">
-          <span
-            aria-hidden="true"
-            className="absolute -inset-x-3 top-6 -bottom-4 -z-10 -rotate-[0.6deg] bg-beacon/30 sm:-right-4 sm:left-6"
-          />
-          <ol className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {PACKAGES.map((pkg, i) => {
-              const previous = PACKAGES[i - 1];
-              const subject = `Beacon Hacks sponsorship: ${pkg.name} (${usd(pkg.priceUsd)})`;
-              const body = `Hi Beacon Hacks team,\n\nWe are interested in the ${pkg.name} package (${usd(pkg.priceUsd)}).\n\nCompany:\nContact name:\n`;
-              return (
-                <li key={pkg.id} className="brut brut-hover relative flex flex-col overflow-hidden px-6 pt-9 pb-6">
-                  <span aria-hidden="true" className="absolute inset-x-0 top-0 h-2.5 border-b-2 border-ink bg-beacon" />
-                  <h3 className="meta text-beacon-deep">{pkg.name}</h3>
-                  <p className="mt-3 font-display text-[3.25rem] leading-[0.9] font-extrabold tracking-[-0.055em] tabular-nums">
-                    {usd(pkg.priceUsd)}
-                  </p>
-                  <p className="mt-4 text-[0.9375rem] leading-relaxed text-ink-3">{pkg.pitch}</p>
-
-                  <div className="mt-5 flex-1 border-t border-line pt-5">
-                    <p className="meta text-ink-2">{previous ? `Everything in ${previous.name}, plus` : "Includes"}</p>
-                    <ul className="mt-3 flex flex-col gap-2.5">
-                      {pkg.benefits.map((benefit) => (
-                        <li key={benefit} className="flex gap-2.5 text-[0.9375rem] leading-snug text-ink">
-                          <Spark className="mt-1 size-3 text-beacon-deep" />
-                          {benefit}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <AnchorButton href={mailto(subject, body, EVENT.email.sponsors)} variant="ghost" className="mt-7 w-full">
-                    Inquire about {pkg.name}
-                  </AnchorButton>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
-
-        <p className="mt-10 max-w-3xl text-[0.9375rem] leading-relaxed text-ink-3">
-          Packages carry no exclusivity, and we never share participant contact
-          information with sponsors.
-        </p>
-
-        <div className="mt-16 sm:mt-20">
-          <div className="flex flex-col gap-2 border-b-2 border-ink pb-4 sm:flex-row sm:items-end sm:justify-between">
-            <h3 className="text-[2rem] leading-none tracking-[-0.04em]">Backing the day</h3>
-            <p className="text-[0.9375rem] text-ink-3">Every partner so far gives in kind. Listed alphabetically.</p>
-          </div>
-
-          {cash.length ? <PartnerGrid partners={cash} /> : null}
-          <PartnerGrid partners={inKind} />
-
-          {cash.length ? null : (
-            <div className="mt-6 flex flex-col gap-4 border-2 border-dashed border-ink-3 p-6 sm:flex-row sm:items-center sm:justify-between">
-              <p className="leading-relaxed text-ink-2">
-                <span className="font-display font-extrabold text-ink">Cash sponsors: open.</span>{" "}
-                Packages start at {usd(PACKAGES[0].priceUsd)}.
-              </p>
-              <a href="#packages" className="link shrink-0">
-                See the packages
-              </a>
-            </div>
-          )}
-        </div>
-
-        <div className="mt-10 flex flex-col gap-5 border-2 border-ink bg-card/80 p-6 shadow-[5px_5px_0_rgba(27,23,18,0.14)] sm:p-7 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
-          <div>
-            <p className="leading-relaxed text-ink-2">
-              <span className="font-display font-extrabold text-ink">In kind works too.</span>{" "}
-              {IN_KIND.summary} {IN_KIND.body}
+      <div id="packages" className="mt-24 scroll-mt-24">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
+          <div className="max-w-2xl">
+            <h3 className="text-[2rem] leading-none font-bold font-stretch-125% tracking-[-0.035em] sm:text-[2.5rem]">
+              Become a sponsor
+            </h3>
+            <p className="mt-5 text-lg leading-relaxed text-ink-3">
+              Cash sponsorship pays for meals, prizes and supplies, and keeps
+              the day free for every student. Packages carry no exclusivity,
+              and we never share participant contact information.
             </p>
           </div>
           <AnchorButton
-            href={mailto("Beacon Hacks in-kind support", undefined, EVENT.email.sponsors)}
-            variant="beacon"
-            className="shrink-0 self-start lg:self-auto"
+            href={mailto("Sponsoring Beacon Hacks", undefined, EVENT.email.sponsors)}
+            variant="ink"
+            size="lg"
+            className="group shrink-0 self-start lg:self-auto"
           >
-            Offer in-kind support
+            Email the team
+            <Arrow />
           </AnchorButton>
         </div>
 
-        <p className="mt-10 leading-relaxed text-ink-3">
-          Questions first? Write to{" "}
-          <a href={mailto("Sponsoring Beacon Hacks", undefined, EVENT.email.sponsors)} className="link">
-            {EVENT.email.sponsors}
+        <ol className="mt-10 grid gap-px overflow-hidden rounded-3xl border border-line bg-line md:grid-cols-2 xl:grid-cols-4">
+          {PACKAGES.map((pkg, i) => {
+            const previous = PACKAGES[i - 1];
+            const subject = `Beacon Hacks sponsorship: ${pkg.name} (${usd(pkg.priceUsd)})`;
+            const body = `Hi Beacon Hacks team,\n\nWe are interested in the ${pkg.name} package (${usd(pkg.priceUsd)}).\n\nCompany:\nContact name:\n`;
+            return (
+              <li key={pkg.id} className="flex flex-col bg-card p-7 sm:p-8">
+                <h4 className="text-[1rem] font-semibold text-ink-2">{pkg.name}</h4>
+                <p className="mt-2 text-[2.75rem] leading-none font-bold font-stretch-125% tracking-[-0.04em] tabular-nums">
+                  {usd(pkg.priceUsd)}
+                </p>
+                <p className="mt-4 text-[0.9375rem] leading-relaxed text-ink-3">{pkg.pitch}</p>
+
+                <div className="mt-6 flex-1 border-t border-line pt-5">
+                  <p className="text-[0.8125rem] font-semibold text-ink-3">
+                    {previous ? `Everything in ${previous.name}, plus` : "Includes"}
+                  </p>
+                  <ul className="mt-3 flex flex-col gap-2.5">
+                    {pkg.benefits.map((benefit) => (
+                      <li key={benefit} className="flex gap-2.5 text-[0.9375rem] leading-snug text-ink">
+                        <svg viewBox="0 0 16 16" aria-hidden="true" className="mt-0.5 size-4 shrink-0" fill="none">
+                          <path d="M3.5 8.5l3 3 6-7" className="stroke-lamp-deep" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        {benefit}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <a
+                  href={mailto(subject, body, EVENT.email.sponsors)}
+                  className="group mt-7 inline-flex w-fit items-center gap-1.5 font-semibold text-ink underline decoration-lamp decoration-2 underline-offset-[0.22em] hover:decoration-[0.3em]"
+                >
+                  Inquire about {pkg.name}
+                  <Arrow />
+                </a>
+              </li>
+            );
+          })}
+        </ol>
+
+        <p className="mt-8 max-w-3xl leading-relaxed text-ink-3">
+          <span className="font-semibold text-ink">In kind works too.</span> Food,
+          equipment, prizes, software and services are welcome at any size, and
+          we agree on recognition together.{" "}
+          <a href={mailto("Beacon Hacks in-kind support", undefined, EVENT.email.sponsors)} className="link text-ink">
+            Offer in-kind support
           </a>
-          . Not ready yet? <NotifyLink>Get updates by email</NotifyLink>.
         </p>
       </div>
-    </section>
-  );
-}
-
-function CtaCard({ href, kicker, title, yellow = false }: { href: string; kicker: string; title: string; yellow?: boolean }) {
-  return (
-    <a
-      href={href}
-      className={`group relative flex min-h-24 items-center justify-between gap-6 border-[3px] border-ink px-6 py-5 text-ink shadow-[8px_8px_0_var(--color-ink)] transition-[transform,box-shadow] duration-200 hover:-translate-x-0.5 hover:-translate-y-1 hover:rotate-0 hover:shadow-[11px_12px_0_var(--color-ink)] ${
-        yellow ? "-rotate-1 bg-beacon" : "rotate-[0.6deg] bg-card"
-      }`}
-    >
-      <span className="flex flex-col gap-0.5">
-        <span className="text-[0.875rem] font-semibold text-ink-2">{kicker}</span>
-        <span className="font-display text-[1.5rem] leading-tight font-extrabold tracking-[-0.03em]">{title}</span>
-      </span>
-      <span className="grid size-12 shrink-0 place-items-center rounded-full bg-ink text-paper transition-transform duration-200 group-hover:rotate-12">
-        <Arrow className="size-5" />
-      </span>
-    </a>
-  );
-}
-
-function PartnerGrid({ partners }: { partners: Partner[] }) {
-  if (!partners.length) return null;
-  return (
-    <ul className="mt-6 grid gap-5 sm:grid-cols-3">
-      {partners.map((partner) => (
-        <li key={partner.id}>
-          <a
-            href={partner.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="brut brut-hover group flex h-full flex-col gap-5 p-6"
-          >
-            <span className="flex h-14 items-center">
-              {/* The name is in the link text right below, so the logo
-                  itself is decorative to a screen reader. */}
-              <PartnerLogo logo={partner.logo} scale={partner.logoScale} />
-            </span>
-            <span className="mt-auto flex flex-col gap-2 border-t border-line pt-4">
-              <span className="flex items-center justify-between gap-3 font-display text-[1.125rem] font-extrabold tracking-[-0.02em] text-ink">
-                {partner.name}
-                <Arrow className="size-4 text-ink-3" />
-                <span className="sr-only">(opens in a new tab)</span>
-              </span>
-              <span className="text-[0.9375rem] leading-snug text-ink-3">{partner.gives}</span>
-              <span className="mt-1">
-                <Tag>{partner.form}</Tag>
-              </span>
-            </span>
-          </a>
-        </li>
-      ))}
-    </ul>
+    </Section>
   );
 }

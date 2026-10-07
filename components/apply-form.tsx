@@ -105,25 +105,25 @@ export function ApplyForm() {
   if (done) {
     return (
       <div className="py-2 sm:py-4">
-        <span aria-hidden="true" className="grid size-12 place-items-center rounded-full border-2 border-ink bg-beacon">
+        <span aria-hidden="true" className="grid size-12 place-items-center rounded-full bg-lamp text-ink shadow-[0_10px_30px_-12px_rgb(255_199_44/0.8)]">
           <svg viewBox="0 0 16 16" className="size-5" fill="none">
-            <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </span>
         <h2
           ref={doneHeading}
           tabIndex={-1}
-          className="mt-6 text-[2.5rem] leading-none tracking-[-0.045em] focus:outline-none"
+          className="mt-6 text-[2.25rem] leading-none font-bold tracking-[-0.035em] focus:outline-none"
         >
           You are in the queue.
         </h2>
         <p className="mt-5 max-w-md leading-relaxed text-ink-3">
           We have your application under{" "}
           <span className="font-semibold text-ink">{email.trim().toLowerCase()}</span>. Spots are
-          confirmed once the venue and the budget are set, and we will email you
-          the day that happens. One email, when there is real news.
+          confirmed once {EVENT.applications.until}, and we will email you the
+          day that happens. One email, when there is real news.
         </p>
-        <LinkButton href="/" variant="ghost" className="mt-8">
+        <LinkButton href="/" variant="outline" className="mt-8">
           Back to the site
         </LinkButton>
       </div>
@@ -131,9 +131,9 @@ export function ApplyForm() {
   }
 
   const choice =
-    "relative flex cursor-pointer items-center justify-center border-2 border-ink bg-card px-3 py-2.5 font-display text-[0.9375rem] font-bold text-ink-2 transition-[background-color,box-shadow,transform] " +
-    "hover:bg-paper has-checked:-translate-y-px has-checked:bg-beacon has-checked:text-ink has-checked:shadow-[3px_3px_0_var(--color-ink)] " +
-    "has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink";
+    "relative flex cursor-pointer items-center justify-center rounded-xl border border-line-2 bg-card px-3 py-3 text-[0.9375rem] font-semibold text-ink-2 transition-[background-color,border-color,color,box-shadow] duration-200 " +
+    "hover:border-ink-3/60 has-checked:border-lamp has-checked:bg-lamp has-checked:text-ink has-checked:shadow-[0_8px_24px_-12px_rgb(255_199_44/0.9)] " +
+    "has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink";
 
   return (
     <form ref={form} onSubmit={onSubmit} noValidate className="flex flex-col gap-6" aria-describedby="apply-note">
@@ -200,7 +200,7 @@ export function ApplyForm() {
         aria-invalid={errors.grade ? true : undefined}
         aria-describedby={errors.grade ? "apply-grade-error" : undefined}
       >
-        <legend className="mb-2 font-display text-[0.9375rem] font-extrabold text-ink">Grade</legend>
+        <legend className="mb-2 text-[0.9375rem] font-semibold text-ink">Grade</legend>
         <div className="grid grid-cols-4 gap-2">
           {GRADES.map((g, i) => (
             <label key={g} className={`${choice} tabular-nums`}>
@@ -230,7 +230,7 @@ export function ApplyForm() {
         aria-invalid={errors.firstHackathon ? true : undefined}
         aria-describedby={errors.firstHackathon ? "apply-first-error" : undefined}
       >
-        <legend className="mb-2 font-display text-[0.9375rem] font-extrabold text-ink">Is this your first hackathon?</legend>
+        <legend className="mb-2 text-[0.9375rem] font-semibold text-ink">Is this your first hackathon?</legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {[
             { value: true, label: "Yes, my first one" },
@@ -281,7 +281,7 @@ export function ApplyForm() {
       </Field>
 
       {formError ? (
-        <p role="alert" className="border-2 border-danger bg-danger-wash px-3.5 py-2.5 text-[0.9375rem] text-danger">
+        <p role="alert" className="rounded-xl border border-danger/40 bg-danger-wash px-4 py-3 text-[0.9375rem] text-danger">
           {formError}{" "}
           <a href={mailto("Beacon Hacks application")} className="font-medium underline underline-offset-2">
             Email us
@@ -290,12 +290,12 @@ export function ApplyForm() {
         </p>
       ) : null}
 
-      <div className="flex flex-col gap-5 border-t-2 border-ink pt-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-5 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p id="apply-note" className="text-[0.875rem] leading-relaxed text-ink-3 sm:max-w-xs">
           For grades 9 to 12. We use this only to tell you about Beacon Hacks.
           Questions: <a href={mailto("A question about applying")} className="link">{EVENT.email.team}</a>
         </p>
-        <Button type="submit" size="lg" variant="beacon" loading={sending} className="sm:shrink-0">
+        <Button type="submit" size="lg" loading={sending} className="sm:shrink-0">
           {sending ? "Sending…" : "Send application"}
         </Button>
       </div>

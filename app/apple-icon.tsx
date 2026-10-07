@@ -25,7 +25,7 @@ export default function AppleIcon() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#1b1712",
+        background: "#060d1b",
       }}
     >
       <img src={MARK} width={150} height={150} alt="" />

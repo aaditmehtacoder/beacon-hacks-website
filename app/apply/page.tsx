@@ -3,9 +3,10 @@ import { EVENT } from "@/lib/event";
 import { ApplyForm } from "@/components/apply-form";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { CalendarIcon, CapIcon, PinIcon, TicketIcon } from "@/components/ui/icons";
 
-const DESCRIPTION =
-  "Apply early for Beacon Hacks, a free one-day hackathon for Bay Area high school students in grades 9 to 12. Spots are confirmed once the venue and the budget are set.";
+const HOSTED = EVENT.venue.name ? `, hosted by ${EVENT.venue.name}` : "";
+const DESCRIPTION = `Apply early for Beacon Hacks, a free one-day hackathon for Bay Area high school students in grades 9 to 12${HOSTED} in Belmont. Spots are confirmed once ${EVENT.applications.until}.`;
 
 export const metadata: Metadata = {
   title: "Apply early",
@@ -29,16 +30,23 @@ export const metadata: Metadata = {
 };
 
 const FACTS = [
-  ["Date", EVENT.date.label, EVENT.date.note],
-  ["Location", EVENT.venue.label, EVENT.venue.note],
-  ["Who", "Grades 9 to 12", "From anywhere in the Bay Area"],
-  ["Cost", "Free", "No fee to apply or attend"],
-] as const;
+  { Icon: CalendarIcon, k: "Date", v: EVENT.date.label, note: EVENT.date.confirmed ? "Doors open at 8:30 AM" : "Target date" },
+  {
+    Icon: PinIcon,
+    k: "Where",
+    v: EVENT.venue.place ? `${EVENT.venue.place}, ${EVENT.venue.city}` : EVENT.venue.label,
+    note: EVENT.venue.address ?? EVENT.venue.note,
+  },
+  { Icon: CapIcon, k: "Who", v: "Grades 9 to 12", note: "From anywhere in the Bay Area" },
+  { Icon: TicketIcon, k: "Cost", v: "Free", note: "No fee to apply or attend" },
+];
 
 const NEXT = [
   "We save your application and you see a confirmation right away.",
-  "When the venue and budget are set, we email everyone who applied to confirm spots.",
-  "Confirmed students then get the address and the final schedule.",
+  `When ${EVENT.applications.until}, we email everyone who applied to confirm spots.`,
+  EVENT.venue.address
+    ? "Confirmed students then get the final schedule and what to bring."
+    : "Confirmed students then get the address and the final schedule.",
 ];
 
 export default function Apply() {
@@ -46,33 +54,35 @@ export default function Apply() {
     <>
       <SiteHeader home={false} showApply={false} />
 
-      <main id="main" tabIndex={-1} className="dots flex-1 bg-paper-warm focus:outline-none">
-        <div className="wrap grid gap-14 py-12 sm:py-16 lg:grid-cols-12 lg:gap-10 lg:py-24">
+      <main id="main" tabIndex={-1} className="flex-1 bg-fog focus:outline-none">
+        <div className="wrap grid gap-14 py-14 sm:py-20 lg:grid-cols-12 lg:gap-16 lg:py-24">
           <div className="lg:col-span-5">
-            <p className="meta text-beacon-deep">Early application</p>
-            <h1 className="display-xl mt-4">Apply early.</h1>
+            <h1 className="heading">Apply early</h1>
             <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-3">
-              Applications open before the date and venue are final, so you
-              can get in line now. It takes about two minutes.
+              Applications open before the {EVENT.venue.confirmed ? "date is" : "date and venue are"}{" "}
+              final, so you can get in line now. It takes about two minutes.
             </p>
 
-            <dl className="mt-10 border-y-2 border-ink">
-              {FACTS.map(([k, v, note], i) => (
-                <div key={k} className={`grid grid-cols-[7rem_1fr] gap-x-4 py-4 ${i > 0 ? "border-t border-line" : ""}`}>
-                  <dt className="meta pt-1 text-beacon-deep">{k}</dt>
+            <dl className="mt-10 border-t border-line">
+              {FACTS.map(({ Icon, k, v, note }) => (
+                <div key={k} className="grid grid-cols-[6.5rem_1fr] gap-x-4 border-b border-line py-4">
+                  <dt className="flex items-start gap-2.5 pt-0.5 text-[0.9375rem] text-ink-3">
+                    <Icon className="mt-0.5 size-[1.125rem] text-lamp-deep" />
+                    {k}
+                  </dt>
                   <dd className="flex flex-col gap-0.5">
-                    <span className="font-display text-[1.125rem] font-extrabold tracking-[-0.02em]">{v}</span>
+                    <span className="font-semibold">{v}</span>
                     <span className="text-[0.875rem] text-ink-3">{note}</span>
                   </dd>
                 </div>
               ))}
             </dl>
 
-            <h2 className="mt-10 text-[1.75rem] leading-none tracking-[-0.035em]">What happens next</h2>
-            <ol className="mt-5 flex flex-col gap-3.5">
+            <h2 className="mt-12 text-[1.5rem] leading-none font-bold tracking-[-0.03em]">What happens next</h2>
+            <ol className="mt-6 flex flex-col gap-4">
               {NEXT.map((step, i) => (
-                <li key={step} className="grid grid-cols-[2rem_1fr] gap-2 leading-relaxed text-ink-2">
-                  <span className="grid size-6 place-items-center rounded-full border-2 border-ink bg-beacon font-display text-[0.75rem] font-extrabold">
+                <li key={step} className="grid grid-cols-[2.25rem_1fr] items-start leading-relaxed text-ink-2">
+                  <span className="grid size-7 place-items-center rounded-full bg-lamp text-[0.8125rem] font-bold text-ink tabular-nums">
                     {i + 1}
                   </span>
                   {step}
@@ -81,12 +91,9 @@ export default function Apply() {
             </ol>
           </div>
 
-          <div className="lg:col-span-7 lg:col-start-6 xl:col-span-6 xl:col-start-7">
-            <div className="relative border-[3px] border-ink bg-card shadow-[10px_10px_0_var(--color-ink)]">
-              <span aria-hidden="true" className="block h-3 border-b-[3px] border-ink bg-beacon" />
-              <div className="p-6 sm:p-9">
-                <ApplyForm />
-              </div>
+          <div className="lg:col-span-7 xl:col-span-6 xl:col-start-7">
+            <div className="rounded-[1.75rem] border border-line bg-card p-6 shadow-[0_40px_80px_-50px_rgb(15_24_40/0.45)] sm:p-10">
+              <ApplyForm />
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { EVENT, mailto } from "@/lib/event";
 import { LinkButton } from "@/components/ui/button";
 import { SiteHeader } from "@/components/site-header";
@@ -33,13 +34,11 @@ export default function CodeOfConduct() {
     <>
       <SiteHeader home={false} />
 
-      <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
-        <div className="wrap py-14 sm:py-20">
+      <main id="main" tabIndex={-1} className="flex-1 bg-fog focus:outline-none">
+        <div className="wrap py-14 sm:py-20 lg:py-24">
           <article className="max-w-3xl">
-            <p className="meta text-beacon-deep">Code of conduct</p>
-            <h1 className="display-xl mt-4">
-              The rules of the room.
-            </h1>
+            <p className="kicker text-lamp-deep">Code of conduct</p>
+            <h1 className="heading mt-5">The rules of the room</h1>
             <p className="mt-6 text-lg leading-relaxed text-ink-3">
               Beacon Hacks is a one-day event for high school students, many of
               whom are attending their first hackathon. Everyone in the building
@@ -110,7 +109,7 @@ export default function CodeOfConduct() {
               </p>
 
               <H>Reporting</H>
-              <div className="my-8 border-2 border-ink bg-beacon-wash px-6 py-5 shadow-[5px_5px_0_var(--color-ink)]">
+              <div className="my-8 rounded-2xl border border-lamp/60 bg-lamp-wash px-6 py-5 sm:px-7 sm:py-6">
                 <p>
                   <strong className="font-semibold text-ink">
                     If something happens, tell an organizer.
@@ -174,8 +173,8 @@ export default function CodeOfConduct() {
               anti-harassment policies they descend from.
             </p>
 
-            <LinkButton href="/" variant="ghost" className="mt-10">
-              ← Back to the site
+            <LinkButton href="/" variant="outline" className="mt-10">
+              Back to the site
             </LinkButton>
           </article>
         </div>
@@ -186,13 +185,13 @@ export default function CodeOfConduct() {
   );
 }
 
-function H({ children }: { children: React.ReactNode }) {
-  return <h2 className="mt-12 mb-4 text-[2rem] leading-none tracking-[-0.04em]">{children}</h2>;
+function H({ children }: { children: ReactNode }) {
+  return <h2 className="mt-14 mb-4 text-[1.75rem] leading-tight font-bold tracking-[-0.03em]">{children}</h2>;
 }
 
-function Prose({ children }: { children: React.ReactNode }) {
+function Prose({ children }: { children: ReactNode }) {
   return (
-    <div className="mt-4 leading-relaxed text-ink-2 [&_li]:mb-2 [&_li]:marker:text-beacon-deep [&_p]:mb-4 [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-6">
+    <div className="mt-4 leading-relaxed text-ink-2 [&_li]:mb-2 [&_li]:pl-1 [&_li]:marker:text-lamp-deep [&_p]:mb-4 [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-6">
       {children}
     </div>
   );

@@ -3,13 +3,13 @@
 `app/opengraph-image.tsx` draws with these. `next/og` needs TTF, OTF or
 WOFF files (not WOFF2), read from disk at build time.
 
-| File | Source | Notes |
-| --- | --- | --- |
-| `Bricolage-Display-800.ttf` | Bricolage Grotesque (Google Fonts, `BricolageGrotesque[opsz,wdth,wght].ttf`) | Static instance at opsz 96, wdth 100, weight 800 |
-| `Bricolage-Text-700.ttf` | same | Static instance at opsz 24, wdth 100, weight 700 |
+| File | Instance |
+| --- | --- |
+| `MonaSans-Expanded-ExtraBold.ttf` | Mona Sans, width 125, weight 800: the title |
+| `MonaSans-SemiExpanded-Bold.ttf` | Mona Sans, width 112.5, weight 700: labels |
+| `MonaSans-Medium.ttf` | Mona Sans, width 100, weight 500: running text |
 
-Both are cut down to Basic Latin plus a few typographic marks. Bricolage
-Grotesque is under the SIL Open Font License 1.1 (`OFL-Bricolage-Grotesque.txt`),
-which allows subsetting and bundling it with the site; it declares no
-Reserved Font Name. Regenerate with fontTools' `varLib.instancer` and
-`subset` if the card needs characters outside the subset.
+All three are the static instances Google Fonts serves for those axis
+values (`fonts.googleapis.com/css2?family=Mona+Sans:wdth,wght@125,800`
+and so on), unmodified. Mona Sans is by GitHub under the SIL Open Font
+License 1.1 (`OFL-Mona-Sans.txt`), which allows bundling it with the site.

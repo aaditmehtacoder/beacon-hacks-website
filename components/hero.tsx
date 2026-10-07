@@ -1,123 +1,120 @@
 import { EVENT } from "@/lib/event";
-import { PARTNERS } from "@/lib/content";
-import { Lamp } from "./ui/lamp";
+import { PARTNERS, VENUE_SPONSOR } from "@/lib/content";
 import { Arrow, LinkButton } from "./ui/button";
-import { BeaconMark } from "./ui/beacon-mark";
+import { CapIcon, PinIcon, SparkIcon, TicketIcon } from "./ui/icons";
 import { PartnerLogo } from "./ui/partner-logo";
-import { NotifyLink } from "./notify/notify-button";
+import { Countdown } from "./countdown";
+import { Shore, Sky } from "./night-scene";
+
+const CHIPS = [
+  { Icon: PinIcon, text: EVENT.venue.place ? `${EVENT.venue.place}, ${EVENT.venue.city}` : "Belmont, CA" },
+  { Icon: CapIcon, text: "Grades 9–12" },
+  { Icon: SparkIcon, text: "No experience needed" },
+  { Icon: TicketIcon, text: "Free to attend" },
+];
+
+/* The venue sponsor first, then the partners. A sponsor still being
+   finalized says so under its logo. */
+const SPONSORED_BY = [
+  ...(VENUE_SPONSOR
+    ? [
+        {
+          name: VENUE_SPONSOR.name,
+          website: VENUE_SPONSOR.website,
+          logo: VENUE_SPONSOR.logoOnNight,
+          scale: 1,
+          caption: VENUE_SPONSOR.status === "pending" ? "Venue · being finalized" : "Venue",
+        },
+      ]
+    : []),
+  ...PARTNERS.map((p) => ({
+    name: p.name,
+    website: p.website,
+    logo: p.logoOnNight,
+    scale: p.logoScale ?? 1,
+    caption: p.short,
+  })),
+];
 
 /**
- * The opening screen, on the dark band: the name, what it is, the two
- * actions and the partners backing the day, with the date card beside it.
- * The full stop of the name is the lamp; its beam runs out to the right.
+ * The opening screen: the night over the bay, the name, what it is, the
+ * two actions and the countdown, with the sponsors along the water. The
+ * lighthouse keeps its light turning behind it all.
  */
 export function Hero() {
   return (
     <section
       id="top"
       aria-labelledby="hero-title"
-      className="on-dark relative overflow-hidden bg-band text-band-ink dots-dark"
+      className="night relative isolate overflow-hidden lg:min-h-[calc(100svh-4rem)]"
     >
-      {/* a quiet ring of light in the corner, for depth */}
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-56 -right-56 size-[36rem] rounded-full border-[3.5rem] border-beacon/[0.07]"
-      />
+      <Sky />
+      <Shore id="hero" className="inset-x-0 bottom-0 h-[17rem] sm:h-[21rem] lg:h-[46%]" />
 
-      <div className="wrap relative grid items-center gap-14 pt-10 pb-14 sm:pt-14 sm:pb-16 lg:grid-cols-[minmax(0,1fr)_minmax(19rem,25rem)] lg:gap-14 lg:pt-14 lg:pb-16">
-        <div className="min-w-0">
-          <h1
-            id="hero-title"
-            className="text-[clamp(4.25rem,11.5vw,9.75rem)] leading-[0.88] font-extrabold tracking-[-0.055em]"
-          >
-            <span className="text-beacon">Beacon</span>
-            <br />
-            Hacks
-            <Lamp onDark />
-          </h1>
+      <div className="wrap relative flex flex-col pt-12 pb-[17rem] sm:pt-20 sm:pb-[22rem] lg:min-h-[calc(100svh-4rem)] lg:pt-[clamp(4rem,10vh,7rem)] lg:pb-12">
+        <h1
+          id="hero-title"
+          className="rise max-w-[11ch] text-[clamp(3.75rem,11vw,9.25rem)] leading-[0.86] font-extrabold font-stretch-125% tracking-[-0.045em] text-moon lg:max-w-none"
+        >
+          Beacon Hacks
+        </h1>
 
-          <div className="rise-in">
-            <p className="mt-7 max-w-xl text-xl leading-relaxed text-band-ink sm:text-[1.375rem]">
-              {EVENT.tagline} One Saturday in Belmont to build something from
-              scratch. No experience needed.
+        <div className="mt-8 grid gap-12 sm:mt-10 lg:grid-cols-12 lg:gap-10">
+          <div className="lg:col-span-7">
+            <p className="rise rise-2 max-w-[34rem] text-xl leading-relaxed text-moon-2 sm:text-[1.375rem]">
+              A free, one-day hackathon for Bay Area high school students.
+              Build anything from scratch, with a team or on your own.
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <LinkButton href="/apply" variant="lamp" size="lg" className="group">
+            <div className="rise rise-3 mt-8 flex flex-wrap items-center gap-3">
+              <LinkButton href="/apply" size="lg" className="group">
                 Apply early
                 <Arrow />
               </LinkButton>
-              <LinkButton href="#sponsors" variant="ghost-dark" size="lg">
-                Sponsor Beacon
+              <LinkButton href="#sponsors" variant="outline-night" size="lg">
+                Sponsor us
               </LinkButton>
             </div>
 
-            <p className="mt-6 text-band-muted">
-              Parent, mentor or judge? <NotifyLink>Get updates by email</NotifyLink>
-            </p>
+            <ul className="fade mt-8 flex flex-wrap gap-x-5 gap-y-3 text-[0.9375rem] text-moon-2">
+              {CHIPS.map(({ Icon, text }) => (
+                <li key={text} className="flex items-center gap-2">
+                  <Icon className="size-[1.125rem] text-lamp" />
+                  {text}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-            <div className="mt-9">
-              <p className="meta text-band-muted">Backed by</p>
-              <ul className="mt-4 flex flex-wrap items-center gap-x-9 gap-y-5">
-                {PARTNERS.map((p) => (
-                  <li key={p.id}>
-                    <a
-                      href={p.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block rounded-sm opacity-90 transition-[opacity,transform] duration-200 hover:-translate-y-0.5 hover:opacity-100"
-                    >
-                      <PartnerLogo logo={p.logoOnDark} scale={(p.logoScale ?? 1) * 0.92} area={4200} />
-                      <span className="sr-only">{p.name} (opens in a new tab)</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <div className="fade lg:col-span-5 lg:col-start-8 lg:pt-1">
+            <Countdown />
           </div>
         </div>
 
-        <DateCard />
+        <div className="fade mt-14 lg:mt-auto lg:pt-14">
+          <p className="text-[0.75rem] font-semibold font-stretch-[112.5%] tracking-[0.16em] text-moon-3 uppercase">
+            Sponsored by
+          </p>
+          <ul className="mt-5 flex flex-wrap items-start gap-x-12 gap-y-7">
+            {SPONSORED_BY.map((s) => (
+              <li key={s.name}>
+                <a
+                  href={s.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex flex-col gap-2.5 rounded-md opacity-90 transition-opacity duration-200 hover:opacity-100"
+                >
+                  <span className="flex h-8 items-center">
+                    <PartnerLogo logo={s.logo} scale={s.scale} area={3600} />
+                  </span>
+                  <span className="text-[0.8125rem] text-moon-3 transition-colors group-hover:text-moon-2">{s.caption}</span>
+                  <span className="sr-only">{s.name} (opens in a new tab)</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
-  );
-}
-
-/**
- * The date, as a card rather than a countdown: it is a target until the
- * venue signs off, and a ticking clock would read as a promise.
- */
-function DateCard() {
-  return (
-    <div className="relative mx-auto w-full max-w-[25rem] px-2 pt-6 pb-3 lg:mx-0 lg:justify-self-end">
-      <div className="relative -rotate-[1.5deg] border-[3px] border-ink bg-card px-8 pt-12 pb-9 text-ink shadow-[12px_12px_0_var(--color-beacon)] sm:px-10">
-        <span aria-hidden="true" className="pointer-events-none absolute inset-2.5 border border-dashed border-line" />
-
-        <span className="absolute -top-5 left-1/2 -translate-x-1/2 rotate-[3deg] border-2 border-ink bg-beacon px-4 py-1.5 font-display text-[0.75rem] font-extrabold tracking-[0.14em] whitespace-nowrap text-ink uppercase">
-          Target date
-        </span>
-
-        <span
-          aria-hidden="true"
-          className="absolute -top-4 -right-4 grid size-12 rotate-[8deg] place-items-center border-2 border-ink bg-beacon"
-        >
-          <BeaconMark className="size-7 text-ink" />
-        </span>
-
-        <p className="relative">
-          <span className="sr-only">{EVENT.date.label}</span>
-          <span aria-hidden="true" className="block font-display text-[clamp(4.75rem,9vw,6.5rem)] leading-[0.82] font-extrabold tracking-[-0.06em]">
-            Jan 30
-          </span>
-          <span aria-hidden="true" className="mt-2 block font-display text-[2.5rem] leading-none font-extrabold tracking-[-0.04em] text-ink-3">
-            2027
-          </span>
-        </p>
-        <p className="meta relative mt-7 text-ink">Saturday · {EVENT.venue.city}, {EVENT.venue.region}</p>
-        <p className="relative mt-2 text-[0.9375rem] leading-snug text-ink-3">
-          Confirmed with the venue. Everyone who applied hears first.
-        </p>
-      </div>
-    </div>
   );
 }
