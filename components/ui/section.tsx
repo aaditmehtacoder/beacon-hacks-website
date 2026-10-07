@@ -38,28 +38,3 @@ export function Section({ id, title, lede, aside, tone = "fog", className = "", 
     </section>
   );
 }
-
-/** A small status pill: confirmed, being finalized, planned. */
-export function Tag({
-  tone = "neutral",
-  children,
-}: {
-  tone?: "neutral" | "lamp" | "pending" | "night";
-  children: ReactNode;
-}) {
-  const style =
-    tone === "lamp"
-      ? "border-lamp/70 bg-lamp-wash text-lamp-deep"
-      : tone === "pending"
-        ? "border-dashed border-ink-3/60 text-ink-2"
-        : tone === "night"
-          ? "border-moon/25 text-moon-2"
-          : "border-transparent bg-fog-2 text-ink-2";
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[0.75rem] leading-5 font-semibold font-stretch-[112.5%] tracking-[0.02em] whitespace-nowrap ${style}`}
-    >
-      {children}
-    </span>
-  );
-}

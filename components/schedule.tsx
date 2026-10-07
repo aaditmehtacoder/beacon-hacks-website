@@ -2,7 +2,6 @@ import type { CSSProperties } from "react";
 import { SCHEDULE, type Phase } from "@/lib/content";
 import { EVENT } from "@/lib/event";
 import { OutArrow } from "./ui/button";
-import { CodeIcon, DoorIcon, MoonIcon, PinIcon } from "./ui/icons";
 
 /* Each part of the day gets its own sky: pale morning, warm afternoon,
    and the night the day ends in. */
@@ -64,34 +63,21 @@ export function Schedule() {
               The day
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-3">
-              A draft schedule for {EVENT.date.label}
-              {target}. Times may shift a little, and meals and workshops
-              depend on sponsors.
+              A draft for {EVENT.date.label}
+              {target}. Times may shift.
             </p>
           </div>
 
           <dl className="grid grid-cols-[auto_1fr] items-start gap-x-6 gap-y-3.5 text-[0.9375rem] lg:col-span-5 lg:pb-1.5">
-            <dt className="flex items-center gap-2.5 text-ink-3">
-              <DoorIcon className="size-[1.125rem] text-lamp-deep" />
-              Doors
-            </dt>
+            <dt className="text-ink-3">Doors</dt>
             <dd className="font-semibold">8:30 AM</dd>
-            <dt className="flex items-center gap-2.5 text-ink-3">
-              <CodeIcon className="size-[1.125rem] text-lamp-deep" />
-              Hacking
-            </dt>
+            <dt className="text-ink-3">Hacking</dt>
             <dd className="font-semibold">
               {EVENT.hours.hacking}, {EVENT.hours.hackingHours} hours
             </dd>
-            <dt className="flex items-center gap-2.5 text-ink-3">
-              <MoonIcon className="size-[1.125rem] text-lamp-deep" />
-              Home by
-            </dt>
+            <dt className="text-ink-3">Home by</dt>
             <dd className="font-semibold">11 PM, no overnight</dd>
-            <dt className="flex items-center gap-2.5 text-ink-3">
-              <PinIcon className="size-[1.125rem] text-lamp-deep" />
-              Where
-            </dt>
+            <dt className="text-ink-3">Where</dt>
             <dd>
               {EVENT.venue.map && EVENT.venue.address ? (
                 <a

@@ -5,29 +5,21 @@
  */
 import { EVENT } from "./event";
 
-export type Track = {
-  name: string;
-  body: string;
-  /** Finishes the sentence "Good fit if ..." */
-  fit: string;
-};
+export type Track = { name: string; body: string };
 
 /** Track names and briefs are ours to define. */
 export const TRACKS: Track[] = [
   {
     name: "Signal",
     body: "Cut through noise. Search, summarize, sort, surface: anything that helps a person find the thing that matters to them.",
-    fit: "you have a folder, feed or inbox you wish would sort itself.",
   },
   {
     name: "Landfall",
     body: "Build for Belmont and the Peninsula. Civic data, schools, transit, small business: anything that makes the place around you work better.",
-    fit: "you already have a complaint about how something in your town works.",
   },
   {
     name: "First Light",
     body: "Beginners only. Judged on what you learned and what you finished, not on how clean the code is.",
-    fit: "this is your first hackathon and you are not sure you belong. You do.",
   },
 ];
 
@@ -92,10 +84,11 @@ export type Partner = {
   logoOnNight: Logo;
   /** Optical size correction on top of the computed logo size. */
   logoScale?: number;
-  /** What they give, in a few words. */
-  gives: string;
-  /** The same in a word or two, under the logo in the hero. */
-  short: string;
+  /** What they give, in a word or two. The terms are theirs to announce. */
+  role: string;
+  /** A cash sponsor's package, which puts its logo in that row of the
+      sponsor wall. In-kind partners have none. */
+  tier?: Package["id"];
 };
 
 export type VenueSponsor = {
@@ -127,14 +120,18 @@ export const VENUE_SPONSOR: VenueSponsor | null = {
 };
 
 /**
- * Companies that have committed in writing, all in kind. Add a company
- * only once they have said yes in writing; offers still being finalised
- * live in PENDING_OFFERS below and have no logo here.
+ * Companies that have committed in writing. In-kind partners have no
+ * `tier`; a cash sponsor's `tier` puts its logo in that row of the sponsor
+ * wall. Add a company only once they have said yes in writing.
  *
  *  - CodeCrafters: prizes offered and accepted by email, Sept 28, 2026.
  *    Logo from the kit they sent; they asked for a link to codecrafters.io.
  *  - YRI Fellowship: partnership agreed by email, Sept 11, 2026. Logo
  *    from yriscience.com/marketing-kit; the link is their referral link.
+ *  - Browserbase: a promo code for participants, a tool perk (Oct 6, 2026).
+ *    Logo from the header of browserbase.com.
+ *  - Origami Prep: Supporter tier (Oct 6, 2026). Logo rendered from the
+ *    header of origamiprep.com (crane mark and wordmark).
  */
 export const PARTNERS: Partner[] = [
   {
@@ -143,8 +140,7 @@ export const PARTNERS: Partner[] = [
     website: "https://codecrafters.io",
     logo: { src: "/sponsors/codecrafters.svg", width: 1280, height: 164 },
     logoOnNight: { src: "/sponsors/codecrafters-white.svg", width: 1280, height: 164 },
-    gives: "VIP memberships for the top three teams",
-    short: "Prizes",
+    role: "Prizes",
   },
   {
     id: "yri",
@@ -153,68 +149,52 @@ export const PARTNERS: Partner[] = [
     logo: { src: "/sponsors/yri-fellowship.png", width: 1200, height: 241 },
     logoOnNight: { src: "/sponsors/yri-fellowship-white.png", width: 1200, height: 205 },
     logoScale: 1.18,
-    gives: "Research scholarships and a mentorship prize",
-    short: "Scholarships",
+    role: "Scholarships",
+  },
+  {
+    id: "browserbase",
+    name: "Browserbase",
+    website: "https://www.browserbase.com",
+    logo: { src: "/sponsors/browserbase.svg", width: 255, height: 50 },
+    logoOnNight: { src: "/sponsors/browserbase-white.svg", width: 255, height: 50 },
+    logoScale: 1.12,
+    role: "Tool perk",
+  },
+  {
+    id: "origami-prep",
+    name: "Origami Prep",
+    website: "https://origamiprep.com",
+    logo: { src: "/sponsors/origami-prep.png", width: 673, height: 103 },
+    logoOnNight: { src: "/sponsors/origami-prep-white.png", width: 673, height: 101 },
+    role: "Supporter",
+    tier: "supporter",
   },
 ];
 
 /* ------------------------------------------------------------ prizes */
 
-export type Prize = {
+export type Perk = {
   from: string;
   /** A PARTNERS id, for the logo. Render has not sent one yet. */
   partner?: string;
-  title: string;
-  /** The headline: who gets it, or how much. */
-  figure: string;
-  /** Short facts under it, as written by the giver. */
-  points: string[];
+  /** What it is, in a few words. The amounts and terms are the sponsor's to
+      announce, and participants get them before the day. */
+  label: string;
+  kind: "prize" | "perk";
   /** "pending": offered in writing, redemption details not settled. */
   status: "confirmed" | "pending";
 };
 
 /**
- * Prizes and credits. Confirmed ones are committed in writing by partners
- * in PARTNERS. Pending ones are offered in writing but not final:
- *
- *  - Render (Hazal Mestci, hazal@render.com): offered Sept 29, 2026,
- *    accepted Oct 3. Still owed: the event credit link, eligibility and
- *    redemption requirements, and the logo. Render is for people 16+.
- *
- * Nothing is added up into a prize pool: memberships, scholarships and
- * credits are not cash and do not sum.
+ * Prizes for the winners and perks for every builder, committed in writing.
+ * Render (Hazal Mestci, hazal@render.com) offered credits Sept 29, 2026 and
+ * still owes the event link, redemption rules and logo, so it is pending.
  */
-export const PRIZES: Prize[] = [
-  {
-    from: "CodeCrafters",
-    partner: "codecrafters",
-    title: "VIP memberships",
-    figure: "Up to 2 years",
-    points: ["For every member of the top three teams", "2 years for 1st, 1 year for 2nd, 6 months for 3rd"],
-    status: "confirmed",
-  },
-  {
-    from: "YRI Fellowship",
-    partner: "yri",
-    title: "Research scholarships",
-    figure: "Up to $1,500",
-    points: [
-      "For winning team members, toward YRI’s research mentorship program",
-      "Guaranteed application review, with priority admission consideration",
-      "A mentorship prize for the overall winner",
-    ],
-    status: "confirmed",
-  },
-  {
-    from: "Render",
-    title: "Building credits",
-    figure: "$50 each",
-    points: [
-      "For every participant aged 16 or older",
-      "$500, $300 and $100 for the top three projects on Render Workflows",
-    ],
-    status: "pending",
-  },
+export const PRIZES_AND_PERKS: Perk[] = [
+  { from: "CodeCrafters", partner: "codecrafters", label: "VIP memberships", kind: "prize", status: "confirmed" },
+  { from: "YRI Fellowship", partner: "yri", label: "Research scholarships", kind: "prize", status: "confirmed" },
+  { from: "Browserbase", partner: "browserbase", label: "A promo code for every builder", kind: "perk", status: "confirmed" },
+  { from: "Render", label: "Cloud credits", kind: "perk", status: "pending" },
 ];
 
 /** Categories we intend to judge. Prize details follow sponsors. */
@@ -281,6 +261,8 @@ export type Package = {
   pitch: string;
   /** New at this level. Each package also includes the one before it. */
   benefits: string[];
+  /** Open places drawn on the sponsor wall. Not a cap: no tier is exclusive. */
+  slots: number;
 };
 
 /**
@@ -293,6 +275,7 @@ export const PACKAGES: Package[] = [
     id: "supporter",
     name: "Supporter",
     priceUsd: 250,
+    slots: 6,
     pitch: "Put your name behind a free day of building.",
     benefits: [
       "Logo on the website",
@@ -304,6 +287,7 @@ export const PACKAGES: Package[] = [
     id: "community",
     name: "Community",
     priceUsd: 500,
+    slots: 4,
     pitch: "More visibility, and a prize with your name on it.",
     benefits: [
       "Larger logo placement",
@@ -314,6 +298,7 @@ export const PACKAGES: Package[] = [
     id: "partner",
     name: "Partner",
     priceUsd: 1_000,
+    slots: 3,
     pitch: "Get in the room with the students building.",
     benefits: [
       "Prominent logo placement",
@@ -325,6 +310,7 @@ export const PACKAGES: Package[] = [
     id: "presenting",
     name: "Presenting",
     priceUsd: 2_500,
+    slots: 1,
     pitch: "Lead the day with us.",
     benefits: [
       "Largest logo placement",

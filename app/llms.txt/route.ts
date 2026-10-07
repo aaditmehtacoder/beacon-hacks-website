@@ -1,5 +1,5 @@
 import { EVENT } from "@/lib/event";
-import { FAQS, JUDGES, PACKAGES, PARTNERS, PRIZES, PRIZE_CATEGORIES, SCHEDULE, TRACKS, VENUE_SPONSOR } from "@/lib/content";
+import { FAQS, JUDGES, PACKAGES, PARTNERS, PRIZES_AND_PERKS, PRIZE_CATEGORIES, SCHEDULE, TRACKS, VENUE_SPONSOR } from "@/lib/content";
 
 /* Built once at build time from the same data as the page, so it never
    says something the site does not. */
@@ -46,12 +46,13 @@ function llms() {
     "",
     ...SCHEDULE.flatMap((phase) => phase.slots.map((slot) => `- ${slot.time}: ${slot.title}. ${slot.note}`)),
     "",
-    "## Prizes",
+    "## Prizes and perks",
     "",
-    ...PRIZES.map(
+    ...PRIZES_AND_PERKS.map(
       (p) =>
-        `- ${p.from}, ${p.title}: ${p.figure}${p.status === "pending" ? " (being finalized)" : ""}. ${p.points.join(". ")}.`,
+        `- ${p.from}: ${p.label} (${p.kind === "prize" ? "for the winners" : "for every builder"}${p.status === "pending" ? ", being finalized" : ""})`,
     ),
+    "- Amounts and terms are shared with participants before the event.",
     `- Judging categories (planned): ${PRIZE_CATEGORIES.join(", ")}`,
     "",
     "## Judges",
@@ -65,7 +66,7 @@ function llms() {
     ...(VENUE_SPONSOR
       ? [`- Venue sponsor: ${VENUE_SPONSOR.name}${VENUE_SPONSOR.status === "pending" ? " (being finalized)" : ""}`]
       : []),
-    ...PARTNERS.map((p) => `- ${p.name} (in kind): ${p.gives}`),
+    ...PARTNERS.map((p) => `- ${p.name}: ${p.role.toLowerCase()}`),
     `- Sponsorship packages: ${PACKAGES.map((p) => `${p.name} ${usd(p.priceUsd)}`).join(", ")}. In-kind support is welcome. Write to ${EVENT.email.sponsors}.`,
     "",
     "## FAQ",

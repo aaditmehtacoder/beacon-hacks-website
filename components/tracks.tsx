@@ -26,7 +26,7 @@ export function Tracks() {
     <Section
       id="tracks"
       title="Three tracks"
-      lede="Choose one at kickoff. A project can be judged in more than one."
+      lede="Pick one at kickoff."
     >
       <ol className="border-t border-line">
         {TRACKS.map((track, i) => (
@@ -44,10 +44,6 @@ export function Tracks() {
             </div>
             <div className="lg:col-span-7 lg:pt-1">
               <p className="max-w-2xl text-lg leading-relaxed text-ink-2">{track.body}</p>
-              <p className="mt-4 max-w-2xl leading-relaxed text-ink-3">
-                <span className="font-semibold text-lamp-deep">Good fit if </span>
-                {track.fit}
-              </p>
             </div>
           </li>
         ))}

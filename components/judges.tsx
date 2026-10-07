@@ -15,7 +15,7 @@ export function Judges() {
     <Section
       id="judges"
       title="Judges"
-      lede="Industry professionals who will walk the room at demo time and talk with every team. More judges are announced as they confirm."
+      lede="They walk the room at demo time and talk with every team. More are announced as they confirm."
       aside={
         <p className="text-ink-3">
           Want to judge or mentor?{" "}
@@ -75,8 +75,7 @@ export function Judges() {
       </ul>
 
       <p className="mt-14 max-w-2xl text-[0.875rem] leading-relaxed text-ink-3">
-        Employers are listed to identify each judge. Judges take part as
-        individuals, and their companies are not sponsors of Beacon Hacks.
+        Judges take part as individuals; their employers are not sponsors.
       </p>
     </Section>
   );

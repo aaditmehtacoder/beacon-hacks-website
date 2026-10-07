@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { EVENT } from "@/lib/event";
-import { CalendarIcon } from "./ui/icons";
 
 const TARGET = new Date(EVENT.date.starts).getTime();
 
@@ -52,13 +51,10 @@ export function Countdown() {
   const target = EVENT.date.confirmed ? "" : " · target date";
 
   return (
-    <div className="flex flex-col gap-3 lg:items-end">
-      <p className="flex items-center gap-2 text-[0.8125rem] text-moon-3">
-        <CalendarIcon className="size-4 text-lamp" />
-        <span>
-          Doors open <span className="text-moon-2">{EVENT.date.short}</span>
-          {target}
-        </span>
+    <div className="flex flex-col gap-4 lg:items-end">
+      <p className="text-[0.8125rem] text-moon-3">
+        {EVENT.date.short}
+        {target}
       </p>
 
       <p className="sr-only">
@@ -71,19 +67,17 @@ export function Countdown() {
       ) : (
         <ol
           aria-hidden="true"
-          className={`flex gap-2 transition-opacity duration-700 ease-out-quart sm:gap-2.5 ${now === null ? "opacity-0" : "opacity-100"}`}
+          className={`flex transition-opacity duration-700 ease-out-quart ${now === null ? "opacity-0" : "opacity-100"}`}
         >
-          {shown.map((unit) => (
+          {shown.map((unit, i) => (
             <li
               key={unit.label}
-              className="flex w-[4.25rem] flex-col items-center rounded-2xl bg-moon/[0.05] pt-3 pb-2.5 ring-1 ring-moon/10 ring-inset sm:w-[4.75rem]"
+              className={`flex flex-col items-start ${i > 0 ? "ml-5 border-l border-moon/12 pl-5 sm:ml-6 sm:pl-6" : ""}`}
             >
-              <span className="text-[1.625rem] leading-none font-bold font-stretch-[112.5%] tracking-[-0.02em] text-moon tabular-nums sm:text-[1.875rem]">
+              <span className="text-[2rem] leading-none font-bold font-stretch-[112.5%] tracking-[-0.02em] text-moon tabular-nums sm:text-[2.375rem]">
                 {String(unit.value).padStart(2, "0")}
               </span>
-              <span className="mt-2 text-[0.625rem] font-semibold font-stretch-[112.5%] tracking-[0.14em] text-moon-3 uppercase">
-                {unit.label}
-              </span>
+              <span className="mt-2 text-[0.6875rem] text-moon-3">{unit.label}</span>
             </li>
           ))}
         </ol>

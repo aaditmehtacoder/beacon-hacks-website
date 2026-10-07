@@ -3,7 +3,6 @@ import { EVENT } from "@/lib/event";
 import { ApplyForm } from "@/components/apply-form";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { CalendarIcon, CapIcon, PinIcon, TicketIcon } from "@/components/ui/icons";
 
 const HOSTED = EVENT.venue.name ? `, hosted by ${EVENT.venue.name}` : "";
 const DESCRIPTION = `Apply to Beacon Hacks, a free one-day hackathon for Bay Area high school students in grades 9 to 12${HOSTED} in Belmont. Spots are confirmed once ${EVENT.applications.until}.`;
@@ -30,15 +29,14 @@ export const metadata: Metadata = {
 };
 
 const FACTS = [
-  { Icon: CalendarIcon, k: "Date", v: EVENT.date.label, note: EVENT.date.confirmed ? "Doors open at 8:30 AM" : "Target date" },
+  { k: "Date", v: EVENT.date.label, note: EVENT.date.confirmed ? "Doors open at 8:30 AM" : "Target date" },
   {
-    Icon: PinIcon,
     k: "Where",
     v: EVENT.venue.place ? `${EVENT.venue.place}, ${EVENT.venue.city}` : EVENT.venue.label,
     note: EVENT.venue.address ?? EVENT.venue.note,
   },
-  { Icon: CapIcon, k: "Who", v: "Grades 9 to 12", note: "From anywhere in the Bay Area" },
-  { Icon: TicketIcon, k: "Cost", v: "Free", note: "No fee to apply or attend" },
+  { k: "Who", v: "Grades 9 to 12", note: "From anywhere in the Bay Area" },
+  { k: "Cost", v: "Free", note: "No fee to apply or attend" },
 ];
 
 const NEXT = [
@@ -64,12 +62,9 @@ export default function Apply() {
             </p>
 
             <dl className="mt-10 border-t border-line">
-              {FACTS.map(({ Icon, k, v, note }) => (
-                <div key={k} className="grid grid-cols-[6.5rem_1fr] gap-x-4 border-b border-line py-4">
-                  <dt className="flex items-start gap-2.5 pt-0.5 text-[0.9375rem] text-ink-3">
-                    <Icon className="mt-0.5 size-[1.125rem] text-lamp-deep" />
-                    {k}
-                  </dt>
+              {FACTS.map(({ k, v, note }) => (
+                <div key={k} className="grid grid-cols-[5.5rem_1fr] gap-x-4 border-b border-line py-4">
+                  <dt className="pt-0.5 text-[0.9375rem] text-ink-3">{k}</dt>
                   <dd className="flex flex-col gap-0.5">
                     <span className="font-semibold">{v}</span>
                     <span className="text-[0.875rem] text-ink-3">{note}</span>

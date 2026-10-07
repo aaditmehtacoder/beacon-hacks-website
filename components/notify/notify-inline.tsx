@@ -48,7 +48,7 @@ export function NotifyInline() {
         Not a student? Get updates.
       </p>
       <p className="mt-2 text-[0.9375rem] leading-relaxed text-moon-3">
-        For parents, mentors, judges and sponsors. Beacon Hacks news only.
+        For parents, mentors, judges and sponsors.
       </p>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-[minmax(0,1fr)_13.5rem_auto] sm:items-start">

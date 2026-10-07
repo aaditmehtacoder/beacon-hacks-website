@@ -73,11 +73,17 @@ NEXT_DIST_DIR=.next-check npm run build   # build beside a running dev server
   semi-expanded, running text at normal width.
 - **The schedule** is the day passing: a pale morning panel, a warm afternoon
   and a night evening.
-- **The hero** carries the countdown to doors open (`EVENT.date.starts`,
-  labelled as the target date until `EVENT.date.confirmed`), and a
-  "Sponsored by" row of the white logos (`logoOnNight`) with a one-word
-  caption each. The countdown is worked out in the browser, so the static
-  page never holds a stale number; seconds stop under reduced motion.
+- **The hero** ends in a strip: "Sponsored by" with the white logos
+  (`logoOnNight`) of confirmed sponsors only, and the countdown to doors open
+  (`EVENT.date.starts`, labelled as the target date until
+  `EVENT.date.confirmed`). The countdown is worked out in the browser, so the
+  static page never holds a stale number; seconds stop under reduced motion.
+- **The sponsor wall** (`components/sponsors.tsx`) shows the venue sponsor,
+  then one row per cash tier with its open places drawn dashed (`slots` in
+  `PACKAGES`, each an email about that tier), then the in-kind partners. A
+  partner with a `tier` fills the first open place in that row.
+- **Prizes and perks** name who gives what in a few words; the amounts and
+  terms are the sponsors' to announce.
 - **Apply** buttons are links to `/apply` that open the application as a
   pop-up (`components/apply/`, a native `<dialog>`); the form loads on first
   hover or focus. The pop-up skips the optional question; `/apply` keeps it.
@@ -114,8 +120,8 @@ unconfirmed thing says so in its own data and on the page.
 | Date | Target, Saturday, January 30, 2027 | Set `EVENT.date.confirmed`; every "target date" note keys off it. Then add a schema.org `Event` block in `app/page.tsx`. |
 | Venue | Being finalized. RingCentral's logo shows as the venue sponsor with a "Being finalized" tag (`VENUE_SPONSOR.status: "pending"`); the venue is not named or addressed anywhere else. | Written approval: fill in `EVENT.venue` (name, place, address, map) and set `confirmed: true`, then set `VENUE_SPONSOR.status` to `"confirmed"` with its `line` and `address`. |
 | Applications | Open early, nobody confirmed | The venue and budget are set. |
-| Partners | CodeCrafters and YRI Fellowship, in kind (`PARTNERS`) | A written yes, and a light logo for the hero (`logoOnNight`). |
-| Prizes | Confirmed: CodeCrafters, YRI. Being finalized: Render (`PRIZES`) | Render moves to `status: "confirmed"` when the credit link and redemption rules arrive. |
+| Partners | In kind: CodeCrafters, YRI Fellowship, Browserbase. Supporter: Origami Prep (`PARTNERS`) | A written yes, and a light logo for the hero (`logoOnNight`). |
+| Prizes and perks | CodeCrafters and YRI (prizes), Browserbase (a promo code). Being finalized: Render (`PRIZES_AND_PERKS`) | Render moves to `status: "confirmed"` when the credit link and redemption rules arrive. |
 | Judges | Swosti Panda, Vasuki Uday Kiran Vudathala (`JUDGES`) | Agreement in writing plus a bio and headshot. |
 
 No prize-pool total is ever shown: memberships, scholarships and credits are

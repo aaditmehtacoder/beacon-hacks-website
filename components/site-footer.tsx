@@ -44,9 +44,7 @@ export function SiteFooter({ closing = false, home = false }: { closing?: boolea
               See you in Belmont
             </h2>
             <p className="mt-7 max-w-lg text-lg leading-relaxed text-moon-2">
-              Applications are open and take about two minutes.{" "}
-              Spots are confirmed once {EVENT.applications.until}, and everyone
-              who applied hears first.
+              Applications are open. They take about two minutes.
             </p>
             <ApplyButton size="lg" className="group mt-9">
               Apply
