@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { EVENT, NAV } from "@/lib/event";
-import { LinkButton } from "./ui/button";
+import { ApplyButton } from "./apply/apply-button";
 import { BeaconMark, DiscordIcon } from "./ui/beacon-mark";
 
 /** Sections that light up a nav item while they fill the middle of the screen. */
@@ -145,11 +145,7 @@ export function SiteHeader({ home = true, showApply = true }: Props) {
             </a>
           ) : null}
 
-          {showApply ? (
-            <LinkButton href="/apply" size="sm">
-              Apply early
-            </LinkButton>
-          ) : null}
+          {showApply ? <ApplyButton size="sm">Apply</ApplyButton> : null}
 
           <details ref={menu} className="group lg:hidden" onToggle={(e) => setOpen(e.currentTarget.open)}>
             <summary className="grid size-10 cursor-pointer place-items-center rounded-full text-moon transition-colors hover:bg-moon/10">

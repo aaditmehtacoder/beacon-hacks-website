@@ -3,6 +3,7 @@
 import { useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldError, fieldNightClass } from "@/components/ui/field";
+import { Select } from "@/components/ui/select";
 import { EVENT } from "@/lib/event";
 import { ROLES, loadNotifySchema, useNotifySignup, type Role } from "./use-notify-signup";
 
@@ -14,7 +15,6 @@ import { ROLES, loadNotifySchema, useNotifySignup, type Role } from "./use-notif
 export function NotifyInline() {
   const { sending, done, emailError, error, setEmailError, submit } = useNotifySignup();
   const emailId = useId();
-  const roleId = useId();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("parent");
   const emailField = useRef<HTMLInputElement>(null);
@@ -51,7 +51,7 @@ export function NotifyInline() {
         For parents, mentors, judges and sponsors. Beacon Hacks news only.
       </p>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-start">
+      <div className="mt-6 grid gap-3 sm:grid-cols-[minmax(0,1fr)_13.5rem_auto] sm:items-start">
         <div className="flex flex-col gap-1.5">
           <label htmlFor={emailId} className="sr-only">
             Email
@@ -81,31 +81,7 @@ export function NotifyInline() {
           ) : null}
         </div>
 
-        <div className="relative">
-          <label htmlFor={roleId} className="sr-only">
-            I am a
-          </label>
-          <select
-            id={roleId}
-            className={`${fieldNightClass} appearance-none pr-10`}
-            value={role}
-            onChange={(e) => setRole(e.target.value as Role)}
-          >
-            {ROLES.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-night text-moon">
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          <svg
-            viewBox="0 0 16 16"
-            aria-hidden="true"
-            fill="none"
-            className="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-moon-2"
-          >
-            <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
+        <Select label="I am a" value={role} onChange={setRole} options={ROLES} />
 
         <Button type="submit" size="lg" loading={sending} className="h-[3.125rem]">
           {sending ? "Saving…" : "Send me updates"}

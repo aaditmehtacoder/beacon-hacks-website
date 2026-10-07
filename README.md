@@ -12,11 +12,13 @@ app/                 routes, the font, metadata, generated share card and icons
   code-of-conduct/   the code of conduct
   api/apply/         stores an application
   api/notify/        stores an updates signup
+  llms.txt/          /llms.txt, the facts for AI assistants, built from lib/
 components/          one file per section, plus ui/ primitives and ui/icons.tsx
   night-scene.tsx    the sky, the shore, the lighthouse and its beam
   countdown.tsx      the hero's countdown to doors open (client)
   hero.tsx, about.tsx, tracks.tsx, prizes.tsx, schedule.tsx, judges.tsx,
   sponsors.tsx, faq.tsx, site-header.tsx, site-footer.tsx (with the closing)
+  apply/             the Apply button and the pop-up it opens
   notify/            the updates form at the end of the home page, and its hook
 lib/event.ts         every fact about the event that appears twice
 lib/content.ts       all page copy and data: tracks, schedule, venue sponsor,
@@ -76,12 +78,29 @@ NEXT_DIST_DIR=.next-check npm run build   # build beside a running dev server
   "Sponsored by" row of the white logos (`logoOnNight`) with a one-word
   caption each. The countdown is worked out in the browser, so the static
   page never holds a stale number; seconds stop under reduced motion.
+- **Apply** buttons are links to `/apply` that open the application as a
+  pop-up (`components/apply/`, a native `<dialog>`); the form loads on first
+  hover or focus. The pop-up skips the optional question; `/apply` keeps it.
+- **The schedule, prizes and judges** rise into view as you scroll, driven
+  by the scroll itself (`.reveal`, CSS `animation-timeline: view()`); without
+  support, under reduced motion, or in print, they simply sit in place.
+- **The role picker** in the updates form is `components/ui/select.tsx`, a
+  listbox styled for the night, with full keyboard support.
 - **Icons** come from `components/ui/icons.tsx`: one line family on a 24
   unit grid, coloured by `currentColor`, always beside text that says the
   same thing.
 - **Utilities.** `wrap` (the content column), `night` (the dark ground; flips
   focus rings to the lamp), `heading` (section headings), `kicker` (a small
   label, used sparingly), `link` (a lamp underline).
+
+## Search and AI assistants
+
+`/llms.txt` sums the event up in Markdown for AI assistants, generated at
+build time from `lib/event.ts` and `lib/content.ts`. The home page carries
+Organization, WebSite and FAQPage structured data (no Event until the date
+is confirmed: schema.org has no "tentative"), the layout sets city-level geo
+tags for Belmont (never the venue), and `robots.txt` names the AI crawlers it
+welcomes.
 
 ## The honesty rule
 
@@ -96,7 +115,7 @@ unconfirmed thing says so in its own data and on the page.
 | Venue | Being finalized. RingCentral's logo shows as the venue sponsor with a "Being finalized" tag (`VENUE_SPONSOR.status: "pending"`); the venue is not named or addressed anywhere else. | Written approval: fill in `EVENT.venue` (name, place, address, map) and set `confirmed: true`, then set `VENUE_SPONSOR.status` to `"confirmed"` with its `line` and `address`. |
 | Applications | Open early, nobody confirmed | The venue and budget are set. |
 | Partners | CodeCrafters and YRI Fellowship, in kind (`PARTNERS`) | A written yes, and a light logo for the hero (`logoOnNight`). |
-| Prizes | Confirmed: CodeCrafters, YRI. Pending: Render | Render moves to confirmed when the credit link and redemption rules arrive (`PENDING_OFFERS`). |
+| Prizes | Confirmed: CodeCrafters, YRI. Being finalized: Render (`PRIZES`) | Render moves to `status: "confirmed"` when the credit link and redemption rules arrive. |
 | Judges | Swosti Panda, Vasuki Uday Kiran Vudathala (`JUDGES`) | Agreement in writing plus a bio and headshot. |
 
 No prize-pool total is ever shown: memberships, scholarships and credits are

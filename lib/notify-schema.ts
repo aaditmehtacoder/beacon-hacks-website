@@ -16,7 +16,7 @@ export const notifySchema = z.object({
 });
 
 /**
- * An early application. Short on purpose: enough to know who is coming and
+ * An application. Short on purpose: enough to know who is coming and
  * to reach them. Nothing here promises a spot; confirmations go out once the
  * venue and the budget are locked.
  */

@@ -37,7 +37,7 @@ export type Slot = {
   time: string;
   title: string;
   note: string;
-  /** Not arranged yet: the slot shows a "Planned" tag. */
+  /** Not arranged yet: the title says so ("Workshop (TBD)"). */
   planned?: boolean;
 };
 export type Phase = { label: string; window: string; slots: Slot[] };
@@ -55,7 +55,7 @@ export const SCHEDULE: Phase[] = [
       { time: "8:30 AM", title: "Doors open", note: "Check in with your school ID, have breakfast, and find a seat with power." },
       { time: "9:30 AM", title: "Opening ceremony", note: "Rules of the day, the tracks, and introductions from partners." },
       { time: "10:00 AM", title: "Hacking begins", note: "Team matching runs for anyone still looking for a team." },
-      { time: "11:30 AM", title: "Workshop: your first API call", note: "Optional, 30 minutes, nothing to install.", planned: true },
+      { time: "11:30 AM", title: "Workshop (TBD)", note: "Optional, about 30 minutes.", planned: true },
     ],
   },
   {
@@ -63,7 +63,7 @@ export const SCHEDULE: Phase[] = [
     window: "Noon to 6 PM",
     slots: [
       { time: "1:00 PM", title: "Lunch", note: "Take a break, then back to building." },
-      { time: "4:00 PM", title: "Workshop: shipping it live", note: "Put your project on a real URL before dinner.", planned: true },
+      { time: "4:00 PM", title: "Workshop (TBD)", note: "Optional.", planned: true },
     ],
   },
   {
@@ -160,54 +160,60 @@ export const PARTNERS: Partner[] = [
 
 /* ------------------------------------------------------------ prizes */
 
-export type Offer = {
+export type Prize = {
   from: string;
+  /** A PARTNERS id, for the logo. Render has not sent one yet. */
+  partner?: string;
   title: string;
-  detail: string;
-  /** Who it is for, in a few words. */
-  who: string;
-  /** Conditions the giver set, shown as written. */
-  conditions?: string;
+  /** The headline: who gets it, or how much. */
+  figure: string;
+  /** Short facts under it, as written by the giver. */
+  points: string[];
+  /** "pending": offered in writing, redemption details not settled. */
+  status: "confirmed" | "pending";
 };
 
-/** Committed in writing, by partners in PARTNERS. */
-export const CONFIRMED_PRIZES: Offer[] = [
-  {
-    from: "CodeCrafters",
-    title: "VIP memberships",
-    who: "Top three teams",
-    detail: "Every member of the top three teams gets a CodeCrafters VIP membership: two years for first place, one year for second and six months for third.",
-  },
-  {
-    from: "YRI Fellowship",
-    title: "Research scholarships and mentorship",
-    who: "Winning teams",
-    detail: "Winning team members receive scholarships of up to $1,500 toward YRI’s research mentorship program, and all winners get guaranteed application review with priority admission consideration. The overall winning team also receives a featured mentorship prize.",
-  },
-];
-
 /**
- * Offered in writing but not final: the redemption details have not
- * arrived. Nothing here is a confirmed benefit until they do.
+ * Prizes and credits. Confirmed ones are committed in writing by partners
+ * in PARTNERS. Pending ones are offered in writing but not final:
  *
  *  - Render (Hazal Mestci, hazal@render.com): offered Sept 29, 2026,
  *    accepted Oct 3. Still owed: the event credit link, eligibility and
  *    redemption requirements, and the logo. Render is for people 16+.
+ *
+ * Nothing is added up into a prize pool: memberships, scholarships and
+ * credits are not cash and do not sum.
  */
-export const PENDING_OFFERS: Offer[] = [
+export const PRIZES: Prize[] = [
   {
-    from: "Render",
-    title: "Building credits",
-    who: "Participants aged 16+",
-    detail: "$50 in Render building credits for each eligible participant.",
-    conditions: "Render accounts are for people aged 16 and older.",
+    from: "CodeCrafters",
+    partner: "codecrafters",
+    title: "VIP memberships",
+    figure: "Up to 2 years",
+    points: ["For every member of the top three teams", "2 years for 1st, 1 year for 2nd, 6 months for 3rd"],
+    status: "confirmed",
+  },
+  {
+    from: "YRI Fellowship",
+    partner: "yri",
+    title: "Research scholarships",
+    figure: "Up to $1,500",
+    points: [
+      "For winning team members, toward YRI’s research mentorship program",
+      "Guaranteed application review, with priority admission consideration",
+      "A mentorship prize for the overall winner",
+    ],
+    status: "confirmed",
   },
   {
     from: "Render",
-    title: "Credits for the top three",
-    who: "Top three projects on Render Workflows",
-    detail: "$500, $300 and $100 in Render credits for first, second and third place.",
-    conditions: "Winning projects must use Render Workflows; ages 16+.",
+    title: "Building credits",
+    figure: "$50 each",
+    points: [
+      "For every participant aged 16 or older",
+      "$500, $300 and $100 for the top three projects on Render Workflows",
+    ],
+    status: "pending",
   },
 ];
 
@@ -227,6 +233,8 @@ export type Judge = {
   name: string;
   role: string;
   org: string;
+  /** The employer's logo, under public/logos, to identify them. */
+  orgLogo: Logo;
   /** Their own words, lightly trimmed. */
   bio: string;
   linkedin: string;
@@ -245,6 +253,7 @@ export const JUDGES: Judge[] = [
     name: "Swosti Panda",
     role: "Lead PM/Analyst, Devices & Services",
     org: "Google",
+    orgLogo: { src: "/logos/google.svg", width: 272, height: 92 },
     bio: "Works on the supply chain and logistics architecture behind Google’s flagship retail stores. Previously at Walmart Technology. MS in Supply Chain Management.",
     linkedin: "https://www.linkedin.com/in/swostipanda/",
     photo: "/photos/judges/swosti-panda.jpg",
@@ -254,6 +263,7 @@ export const JUDGES: Judge[] = [
     name: "Vasuki Uday Kiran Vudathala",
     role: "Staff Performance Engineer, AI/ML",
     org: "ServiceNow",
+    orgLogo: { src: "/logos/servicenow.svg", width: 130.3, height: 19.25 },
     bio: "Specializes in GenAI performance, scalability and production reliability. Sixteen-plus years in industry, and a technical author, conference speaker, and hackathon judge and mentor.",
     linkedin: "https://www.linkedin.com/in/vasukiudaykiran/",
     photo: "/photos/judges/uday-vudathala.jpg",
@@ -353,8 +363,8 @@ export const FAQS: Faq[] = [
   },
   {
     q: "Can I apply now?",
-    a: `Yes. Early applications are open and take about two minutes. Applying does not guarantee a spot: we confirm spots once ${EVENT.applications.until}, and we will email everyone who applied.`,
-    link: { href: "/apply", label: "Apply early" },
+    a: `Yes. Applications are open and take about two minutes. Applying does not guarantee a spot: we confirm spots once ${EVENT.applications.until}, and we will email everyone who applied.`,
+    link: { href: "/apply", label: "Apply" },
   },
   {
     q: "How much does it cost?",

@@ -200,6 +200,32 @@
   to   { opacity: 1; }
 }
 
+@keyframes pop {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes dialog-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Scroll reveal: a short rise as a block comes into view, driven by the
+   scroll position itself (no script). Browsers without scroll-driven
+   animations, and visitors who ask for reduced motion, see it in place. */
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes sun-up {
+  from { opacity: 0.2; transform: translateY(9px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* The page behind an open dialog holds still. */
+html:has(dialog[open]) { overflow: hidden; }
+
 .beam {
   transform: scaleX(-1);
   transform-origin: 0 50%;
@@ -224,6 +250,24 @@
   .rise-2 { animation-delay: 0.08s; }
   .rise-3 { animation-delay: 0.16s; }
   .fade { animation: fade 0.9s var(--ease-out-quart) both; }
+  .pop { animation: pop 0.16s var(--ease-out-quart) both; }
+  dialog[open] { animation: dialog-in 0.4s var(--ease-out-expo) both; }
+  dialog[open]::backdrop { animation: fade 0.3s var(--ease-out-quart) both; }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry var(--reveal-from, 0%) cover var(--reveal-to, 26%);
+    }
+    .sun-up {
+      animation: sun-up linear both;
+      animation-timeline: view();
+      animation-range: entry 30% cover 40%;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -237,5 +281,6 @@
 
 @media print {
   .no-print { display: none !important; }
+  .reveal, .sun-up { animation: none !important; }
   body { background: #fff; }
 }

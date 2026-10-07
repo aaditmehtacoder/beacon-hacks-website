@@ -127,6 +127,24 @@ export const BulbIcon = ({ className }: P) => (
   </Icon>
 );
 
+export const CheckIcon = ({ className }: P) => (
+  <Icon className={className}>
+    <path d="m5 12.5 4.5 4.5L19 7.5" />
+  </Icon>
+);
+
+export const ChevronIcon = ({ className }: P) => (
+  <Icon className={className}>
+    <path d="m6.5 9.5 5.5 5.5 5.5-5.5" />
+  </Icon>
+);
+
+export const CloseIcon = ({ className }: P) => (
+  <Icon className={className}>
+    <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
+  </Icon>
+);
+
 /** LinkedIn's mark (Simple Icons, CC0), filled. */
 export const LinkedInIcon = ({ className = "size-5" }: P) => (
   <svg viewBox="0 0 24 24" className={`shrink-0 ${className}`} aria-hidden="true" fill="currentColor">

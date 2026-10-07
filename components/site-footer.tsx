@@ -2,7 +2,8 @@ import Link from "next/link";
 import { EVENT, mailto } from "@/lib/event";
 import { BeaconMark, DiscordIcon } from "./ui/beacon-mark";
 import { MailIcon } from "./ui/icons";
-import { Arrow, LinkButton } from "./ui/button";
+import { Arrow } from "./ui/button";
+import { ApplyButton } from "./apply/apply-button";
 import { NotifyInline } from "./notify/notify-inline";
 import { Shore, Sky } from "./night-scene";
 
@@ -24,7 +25,7 @@ export function SiteFooter({ closing = false, home = false }: { closing?: boolea
     { label: "Judges", href: at("#judges") },
     { label: "Sponsors", href: at("#sponsors") },
     { label: "FAQ", href: at("#faq") },
-    { label: "Apply early", href: "/apply" },
+    { label: "Apply", href: "/apply" },
     { label: "Code of conduct", href: "/code-of-conduct" },
   ];
 
@@ -43,14 +44,14 @@ export function SiteFooter({ closing = false, home = false }: { closing?: boolea
               See you in Belmont
             </h2>
             <p className="mt-7 max-w-lg text-lg leading-relaxed text-moon-2">
-              Early applications are open and take about two minutes.{" "}
+              Applications are open and take about two minutes.{" "}
               Spots are confirmed once {EVENT.applications.until}, and everyone
               who applied hears first.
             </p>
-            <LinkButton href="/apply" size="lg" className="group mt-9">
-              Apply early
+            <ApplyButton size="lg" className="group mt-9">
+              Apply
               <Arrow />
-            </LinkButton>
+            </ApplyButton>
 
             <div id="updates" className="mt-16 max-w-2xl scroll-mt-28 border-t border-moon/12 pt-10">
               <NotifyInline />

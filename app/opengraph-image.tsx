@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { EVENT } from "@/lib/event";
 
 const WHERE = EVENT.venue.name ? `Hosted by ${EVENT.venue.name} in ${EVENT.venue.label}.` : `In ${EVENT.venue.label}.`;
-export const alt = `Beacon Hacks: ${EVENT.tagline} ${WHERE} Target date ${EVENT.date.label}. Early applications are open.`;
+export const alt = `Beacon Hacks: ${EVENT.tagline} ${WHERE} Target date ${EVENT.date.label}. Applications are open.`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

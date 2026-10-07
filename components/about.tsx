@@ -8,35 +8,31 @@ const HIGHLIGHTS = [
   { Icon: TrophyIcon, title: "Judges and prizes", body: "Demo what you made to industry judges." },
 ];
 
-/** What the day is and who it is for. */
+/** What the day is and who it is for, in one screen. */
 export function About() {
   return (
     <section id="about" aria-labelledby="about-title" className="bg-fog">
-      <div className="wrap grid gap-10 py-24 sm:py-32 lg:grid-cols-12 lg:gap-x-16 lg:py-40">
-        <h2 id="about-title" className="heading max-w-[13ch] lg:col-span-9">
+      <div className="wrap py-20 sm:py-24">
+        <h2 id="about-title" className="heading">
           Build what lights the way
         </h2>
-        <div className="flex max-w-2xl flex-col gap-5 text-lg leading-relaxed text-ink-2 lg:col-span-7 lg:col-start-5 lg:mt-4">
+        <div className="mt-8 grid gap-5 text-lg leading-relaxed text-ink-2 lg:grid-cols-2 lg:gap-16">
           <p>
             Beacon Hacks is a free, one-day hackathon for high school students
-            from across the Bay Area. Come with a team of up to four, or find
-            one on the day.
+            from across the Bay Area. We are planning for {EVENT.capacityLabel}{" "}
+            students in {EVENT.venue.city}. Come with a team of up to four, or
+            find one on the day.
           </p>
           <p>
             Never written code before? You are welcome here. Spend the day
             making an app, a game, a website or a hardware hack with people who
             want to build too, then show it to the judges.
           </p>
-          <p className="text-ink-3">
-            We are planning for {EVENT.capacityLabel} students
-            {EVENT.venue.place ? ` at ${EVENT.venue.place}` : ""} in {EVENT.venue.city}, and
-            recruiting mentors from the local tech community.
-          </p>
         </div>
 
-        <ul className="mt-6 grid gap-x-10 gap-y-8 border-t border-line pt-12 sm:grid-cols-2 lg:col-span-12 lg:mt-10 lg:grid-cols-4">
+        <ul className="mt-12 grid gap-x-10 gap-y-8 border-t border-line pt-10 sm:grid-cols-2 lg:grid-cols-4">
           {HIGHLIGHTS.map(({ Icon, title, body }) => (
-            <li key={title}>
+            <li key={title} className="reveal">
               <span className="grid size-11 place-items-center rounded-full bg-lamp-wash text-lamp-deep ring-1 ring-lamp/50">
                 <Icon className="size-[1.375rem]" />
               </span>

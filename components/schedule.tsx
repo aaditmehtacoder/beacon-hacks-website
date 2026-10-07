@@ -1,6 +1,6 @@
+import type { CSSProperties } from "react";
 import { SCHEDULE, type Phase } from "@/lib/content";
 import { EVENT } from "@/lib/event";
-import { Tag } from "./ui/section";
 import { OutArrow } from "./ui/button";
 import { CodeIcon, DoorIcon, MoonIcon, PinIcon } from "./ui/icons";
 
@@ -12,7 +12,6 @@ const SKY = [
     time: "text-lamp-deep",
     note: "text-ink-3",
     line: "border-ink/10",
-    tag: "neutral" as const,
     glyph: (
       <svg viewBox="0 0 56 40" fill="none" className="h-10 w-14">
         <path d="M12 30a10 10 0 0 1 20 0Z" className="fill-lamp" />
@@ -25,7 +24,6 @@ const SKY = [
     time: "text-lamp-deep",
     note: "text-ink-3",
     line: "border-ink/10",
-    tag: "neutral" as const,
     glyph: (
       <svg viewBox="0 0 56 40" fill="none" className="h-10 w-14">
         <circle cx="34" cy="14" r="7.5" className="fill-lamp" />
@@ -38,7 +36,6 @@ const SKY = [
     time: "text-lamp",
     note: "text-moon-3",
     line: "border-moon/12",
-    tag: "night" as const,
     glyph: (
       <svg viewBox="0 0 56 40" fill="none" className="h-10 w-14">
         <path d="M38 6a10 10 0 1 0 9 14 8 8 0 0 1-9-14Z" className="fill-lamp" />
@@ -119,7 +116,7 @@ export function Schedule() {
 
         <div className="mt-14 grid gap-4 sm:mt-16 lg:grid-cols-3">
           {SCHEDULE.map((phase, i) => (
-            <PhasePanel key={phase.label} phase={phase} sky={SKY[i]} />
+            <PhasePanel key={phase.label} phase={phase} sky={SKY[i]} index={i} />
           ))}
         </div>
       </div>
@@ -127,9 +124,17 @@ export function Schedule() {
   );
 }
 
-function PhasePanel({ phase, sky }: { phase: Phase; sky: (typeof SKY)[number] }) {
+/* Panels side by side arrive one after another: each starts its rise a
+   little later in the scroll. */
+const STAGGER = ["0%", "6%", "12%"];
+
+function PhasePanel({ phase, sky, index }: { phase: Phase; sky: (typeof SKY)[number]; index: number }) {
   return (
-    <section aria-labelledby={`phase-${phase.label}`} className={`flex flex-col rounded-[1.75rem] p-7 sm:p-8 ${sky.panel}`}>
+    <section
+      aria-labelledby={`phase-${phase.label}`}
+      className={`reveal flex flex-col rounded-[1.75rem] p-7 sm:p-8 ${sky.panel}`}
+      style={{ "--reveal-from": STAGGER[index], "--reveal-to": `${26 + index * 6}%` } as CSSProperties}
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 id={`phase-${phase.label}`} className="text-[1.625rem] leading-none font-bold font-stretch-125% tracking-[-0.03em]">
@@ -137,21 +142,18 @@ function PhasePanel({ phase, sky }: { phase: Phase; sky: (typeof SKY)[number] })
           </h3>
           <p className={`mt-2 text-[0.875rem] font-medium ${sky.note}`}>{phase.window}</p>
         </div>
-        <span aria-hidden="true" className="-mt-1">
+        <span aria-hidden="true" className="sun-up -mt-1">
           {sky.glyph}
         </span>
       </div>
 
       <ol className="mt-7">
         {phase.slots.map((slot) => (
-          <li key={slot.title} className={`border-t py-4 last:pb-0 ${sky.line}`}>
+          <li key={`${slot.time}-${slot.title}`} className={`reveal border-t py-4 last:pb-0 ${sky.line}`}>
             <p className={`text-[0.8125rem] font-semibold font-stretch-[112.5%] tracking-[0.04em] tabular-nums uppercase ${sky.time}`}>
               {slot.time}
             </p>
-            <p className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[1.0625rem] leading-snug font-semibold">
-              {slot.title}
-              {slot.planned ? <Tag tone={sky.tag}>Planned</Tag> : null}
-            </p>
+            <p className="mt-1 text-[1.0625rem] leading-snug font-semibold">{slot.title}</p>
             <p className={`mt-1 text-[0.9375rem] leading-relaxed ${sky.note}`}>{slot.note}</p>
           </li>
         ))}

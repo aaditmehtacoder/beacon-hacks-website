@@ -12,11 +12,14 @@ export function PartnerLogo({
   logo,
   scale = 1,
   area = 6400,
+  eager = false,
   className = "",
 }: {
   logo: Logo;
   scale?: number;
   area?: number;
+  /** Load at once: for logos in the first screen. */
+  eager?: boolean;
   className?: string;
 }) {
   const ratio = logo.width / logo.height;
@@ -29,6 +32,7 @@ export function PartnerLogo({
       width={width}
       height={height}
       unoptimized={logo.src.endsWith(".svg")}
+      loading={eager ? "eager" : undefined}
       className={`object-contain object-left ${className}`}
       style={{ width, maxWidth: "100%", height: "auto" }}
     />

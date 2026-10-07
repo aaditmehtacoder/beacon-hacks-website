@@ -6,10 +6,10 @@ import { SiteFooter } from "@/components/site-footer";
 import { CalendarIcon, CapIcon, PinIcon, TicketIcon } from "@/components/ui/icons";
 
 const HOSTED = EVENT.venue.name ? `, hosted by ${EVENT.venue.name}` : "";
-const DESCRIPTION = `Apply early for Beacon Hacks, a free one-day hackathon for Bay Area high school students in grades 9 to 12${HOSTED} in Belmont. Spots are confirmed once ${EVENT.applications.until}.`;
+const DESCRIPTION = `Apply to Beacon Hacks, a free one-day hackathon for Bay Area high school students in grades 9 to 12${HOSTED} in Belmont. Spots are confirmed once ${EVENT.applications.until}.`;
 
 export const metadata: Metadata = {
-  title: "Apply early",
+  title: "Apply",
   description: DESCRIPTION,
   alternates: { canonical: "/apply" },
   openGraph: {
@@ -17,13 +17,13 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "/apply",
     siteName: "Beacon Hacks",
-    title: "Apply early · Beacon Hacks",
+    title: "Apply · Beacon Hacks",
     description: DESCRIPTION,
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Beacon Hacks. A free hackathon for Bay Area high school builders." }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Apply early · Beacon Hacks",
+    title: "Apply · Beacon Hacks",
     description: DESCRIPTION,
     images: ["/opengraph-image"],
   },
@@ -57,7 +57,7 @@ export default function Apply() {
       <main id="main" tabIndex={-1} className="flex-1 bg-fog focus:outline-none">
         <div className="wrap grid gap-14 py-14 sm:py-20 lg:grid-cols-12 lg:gap-16 lg:py-24">
           <div className="lg:col-span-5">
-            <h1 className="heading">Apply early</h1>
+            <h1 className="heading">Apply</h1>
             <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-3">
               Applications open before the {EVENT.venue.confirmed ? "date is" : "date and venue are"}{" "}
               final, so you can get in line now. It takes about two minutes.

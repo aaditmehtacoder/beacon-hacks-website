@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Mona_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { EVENT } from "@/lib/event";
+import { ApplyDialog } from "@/components/apply/apply-dialog";
 import "./globals.css";
 
 /* One family for everything: Mona Sans, a variable grotesque with a width
@@ -15,7 +16,7 @@ const mona = Mona_Sans({
 
 const TITLE = "Beacon Hacks · Free hackathon for Bay Area high school students";
 const HOSTED = EVENT.venue.name ? `, hosted by ${EVENT.venue.name}` : "";
-const DESCRIPTION = `A free one-day hackathon for Bay Area high school builders${HOSTED} in Belmont, California. Target date Saturday, January 30, 2027. Grades 9 to 12, no experience needed. Early applications are open.`;
+const DESCRIPTION = `A free one-day hackathon for Bay Area high school builders${HOSTED} in Belmont, California. Target date Saturday, January 30, 2027. Grades 9 to 12, no experience needed. Applications are open.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(EVENT.url),
@@ -43,6 +44,14 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
   },
   robots: { index: true, follow: true },
+  /* Where the event is, at city level (never the venue): read by local and
+     generative search. llms.txt carries the full facts for AI assistants. */
+  other: {
+    "geo.region": "US-CA",
+    "geo.placename": "Belmont, California",
+    "geo.position": "37.518;-122.292",
+    ICBM: "37.518, -122.292",
+  },
 };
 
 export const viewport: Viewport = {
@@ -61,6 +70,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         {children}
+        <ApplyDialog />
         {/* Vercel Analytics. Silent in development, reports only on Vercel. */}
         <Analytics />
       </body>

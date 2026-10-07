@@ -10,6 +10,7 @@ import { Sponsors } from "@/components/sponsors";
 import { Faq } from "@/components/faq";
 import { SiteFooter } from "@/components/site-footer";
 import { EVENT } from "@/lib/event";
+import { FAQS } from "@/lib/content";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -39,6 +40,18 @@ const STRUCTURED_DATA = {
       url: EVENT.url,
       name: EVENT.name,
       publisher: { "@id": `${EVENT.url}/#organization` },
+    },
+    /* The FAQ as questions and answers, so search and AI assistants can
+       quote it as written. */
+    {
+      "@type": "FAQPage",
+      "@id": `${EVENT.url}/#faq`,
+      isPartOf: { "@id": `${EVENT.url}/#website` },
+      mainEntity: FAQS.map((item) => ({
+        "@type": "Question",
+        name: item.q,
+        acceptedAnswer: { "@type": "Answer", text: item.a },
+      })),
     },
   ],
 };

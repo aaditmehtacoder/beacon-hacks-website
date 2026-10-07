@@ -3,7 +3,7 @@ import { applySchema } from "@/lib/notify-schema";
 import { addEntry } from "@/lib/store";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 
-/** An early application. Stored; forwarded to NOTIFY_WEBHOOK_URL if set. */
+/** An application. Stored; forwarded to NOTIFY_WEBHOOK_URL if set. */
 const WEBHOOK = process.env.NOTIFY_WEBHOOK_URL;
 
 export async function POST(request: Request) {

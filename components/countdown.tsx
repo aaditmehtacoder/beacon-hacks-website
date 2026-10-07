@@ -52,12 +52,12 @@ export function Countdown() {
   const target = EVENT.date.confirmed ? "" : " · target date";
 
   return (
-    <div>
-      <p className="flex items-center gap-2.5 text-[0.9375rem] text-moon-2">
-        <CalendarIcon className="size-[1.125rem] text-lamp" />
+    <div className="flex flex-col gap-3 lg:items-end">
+      <p className="flex items-center gap-2 text-[0.8125rem] text-moon-3">
+        <CalendarIcon className="size-4 text-lamp" />
         <span>
-          {EVENT.date.label}
-          <span className="text-moon-3">{target}</span>
+          Doors open <span className="text-moon-2">{EVENT.date.short}</span>
+          {target}
         </span>
       </p>
 
@@ -67,26 +67,22 @@ export function Countdown() {
       </p>
 
       {done && now !== null ? (
-        <p className="mt-5 text-[clamp(2.25rem,4.5vw,3.5rem)] leading-none font-bold font-stretch-125% tracking-[-0.03em] text-lamp">
-          It’s hack day.
-        </p>
+        <p className="text-[1.75rem] leading-none font-bold font-stretch-125% tracking-[-0.02em] text-lamp">It’s hack day.</p>
       ) : (
         <ol
           aria-hidden="true"
-          className={`mt-5 flex items-start transition-opacity duration-700 ease-out-quart ${now === null ? "opacity-0" : "opacity-100"}`}
+          className={`flex gap-2 transition-opacity duration-700 ease-out-quart sm:gap-2.5 ${now === null ? "opacity-0" : "opacity-100"}`}
         >
-          {shown.map((unit, i) => (
-            <li key={unit.label} className="flex items-start">
-              {i > 0 ? (
-                <span className="px-2 text-[clamp(2.5rem,5vw,4.25rem)] leading-none font-bold text-lamp/70 sm:px-3">:</span>
-              ) : null}
-              <span className="flex flex-col items-center">
-                <span className="text-[clamp(2.5rem,5vw,4.25rem)] leading-none font-bold font-stretch-[118%] tracking-[-0.03em] text-moon tabular-nums">
-                  {String(unit.value).padStart(2, "0")}
-                </span>
-                <span className="mt-2.5 text-[0.6875rem] font-semibold font-stretch-[112.5%] tracking-[0.16em] text-moon-3 uppercase">
-                  {unit.label}
-                </span>
+          {shown.map((unit) => (
+            <li
+              key={unit.label}
+              className="flex w-[4.25rem] flex-col items-center rounded-2xl bg-moon/[0.05] pt-3 pb-2.5 ring-1 ring-moon/10 ring-inset sm:w-[4.75rem]"
+            >
+              <span className="text-[1.625rem] leading-none font-bold font-stretch-[112.5%] tracking-[-0.02em] text-moon tabular-nums sm:text-[1.875rem]">
+                {String(unit.value).padStart(2, "0")}
+              </span>
+              <span className="mt-2 text-[0.625rem] font-semibold font-stretch-[112.5%] tracking-[0.14em] text-moon-3 uppercase">
+                {unit.label}
               </span>
             </li>
           ))}

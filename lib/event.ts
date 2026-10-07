@@ -68,7 +68,7 @@ export const EVENT = {
   capacityLabel: "75 to 100",
 
   /**
-   * Early applications are open: anyone can apply now. `until` finishes
+   * Applications are open: anyone can apply now. `until` finishes
    * the sentence "Spots are confirmed once ...".
    */
   applications: {

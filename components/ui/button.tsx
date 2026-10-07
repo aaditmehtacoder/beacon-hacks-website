@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 
-type Variant = "lamp" | "ink" | "outline" | "outline-night";
-type Size = "sm" | "md" | "lg";
+export type Variant = "lamp" | "ink" | "outline" | "outline-night";
+export type Size = "sm" | "md" | "lg";
 
 /* Pills with a semi-expanded label. Hover lifts a hair; press settles. */
 const BASE =
@@ -31,7 +31,7 @@ const SIZE: Record<Size, string> = {
   lg: "h-13 px-7 text-base",
 };
 
-function classes(variant: Variant, size: Size, extra?: string) {
+export function buttonClasses(variant: Variant = "lamp", size: Size = "md", extra?: string) {
   return [BASE, VARIANT[variant], SIZE[size], extra].filter(Boolean).join(" ");
 }
 
@@ -54,7 +54,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={classes(variant, size, className)}
+      className={buttonClasses(variant, size, className)}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       {...rest}
@@ -71,7 +71,7 @@ type LinkButtonProps = ComponentProps<typeof Link> & {
 };
 
 export function LinkButton({ variant = "lamp", size = "md", className, ...rest }: LinkButtonProps) {
-  return <Link className={classes(variant, size, className)} {...rest} />;
+  return <Link className={buttonClasses(variant, size, className)} {...rest} />;
 }
 
 /** For mailto: and other non-route links that should look like buttons. */
@@ -81,7 +81,7 @@ export function AnchorButton({
   className,
   ...rest
 }: ComponentProps<"a"> & { variant?: Variant; size?: Size }) {
-  return <a className={classes(variant, size, className)} {...rest} />;
+  return <a className={buttonClasses(variant, size, className)} {...rest} />;
 }
 
 function Spinner() {
