@@ -1,8 +1,6 @@
 import { EVENT } from "@/lib/event";
-import { PARTNERS, VENUE_SPONSOR } from "@/lib/content";
 import { Arrow, LinkButton } from "./ui/button";
 import { ApplyButton } from "./apply/apply-button";
-import { PartnerLogo } from "./ui/partner-logo";
 import { Countdown } from "./countdown";
 import { Shore, Sky } from "./night-scene";
 
@@ -13,19 +11,10 @@ const FACTS = [
   "Free",
 ];
 
-/* Confirmed sponsors only, logos only. The venue sponsor joins once it is
-   confirmed; until then the sponsors section says it is being finalized. */
-const SPONSORED_BY = [
-  ...(VENUE_SPONSOR?.status === "confirmed"
-    ? [{ name: VENUE_SPONSOR.name, website: VENUE_SPONSOR.website, logo: VENUE_SPONSOR.logoOnNight, scale: 1 }]
-    : []),
-  ...PARTNERS.map((p) => ({ name: p.name, website: p.website, logo: p.logoOnNight, scale: p.logoScale ?? 1 })),
-];
-
 /**
  * The opening screen: the night over the bay, the name, what it is and
  * the two actions, with the lighthouse turning its light behind them. A
- * strip along the bottom holds the sponsors and the countdown.
+ * strip along the bottom holds the facts and the countdown.
  */
 export function Hero() {
   return (
@@ -61,8 +50,12 @@ export function Hero() {
               Sponsor us
             </LinkButton>
           </div>
+        </div>
+      </div>
 
-          <ul className="fade mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.9375rem] text-moon-2">
+      <div className="relative border-t border-moon/10 bg-night">
+        <div className="wrap flex flex-col gap-8 py-8 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+          <ul className="fade flex flex-wrap items-center gap-x-6 gap-y-2 text-[0.9375rem] text-moon-2 lg:pb-1">
             {FACTS.map((fact) => (
               <li key={fact} className="flex items-center gap-2.5">
                 <span aria-hidden="true" className="size-1.5 rounded-full bg-lamp" />
@@ -70,31 +63,6 @@ export function Hero() {
               </li>
             ))}
           </ul>
-        </div>
-      </div>
-
-      <div className="relative border-t border-moon/10 bg-night">
-        <div className="wrap flex flex-col gap-9 py-8 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
-          <div className="fade">
-            <p className="text-[0.75rem] font-semibold font-stretch-[112.5%] tracking-[0.16em] text-moon-3 uppercase">
-              Sponsored by
-            </p>
-            <ul className="mt-5 flex flex-wrap items-center gap-x-12 gap-y-6">
-              {SPONSORED_BY.map((s) => (
-                <li key={s.name}>
-                  <a
-                    href={s.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex h-8 items-center rounded-md opacity-80 transition-opacity duration-200 hover:opacity-100"
-                  >
-                    <PartnerLogo logo={s.logo} scale={s.scale} area={3600} eager />
-                    <span className="sr-only">{s.name} (opens in a new tab)</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
 
           <div className="fade">
             <Countdown />

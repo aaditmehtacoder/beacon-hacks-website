@@ -80,8 +80,6 @@ export type Partner = {
   website: string;
   /** Under public/sponsors, on a transparent ground, with its real size. */
   logo: Logo;
-  /** The light version, for the "Sponsored by" row on the night. */
-  logoOnNight: Logo;
   /** Optical size correction on top of the computed logo size. */
   logoScale?: number;
   /** What they give, in a word or two. The terms are theirs to announce. */
@@ -95,8 +93,6 @@ export type VenueSponsor = {
   name: string;
   website: string;
   logo: Logo;
-  /** The light version, for the "Sponsored by" row on the night. */
-  logoOnNight: Logo;
   /** "pending" shows the logo with a "Being finalized" tag; "confirmed"
       adds the line and the address. */
   status: "pending" | "confirmed";
@@ -115,7 +111,6 @@ export const VENUE_SPONSOR: VenueSponsor | null = {
   name: "RingCentral",
   website: "https://www.ringcentral.com",
   logo: { src: "/sponsors/ringcentral.svg", width: 961, height: 146 },
-  logoOnNight: { src: "/sponsors/ringcentral-white.svg", width: 961, height: 146 },
   status: "pending",
 };
 
@@ -139,7 +134,6 @@ export const PARTNERS: Partner[] = [
     name: "CodeCrafters",
     website: "https://codecrafters.io",
     logo: { src: "/sponsors/codecrafters.svg", width: 1280, height: 164 },
-    logoOnNight: { src: "/sponsors/codecrafters-white.svg", width: 1280, height: 164 },
     role: "Prizes",
   },
   {
@@ -147,7 +141,6 @@ export const PARTNERS: Partner[] = [
     name: "YRI Fellowship",
     website: "https://yriscience.com?ref=BEACONHACKS",
     logo: { src: "/sponsors/yri-fellowship.png", width: 1200, height: 241 },
-    logoOnNight: { src: "/sponsors/yri-fellowship-white.png", width: 1200, height: 205 },
     logoScale: 1.18,
     role: "Scholarships",
   },
@@ -156,7 +149,6 @@ export const PARTNERS: Partner[] = [
     name: "Browserbase",
     website: "https://www.browserbase.com",
     logo: { src: "/sponsors/browserbase.svg", width: 255, height: 50 },
-    logoOnNight: { src: "/sponsors/browserbase-white.svg", width: 255, height: 50 },
     logoScale: 1.12,
     role: "Tool perk",
   },
@@ -165,8 +157,7 @@ export const PARTNERS: Partner[] = [
     name: "Origami Prep",
     website: "https://origamiprep.com",
     logo: { src: "/sponsors/origami-prep.png", width: 673, height: 103 },
-    logoOnNight: { src: "/sponsors/origami-prep-white.png", width: 673, height: 101 },
-    role: "Supporter",
+    role: "Supporter, and a prize",
     tier: "supporter",
   },
 ];
@@ -175,26 +166,22 @@ export const PARTNERS: Partner[] = [
 
 export type Perk = {
   from: string;
-  /** A PARTNERS id, for the logo. Render has not sent one yet. */
+  /** A PARTNERS id, for the logo. */
   partner?: string;
   /** What it is, in a few words. The amounts and terms are the sponsor's to
       announce, and participants get them before the day. */
   label: string;
   kind: "prize" | "perk";
-  /** "pending": offered in writing, redemption details not settled. */
+  /** "pending": offered in writing, details not settled; the page says so. */
   status: "confirmed" | "pending";
 };
 
-/**
- * Prizes for the winners and perks for every builder, committed in writing.
- * Render (Hazal Mestci, hazal@render.com) offered credits Sept 29, 2026 and
- * still owes the event link, redemption rules and logo, so it is pending.
- */
+/** Prizes for the winners and perks for every builder, committed in writing. */
 export const PRIZES_AND_PERKS: Perk[] = [
   { from: "CodeCrafters", partner: "codecrafters", label: "VIP memberships", kind: "prize", status: "confirmed" },
   { from: "YRI Fellowship", partner: "yri", label: "Research scholarships", kind: "prize", status: "confirmed" },
+  { from: "Origami Prep", partner: "origami-prep", label: "A free one-year subscription", kind: "prize", status: "confirmed" },
   { from: "Browserbase", partner: "browserbase", label: "A promo code for every builder", kind: "perk", status: "confirmed" },
-  { from: "Render", label: "Cloud credits", kind: "perk", status: "pending" },
 ];
 
 /** Categories we intend to judge. Prize details follow sponsors. */
