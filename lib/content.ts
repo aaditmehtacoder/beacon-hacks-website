@@ -145,11 +145,27 @@ export const PARTNERS: Partner[] = [
     role: "Scholarships",
   },
   {
+    id: "aops",
+    name: "Art of Problem Solving",
+    website: "https://artofproblemsolving.com",
+    logo: { src: "/sponsors/aops.png", width: 930, height: 320 },
+    logoScale: 1.15,
+    role: "Prizes",
+  },
+  {
     id: "browserbase",
     name: "Browserbase",
     website: "https://www.browserbase.com",
     logo: { src: "/sponsors/browserbase.svg", width: 255, height: 50 },
     logoScale: 1.12,
+    role: "Tool perk",
+  },
+  {
+    id: "tavus",
+    name: "Tavus",
+    website: "https://www.tavus.io",
+    logo: { src: "/sponsors/tavus.svg", width: 2471, height: 489 },
+    logoScale: 0.88,
     role: "Tool perk",
   },
   {
@@ -181,7 +197,9 @@ export const PRIZES_AND_PERKS: Perk[] = [
   { from: "CodeCrafters", partner: "codecrafters", label: "VIP memberships", kind: "prize", status: "confirmed" },
   { from: "YRI Fellowship", partner: "yri", label: "Research scholarships", kind: "prize", status: "confirmed" },
   { from: "Origami Prep", partner: "origami-prep", label: "A free one-year subscription", kind: "prize", status: "confirmed" },
-  { from: "Browserbase", partner: "browserbase", label: "A promo code for every builder", kind: "perk", status: "confirmed" },
+  { from: "Art of Problem Solving", partner: "aops", label: "Prizes", kind: "prize", status: "confirmed" },
+  { from: "Browserbase", partner: "browserbase", label: "A promo code", kind: "perk", status: "confirmed" },
+  { from: "Tavus", partner: "tavus", label: "A free month", kind: "perk", status: "confirmed" },
 ];
 
 /** Categories we intend to judge. Prize details follow sponsors. */

@@ -10,8 +10,11 @@ library.
 app/                 routes, the font, metadata, generated share card and icons
   apply/             the early application
   code-of-conduct/   the code of conduct
+  admin/             organizers only: applications and the updates list
+  not-found.tsx      the 404: the night over the bay and the way home
   api/apply/         stores an application
   api/notify/        stores an updates signup
+  api/admin/         sign in, list, CSV, remove
   llms.txt/          /llms.txt, the facts for AI assistants, built from lib/
 components/          one file per section, plus ui/ primitives and ui/icons.tsx
   night-scene.tsx    the sky, the shore, the lighthouse and its beam
@@ -20,10 +23,12 @@ components/          one file per section, plus ui/ primitives and ui/icons.tsx
   sponsors.tsx, faq.tsx, site-header.tsx, site-footer.tsx (with the closing)
   apply/             the Apply button and the pop-up it opens
   notify/            the updates form at the end of the home page, and its hook
+  admin/             the admin header, sign-in and list
 lib/event.ts         every fact about the event that appears twice
 lib/content.ts       all page copy and data: tracks, schedule, venue sponsor,
                      partners, prizes, judges, packages, FAQ
 lib/store.ts         where signups live (Upstash Redis, or a local file)
+lib/admin-auth.ts    the shared admin password and its cookie
 assets/og/           Mona Sans instances for the generated share card (OFL)
 public/sponsors/     sponsor and partner logos
 public/photos/judges the headshots judges sent
@@ -119,8 +124,8 @@ unconfirmed thing says so in its own data and on the page.
 | Date | Target, Saturday, January 30, 2027 | Set `EVENT.date.confirmed`; every "target date" note keys off it. Then add a schema.org `Event` block in `app/page.tsx`. |
 | Venue | Being finalized. RingCentral's logo shows as the venue sponsor with a "Being finalized" tag (`VENUE_SPONSOR.status: "pending"`); the venue is not named or addressed anywhere else. | Written approval: fill in `EVENT.venue` (name, place, address, map) and set `confirmed: true`, then set `VENUE_SPONSOR.status` to `"confirmed"` with its `line` and `address`. |
 | Applications | Open early, nobody confirmed | The venue and budget are set. |
-| Partners | In kind: CodeCrafters, YRI Fellowship, Browserbase. Supporter: Origami Prep (`PARTNERS`) | A written yes. |
-| Prizes and perks | CodeCrafters, YRI Fellowship and Origami Prep (prizes), Browserbase (a promo code) (`PRIZES_AND_PERKS`) | A written yes; `status: "pending"` shows "Being finalized". |
+| Partners | In kind: CodeCrafters, YRI Fellowship, Art of Problem Solving, Browserbase, Tavus. Supporter: Origami Prep (`PARTNERS`) | A written yes. |
+| Prizes and perks | CodeCrafters, YRI Fellowship, Origami Prep and AoPS (prizes); Browserbase (a promo code) and Tavus (a free month) (`PRIZES_AND_PERKS`) | A written yes; `status: "pending"` shows "Being finalized". |
 | Judges | Swosti Panda, Vasuki Uday Kiran Vudathala (`JUDGES`) | Agreement in writing plus a bio and headshot. |
 
 No prize-pool total is ever shown: memberships, scholarships and credits are
@@ -159,7 +164,14 @@ same store, one row per email, newest wins, and both are rate limited per IP.
 set it uses Upstash Redis (add "Upstash Redis" from the Vercel Marketplace and
 those are set for you); every entry is a field of the `beacon:entries` hash,
 which the Upstash data browser shows. Locally it writes `.data/entries.json`
-(gitignored).
+(gitignored). On Vercel without a database it keeps entries in `/tmp`, and
+`/admin` says loudly that nothing is being saved.
+
+**`/admin`** shows everyone, newest first: filter, search, copy the emails,
+download a CSV, remove a row. It is behind one shared password,
+`ADMIN_PASSWORD`, which must be set in production (the development default is
+`cwb`, so it works out of the box without a password in git). The page is
+`noindex` and excluded from `robots.txt` and the sitemap.
 
 Optionally set `NOTIFY_WEBHOOK_URL` and every signup is also POSTed there as
 JSON. `.env.example` lists both.

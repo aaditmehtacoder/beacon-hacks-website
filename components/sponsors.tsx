@@ -89,10 +89,14 @@ export function Sponsors() {
         })}
 
         <Tier label="In kind" note="Products, credits and services that make the day possible">
-          <ul className="grid gap-3 sm:grid-cols-3">
+          {/* Two, three, then five to a row; a short last row sits centred. */}
+          <ul className="flex flex-wrap justify-center gap-3">
             {PARTNERS.filter((p) => !p.tier).map((partner) => (
-              <li key={partner.id}>
-                <LogoCard partner={partner} className="h-36" caption />
+              <li
+                key={partner.id}
+                className="basis-[calc((100%-0.75rem)/2)] sm:basis-[calc((100%-1.5rem)/3)] lg:basis-[calc((100%-3rem)/5)]"
+              >
+                <LogoCard partner={partner} className="h-32 sm:h-36" caption />
               </li>
             ))}
           </ul>
@@ -128,7 +132,7 @@ function LogoCard({ partner, className, caption = false }: { partner: Partner; c
       href={partner.website}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group flex flex-col items-center justify-center gap-4 rounded-2xl border border-line bg-card px-6 transition-[border-color,box-shadow] duration-300 hover:border-line-2 hover:shadow-[0_20px_40px_-30px_rgb(15_24_40/0.4)] ${className}`}
+      className={`group flex flex-col items-center justify-center gap-4 rounded-2xl border border-line bg-card px-4 transition-[border-color,box-shadow] duration-300 sm:px-6 hover:border-line-2 hover:shadow-[0_20px_40px_-30px_rgb(15_24_40/0.4)] ${className}`}
     >
       <span className="flex h-10 items-center transition-transform duration-300 ease-out-quart group-hover:scale-[1.03]">
         <PartnerLogo logo={partner.logo} scale={partner.logoScale} area={4400} />
