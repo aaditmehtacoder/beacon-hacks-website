@@ -287,7 +287,10 @@ html:has(dialog[open]) { overflow: hidden; }
   .rise-2 { animation-delay: 0.08s; }
   .rise-3 { animation-delay: 0.16s; }
   .fade { animation: fade 0.9s var(--ease-out-quart) both; }
-  .pop { animation: pop 0.16s var(--ease-out-quart) both; }
+  /* No fill: once it ends it lets go. A held opacity animation keeps the
+     element a backdrop root, and glass inside it (the phone menu) would
+     stop blurring the page. */
+  .pop { animation: pop 0.16s var(--ease-out-quart); }
   dialog[open] { animation: dialog-in 0.4s var(--ease-out-expo) both; }
   dialog[open]::backdrop { animation: fade 0.3s var(--ease-out-quart) both; }
 }

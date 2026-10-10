@@ -1,11 +1,19 @@
 import { EVENT } from "@/lib/event";
-import { FAQS, JUDGES, PACKAGES, PARTNERS, PRIZES_AND_PERKS, PRIZE_CATEGORIES, SCHEDULE, TRACKS, VENUE_SPONSOR } from "@/lib/content";
+import { FAQS, JUDGES, PACKAGES, PARTNERS, PRIZES_AND_PERKS, SCHEDULE, TRACKS, VENUE_SPONSOR, type Perk } from "@/lib/content";
 
 /* Built once at build time from the same data as the page, so it never
    says something the site does not. */
 export const dynamic = "force-static";
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
+
+/* Who gives a prize or a perk, as "A, B and C". What each gives stays off
+   the site, here as on the page. */
+const givers = (kind: Perk["kind"]) =>
+  PRIZES_AND_PERKS.filter((p) => p.kind === kind)
+    .map((p) => `${p.from}${p.status === "pending" ? " (being finalized)" : ""}`)
+    .join(", ")
+    .replace(/, ([^,]*)$/, " and $1");
 
 function llms() {
   const url = EVENT.url;
@@ -48,12 +56,9 @@ function llms() {
     "",
     "## Prizes and perks",
     "",
-    ...PRIZES_AND_PERKS.map(
-      (p) =>
-        `- ${p.from}: ${p.label} (${p.kind === "prize" ? "for the winners" : "for every builder"}${p.status === "pending" ? ", being finalized" : ""})`,
-    ),
-    "- Amounts and terms are shared with participants before the event.",
-    `- Judging categories (planned): ${PRIZE_CATEGORIES.join(", ")}`,
+    `- For the winners: prizes from ${givers("prize")}.`,
+    `- For every builder: perks from ${givers("perk")}.`,
+    "- Participants get the details before the event.",
     "",
     "## Judges",
     "",

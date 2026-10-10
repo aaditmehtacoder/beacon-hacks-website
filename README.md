@@ -93,8 +93,9 @@ NEXT_DIST_DIR=.next-check npm run build   # build beside a running dev server
   then one row per cash tier with its open places drawn dashed (`slots` in
   `PACKAGES`, each an email about that tier), then the in-kind partners. A
   partner with a `tier` fills the first open place in that row.
-- **Prizes and perks** name who gives what in a few words; the amounts and
-  terms are the sponsors' to announce.
+- **Prizes and perks** name only who gives: the sponsors' logos, for the
+  winners and for every builder. What each one gives stays off the site and
+  out of the code; participants get the details before the day.
 - **Apply** buttons are links to `/apply` that open the application as a
   pop-up (`components/apply/`, a native `<dialog>`); the form loads on first
   hover or focus. The pop-up skips the optional question; `/apply` keeps it.
@@ -132,12 +133,11 @@ unconfirmed thing says so in its own data and on the page.
 | Date | Target, Saturday, January 30, 2027 | Set `EVENT.date.confirmed`; every "target date" note keys off it. Then add a schema.org `Event` block in `app/page.tsx`. |
 | Venue | Being finalized. RingCentral's logo shows as the venue sponsor with a "Being finalized" tag (`VENUE_SPONSOR.status: "pending"`); the venue is not named or addressed anywhere else. | Written approval: fill in `EVENT.venue` (name, place, address, map) and set `confirmed: true`, then set `VENUE_SPONSOR.status` to `"confirmed"` with its `line` and `address`. |
 | Applications | Open early, nobody confirmed | The venue and budget are set. |
-| Partners | In kind: CodeCrafters, YRI Fellowship, Art of Problem Solving, Browserbase, Tavus. Community: Non-Trivial. Supporter: Origami Prep (`PARTNERS`) | A written yes. |
-| Prizes and perks | CodeCrafters, YRI Fellowship, Origami Prep and AoPS (prizes); Browserbase (a promo code) and Tavus (a free month) (`PRIZES_AND_PERKS`) | A written yes; `status: "pending"` shows "Being finalized". |
+| Partners | In kind: CodeCrafters, YRI Fellowship, Art of Problem Solving, Browserbase, Tavus, .xyz. Community: Non-Trivial. Supporter: Origami Prep (`PARTNERS`) | A written yes. |
+| Prizes and perks | Prizes from CodeCrafters, YRI Fellowship, Origami Prep and AoPS; perks from Browserbase, Tavus and .xyz. Who gives, never what (`PRIZES_AND_PERKS`) | A written yes; `status: "pending"` shows "Being finalized". |
 | Judges | Swosti Panda, Vasuki Uday Kiran Vudathala (`JUDGES`) | Agreement in writing plus a bio and headshot. |
 
-No prize-pool total is ever shown: memberships, scholarships and credits are
-not cash and do not add up.
+No prize-pool total is ever shown, and no sponsor's prize on its own either.
 
 ## Sponsorship
 

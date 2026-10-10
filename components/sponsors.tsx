@@ -89,12 +89,13 @@ export function Sponsors() {
         })}
 
         <Tier label="In kind" note="Products, credits and services that make the day possible">
-          {/* Two, three, then five to a row; a short last row sits centred. */}
+          {/* Two, three, then six to a row, in line with the Supporter places
+              above; a short last row sits centred. */}
           <ul className="flex flex-wrap justify-center gap-3">
             {PARTNERS.filter((p) => !p.tier).map((partner) => (
               <li
                 key={partner.id}
-                className="basis-[calc((100%-0.75rem)/2)] sm:basis-[calc((100%-1.5rem)/3)] lg:basis-[calc((100%-3rem)/5)]"
+                className="basis-[calc((100%-0.75rem)/2)] sm:basis-[calc((100%-1.5rem)/3)] xl:basis-[calc((100%-3.75rem)/6)]"
               >
                 <LogoCard partner={partner} className="h-32 sm:h-36" caption />
               </li>

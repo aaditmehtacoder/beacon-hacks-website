@@ -123,12 +123,14 @@ export const VENUE_SPONSOR: VenueSponsor | null = {
  *    Logo from the kit they sent; they asked for a link to codecrafters.io.
  *  - YRI Fellowship: partnership agreed by email, Sept 11, 2026. Logo
  *    from yriscience.com/marketing-kit; the link is their referral link.
- *  - Browserbase: a promo code for participants, a tool perk (Oct 6, 2026).
- *    Logo from the header of browserbase.com.
+ *  - Browserbase: a perk for participants (Oct 6, 2026). Logo from the
+ *    header of browserbase.com.
  *  - Origami Prep: Supporter tier (Oct 6, 2026). Logo rendered from the
  *    header of origamiprep.com (crane mark and wordmark).
  *  - Non-Trivial: Community tier (Oct 9, 2026). Logo from logo@2x.png,
  *    with its empty margin trimmed.
+ *  - .xyz: a perk for participants (Oct 9, 2026). Logo from the header of
+ *    gen.xyz, recoloured from white to black for the cards.
  */
 export const PARTNERS: Partner[] = [
   {
@@ -171,6 +173,14 @@ export const PARTNERS: Partner[] = [
     role: "Tool perk",
   },
   {
+    id: "xyz",
+    name: ".xyz",
+    website: "https://gen.xyz",
+    logo: { src: "/sponsors/xyz.svg", width: 85, height: 49.5 },
+    logoScale: 0.78,
+    role: "Free domains",
+  },
+  {
     id: "non-trivial",
     name: "Non-Trivial",
     website: "https://www.non-trivial.org",
@@ -191,13 +201,12 @@ export const PARTNERS: Partner[] = [
 
 /* ------------------------------------------------------------ prizes */
 
+/** Who gives a prize or a perk. What each one gives is not published:
+    participants get the details before the day. */
 export type Perk = {
   from: string;
   /** A PARTNERS id, for the logo. */
   partner?: string;
-  /** What it is, in a few words. The amounts and terms are the sponsor's to
-      announce, and participants get them before the day. */
-  label: string;
   kind: "prize" | "perk";
   /** "pending": offered in writing, details not settled; the page says so. */
   status: "confirmed" | "pending";
@@ -205,22 +214,13 @@ export type Perk = {
 
 /** Prizes for the winners and perks for every builder, committed in writing. */
 export const PRIZES_AND_PERKS: Perk[] = [
-  { from: "CodeCrafters", partner: "codecrafters", label: "VIP memberships", kind: "prize", status: "confirmed" },
-  { from: "YRI Fellowship", partner: "yri", label: "Research scholarships", kind: "prize", status: "confirmed" },
-  { from: "Origami Prep", partner: "origami-prep", label: "A free one-year subscription", kind: "prize", status: "confirmed" },
-  { from: "Art of Problem Solving", partner: "aops", label: "Prizes", kind: "prize", status: "confirmed" },
-  { from: "Browserbase", partner: "browserbase", label: "A promo code", kind: "perk", status: "confirmed" },
-  { from: "Tavus", partner: "tavus", label: "A free month", kind: "perk", status: "confirmed" },
-];
-
-/** Categories we intend to judge. Prize details follow sponsors. */
-export const PRIZE_CATEGORIES = [
-  "Best overall",
-  "Runner-up",
-  "Third place",
-  "First Light: best beginner project",
-  "Landfall: best project for the Peninsula",
-  "Best design",
+  { from: "CodeCrafters", partner: "codecrafters", kind: "prize", status: "confirmed" },
+  { from: "YRI Fellowship", partner: "yri", kind: "prize", status: "confirmed" },
+  { from: "Origami Prep", partner: "origami-prep", kind: "prize", status: "confirmed" },
+  { from: "Art of Problem Solving", partner: "aops", kind: "prize", status: "confirmed" },
+  { from: "Browserbase", partner: "browserbase", kind: "perk", status: "confirmed" },
+  { from: "Tavus", partner: "tavus", kind: "perk", status: "confirmed" },
+  { from: ".xyz", partner: "xyz", kind: "perk", status: "confirmed" },
 ];
 
 /* ------------------------------------------------------------ judges */
