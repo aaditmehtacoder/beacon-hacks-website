@@ -127,6 +127,8 @@ export const VENUE_SPONSOR: VenueSponsor | null = {
  *    Logo from the header of browserbase.com.
  *  - Origami Prep: Supporter tier (Oct 6, 2026). Logo rendered from the
  *    header of origamiprep.com (crane mark and wordmark).
+ *  - Non-Trivial: Community tier (Oct 9, 2026). Logo from logo@2x.png,
+ *    with its empty margin trimmed.
  */
 export const PARTNERS: Partner[] = [
   {
@@ -167,6 +169,15 @@ export const PARTNERS: Partner[] = [
     logo: { src: "/sponsors/tavus.svg", width: 2471, height: 489 },
     logoScale: 0.88,
     role: "Tool perk",
+  },
+  {
+    id: "non-trivial",
+    name: "Non-Trivial",
+    website: "https://www.non-trivial.org",
+    logo: { src: "/sponsors/non-trivial.png", width: 1828, height: 296 },
+    logoScale: 1.1,
+    role: "Community sponsor",
+    tier: "community",
   },
   {
     id: "origami-prep",

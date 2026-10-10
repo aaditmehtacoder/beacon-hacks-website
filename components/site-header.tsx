@@ -21,21 +21,28 @@ type Props = {
   home?: boolean;
   /** Hide the Apply button where it would point at the page itself. */
   showApply?: boolean;
+  /** For a page that opens on the night: it runs up under the header, and
+      the glass starts out clearer so the sky shows through. Elsewhere the
+      header keeps its own place above the page. */
+  overlay?: boolean;
 };
 
 /**
- * The sticky header, on the night. The phone menu is a native <details>
- * disclosure, so it opens and closes even before (or without) JavaScript;
- * script only adds the niceties: Escape, a click outside, or following a
- * link closes it.
+ * The sticky header: a bar of night glass floating at the top of the page,
+ * with the Discord invite and Apply at its right. The phone menu is a
+ * native <details> disclosure, so it opens and closes even before (or
+ * without) JavaScript; script only adds the niceties: Escape, a click
+ * outside, or following a link closes it.
  */
-export function SiteHeader({ home = true, showApply = true }: Props) {
+export function SiteHeader({ home = true, showApply = true, overlay = false }: Props) {
   const menu = useRef<HTMLDetailsElement>(null);
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("");
   const discord = EVENT.social.discord;
   const href = (anchor: string) => (home ? anchor : `/${anchor}`);
+  /* At the top of a night page only the sky is behind the glass. */
+  const clear = overlay && !scrolled && !open;
 
   const closeMenu = useCallback((returnFocus: boolean) => {
     const details = menu.current;
@@ -44,7 +51,7 @@ export function SiteHeader({ home = true, showApply = true }: Props) {
     if (returnFocus) details.querySelector("summary")?.focus();
   }, []);
 
-  /* A hairline under the header once the page has moved. */
+  /* Once the page moves, the glass smokes over: content passes beneath. */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -100,102 +107,114 @@ export function SiteHeader({ home = true, showApply = true }: Props) {
 
   return (
     <header
-      className={`night sticky top-0 z-50 border-b transition-[border-color] duration-300 ${
-        scrolled || open ? "border-moon/10" : "border-transparent"
-      }`}
+      className={`pointer-events-none sticky top-0 z-50 pt-2 sm:pt-3 ${overlay ? "-mb-[var(--header-h)]" : ""}`}
     >
-      <div className="wrap flex h-16 items-center gap-6">
-        <Link
-          href={home ? "#top" : "/"}
-          className="-mx-1.5 flex shrink-0 items-center gap-2.5 rounded-full px-1.5 py-1"
-          aria-label="Beacon Hacks, home"
+      <div className="wrap">
+        {/* The gap above plus this bar's h-14 make --header-h. */}
+        <div
+          className={`glass pointer-events-auto relative -mx-3 flex h-14 items-center gap-3 rounded-full pr-2 pl-3 sm:-mx-4 sm:gap-6 sm:pl-4 ${
+            clear ? "[--glass-tint:42%]" : ""
+          }`}
         >
-          <BeaconMark className="size-7 text-lamp" />
-          <span className="text-[1.0625rem] leading-none font-bold font-stretch-125% tracking-[-0.02em]">Beacon Hacks</span>
-        </Link>
+          {/* The lamp catching the rim of the glass. */}
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-12 -bottom-px h-px bg-linear-to-r from-transparent via-lamp/35 to-transparent"
+          />
 
-        <nav aria-label="Main" className="ml-auto hidden items-center gap-1 lg:flex">
-          {NAV.map((item) => {
-            const current = home && active === item.href;
-            return (
+          <Link
+            href={home ? "#top" : "/"}
+            className="-mx-1.5 flex shrink-0 items-center gap-2.5 rounded-full px-1.5 py-1"
+            aria-label="Beacon Hacks, home"
+          >
+            <BeaconMark className="size-7 text-lamp" />
+            <span className="text-[1.0625rem] leading-none font-bold font-stretch-125% tracking-[-0.02em]">Beacon Hacks</span>
+          </Link>
+
+          <nav aria-label="Main" className="hidden flex-1 items-center justify-center gap-1 lg:flex">
+            {NAV.map((item) => {
+              const current = home && active === item.href;
+              return (
+                <a
+                  key={item.href}
+                  href={href(item.href)}
+                  aria-current={current ? "true" : undefined}
+                  className={`rounded-full px-3.5 py-2 text-[0.9375rem] font-medium transition-colors duration-200 ${
+                    current ? "bg-moon/8 text-lamp" : "text-moon-2 hover:bg-moon/6 hover:text-moon"
+                  }`}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
+          </nav>
+
+          <div className="ml-auto flex items-center gap-2 lg:ml-0">
+            {discord ? (
               <a
-                key={item.href}
-                href={href(item.href)}
-                aria-current={current ? "true" : undefined}
-                className={`rounded-full px-3.5 py-2 text-[0.9375rem] font-medium transition-colors duration-200 ${
-                  current ? "text-lamp" : "text-moon-2 hover:text-moon"
-                }`}
+                href={discord}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden h-9 items-center gap-2 rounded-full border border-moon/20 px-3.5 text-[0.875rem] font-semibold font-stretch-[112.5%] tracking-[-0.005em] whitespace-nowrap text-moon transition-[background-color,border-color,transform] duration-200 ease-out-quart hover:-translate-y-px hover:border-[#5865f2] hover:bg-[#5865f2] active:translate-y-0 sm:inline-flex"
               >
-                {item.label}
+                <DiscordIcon className="size-[1.125rem]" />
+                <span aria-hidden="true">Discord</span>
+                <span className="sr-only">Beacon Hacks on Discord (opens in a new tab)</span>
               </a>
-            );
-          })}
-        </nav>
+            ) : null}
 
-        <div className="ml-auto flex items-center gap-2 lg:ml-3">
-          {discord ? (
-            <a
-              href={discord}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden size-10 place-items-center rounded-full text-moon-2 transition-colors hover:bg-moon/10 hover:text-moon sm:grid"
-            >
-              <DiscordIcon className="size-5" />
-              <span className="sr-only">Beacon Hacks on Discord (opens in a new tab)</span>
-            </a>
-          ) : null}
+            {showApply ? <ApplyButton size="sm">Apply</ApplyButton> : null}
 
-          {showApply ? <ApplyButton size="sm">Apply</ApplyButton> : null}
+            <details ref={menu} className="group lg:hidden" onToggle={(e) => setOpen(e.currentTarget.open)}>
+              <summary className="grid size-10 cursor-pointer place-items-center rounded-full text-moon transition-colors hover:bg-moon/10">
+                <span className="sr-only">Menu</span>
+                <svg viewBox="0 0 16 16" className="size-[1.125rem]" aria-hidden="true" fill="none">
+                  <path
+                    className="group-open:hidden"
+                    d="M2 5h12M2 11h12"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    className="hidden group-open:block"
+                    d="M3.5 3.5l9 9M12.5 3.5l-9 9"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </summary>
 
-          <details ref={menu} className="group lg:hidden" onToggle={(e) => setOpen(e.currentTarget.open)}>
-            <summary className="grid size-10 cursor-pointer place-items-center rounded-full text-moon transition-colors hover:bg-moon/10">
-              <span className="sr-only">Menu</span>
-              <svg viewBox="0 0 16 16" className="size-[1.125rem]" aria-hidden="true" fill="none">
-                <path
-                  className="group-open:hidden"
-                  d="M2 5h12M2 11h12"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                />
-                <path
-                  className="hidden group-open:block"
-                  d="M3.5 3.5l9 9M12.5 3.5l-9 9"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </summary>
-
-            <div className="night absolute inset-x-0 top-full border-b border-moon/10">
-              <nav aria-label="Main" className="wrap flex flex-col pt-2 pb-6">
-                {NAV.map((item) => (
-                  <a
-                    key={item.href}
-                    href={href(item.href)}
-                    onClick={() => closeMenu(false)}
-                    className="border-b border-moon/10 py-4 text-[1.375rem] font-bold font-stretch-125% tracking-[-0.02em] text-moon transition-colors hover:text-lamp"
-                  >
-                    {item.label}
-                  </a>
-                ))}
-                {discord ? (
-                  <a
-                    href={discord}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => closeMenu(false)}
-                    className="flex items-center gap-3 py-4 text-[1.375rem] font-bold font-stretch-125% tracking-[-0.02em] text-moon hover:text-lamp"
-                  >
-                    <DiscordIcon className="size-6 text-lamp" />
-                    Join the Discord
-                    <span className="sr-only">(opens in a new tab)</span>
-                  </a>
-                ) : null}
-              </nav>
-            </div>
-          </details>
+              <div className="glass pop absolute inset-x-0 top-full mt-2 rounded-[1.75rem] p-2 [--glass-tint:90%]">
+                <nav aria-label="Main" className="flex flex-col">
+                  {NAV.map((item) => (
+                    <a
+                      key={item.href}
+                      href={href(item.href)}
+                      onClick={() => closeMenu(false)}
+                      className="rounded-[1.25rem] px-4 py-3 text-[1.375rem] font-bold font-stretch-125% tracking-[-0.02em] text-moon transition-colors hover:bg-moon/6 hover:text-lamp"
+                    >
+                      {item.label}
+                    </a>
+                  ))}
+                  {discord ? (
+                    <a
+                      href={discord}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => closeMenu(false)}
+                      className="mt-2 flex items-center gap-3 rounded-[1.25rem] bg-[#5865f2] px-4 py-3.5 text-[1.0625rem] font-semibold font-stretch-[112.5%] text-white transition-colors hover:bg-[#4752c4]"
+                    >
+                      <DiscordIcon className="size-6" />
+                      Join the Discord
+                      <span className="sr-only">(opens in a new tab)</span>
+                    </a>
+                  ) : null}
+                </nav>
+              </div>
+            </details>
+          </div>
         </div>
       </div>
     </header>

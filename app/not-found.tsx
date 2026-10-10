@@ -15,13 +15,13 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <>
-      <SiteHeader home={false} />
+      <SiteHeader home={false} overlay />
 
       <main id="main" tabIndex={-1} className="night relative isolate flex flex-1 flex-col overflow-hidden focus:outline-none">
         <Sky />
         <Shore id="lost" className="inset-x-0 bottom-0 h-[15rem] sm:h-[19rem] lg:h-[26rem]" />
 
-        <div className="wrap relative flex flex-1 flex-col justify-center pt-14 pb-[16rem] sm:pt-20 sm:pb-[20rem] lg:pt-[min(4rem,6vh)] lg:pb-[min(17rem,30vh)]">
+        <div className="wrap relative flex flex-1 flex-col justify-center pt-[calc(var(--header-h)+3.5rem)] pb-[16rem] sm:pt-[calc(var(--header-h)+5rem)] sm:pb-[20rem] lg:pt-[calc(var(--header-h)+min(4rem,6vh))] lg:pb-[min(17rem,30vh)]">
           <h1>
             <span className="rise block text-[clamp(6.5rem,min(24vw,27vh),15rem)] leading-[0.8] font-extrabold font-stretch-125% tracking-[-0.05em] text-moon">
               404

@@ -91,7 +91,7 @@ export const EVENT = {
    * the FAQ and the footer.
    */
   social: {
-    discord: "",
+    discord: "https://discord.gg/WUV8FtUkmB",
   },
 
   /** The primary host. The apex redirects here, so canonicals point here. */

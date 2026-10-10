@@ -68,11 +68,13 @@
 }
 
 :root {
+  /* The header's full height: its gap above the glass bar plus the bar
+     (h-14). Pages that open on the night run up under it by this much. */
   --header-h: 4rem;
   --gut: 1.25rem;
   color-scheme: light;
 }
-@media (min-width: 640px)  { :root { --gut: 2rem; } }
+@media (min-width: 640px)  { :root { --gut: 2rem; --header-h: 4.25rem; } }
 @media (min-width: 1024px) { :root { --gut: 3rem; } }
 
 /* ------------------------------------------------------------ base */
@@ -101,7 +103,8 @@
     outline-offset: 3px;
     border-radius: 6px;
   }
-  .night :focus-visible { outline-color: var(--color-lamp); }
+  .night :focus-visible,
+  .glass :focus-visible { outline-color: var(--color-lamp); }
 
   h1, h2, h3, h4 {
     font-stretch: 125%;
@@ -130,6 +133,40 @@
 @utility night {
   background-color: var(--color-night);
   color: var(--color-moon);
+}
+
+/* Night glass, for what floats over the page: the header and its phone
+   menu. The page passes beneath blurred and a little richer, under a sheen
+   that catches the light at the top. The tint is deep enough that moon-2
+   text keeps 7:1 even over the fog; lower `--glass-tint` only where the
+   night is all that is behind. Like `night`, it flips focus rings to the
+   lamp. The element must be positioned (relative or absolute).
+
+   The glass is a layer behind the content rather than the element itself:
+   an element with a backdrop-filter becomes the backdrop for everything
+   inside it, so glass nested in glass (the menu in the header) would blur
+   nothing. */
+@utility glass {
+  isolation: isolate;
+  color: var(--color-moon);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background-color: color-mix(in oklab, var(--color-night) var(--glass-tint, 80%), transparent);
+    background-image: linear-gradient(to bottom, color-mix(in oklab, var(--color-moon) 6%, transparent), transparent 60%);
+    -webkit-backdrop-filter: blur(18px) saturate(1.6);
+    backdrop-filter: blur(18px) saturate(1.6);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--color-moon) 10%, transparent),
+      inset 0 0 0 1px color-mix(in oklab, var(--color-moon) 8%, transparent),
+      0 18px 40px -20px color-mix(in oklab, var(--color-night) 70%, transparent);
+    transition: background-color 0.5s var(--ease-out-quart);
+  }
 }
 
 /* Section headings: expanded and heavy. */

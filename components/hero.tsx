@@ -14,21 +14,22 @@ const FACTS = [
 /**
  * The opening screen: the night over the bay, the name, what it is and
  * the two actions, with the lighthouse turning its light behind them. A
- * strip along the bottom holds the facts and the countdown.
+ * strip along the bottom holds the facts and the countdown. The sky runs
+ * up under the glass header, so the copy starts below --header-h.
  */
 export function Hero() {
   return (
     <section
       id="top"
       aria-labelledby="hero-title"
-      className="night relative isolate flex flex-col overflow-hidden lg:min-h-[calc(100svh-4rem)]"
+      className="night relative isolate flex flex-col overflow-hidden lg:min-h-svh"
     >
       <Sky />
 
       <div className="relative flex-1">
         <Shore id="hero" className="inset-x-0 bottom-0 h-[16rem] sm:h-[20rem] lg:h-[54%]" />
 
-        <div className="wrap relative pt-12 pb-[16rem] sm:pt-20 sm:pb-[21rem] lg:pt-[clamp(4rem,11vh,7.5rem)] lg:pb-20">
+        <div className="wrap relative pt-[calc(var(--header-h)+3rem)] pb-[16rem] sm:pt-[calc(var(--header-h)+5rem)] sm:pb-[21rem] lg:pt-[calc(var(--header-h)+clamp(4rem,11vh,7.5rem))] lg:pb-20">
           <h1
             id="hero-title"
             className="rise max-w-[11ch] text-[clamp(3.75rem,11vw,9.25rem)] leading-[0.86] font-extrabold font-stretch-125% tracking-[-0.045em] text-moon lg:max-w-none"

@@ -63,7 +63,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
       />
-      <SiteHeader />
+      <SiteHeader overlay />
       <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
         <Hero />
         <About />

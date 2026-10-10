@@ -78,6 +78,13 @@ NEXT_DIST_DIR=.next-check npm run build   # build beside a running dev server
   semi-expanded, running text at normal width.
 - **The schedule** is the day passing: a pale morning panel, a warm afternoon
   and a night evening.
+- **The header** is a bar of night glass floating at the top of every page
+  (`glass` in `app/globals.css`): the page passes beneath it blurred, under a
+  sheen and a hairline of lamp light along its lower rim. Where a page opens
+  on the night (the home page and the 404, `overlay`), the sky runs up under
+  it and the glass starts out clearer; it smokes over once the page moves,
+  so its links keep 7:1 over the fog. Discord and Apply sit at its right;
+  on phones Discord moves into the menu, which drops down as the same glass.
 - **The hero** ends in a strip: the four facts, and the countdown to doors
   open (`EVENT.date.starts`, labelled as the target date until
   `EVENT.date.confirmed`). The countdown is worked out in the browser, so the
@@ -100,8 +107,9 @@ NEXT_DIST_DIR=.next-check npm run build   # build beside a running dev server
   unit grid, coloured by `currentColor`, always beside text that says the
   same thing.
 - **Utilities.** `wrap` (the content column), `night` (the dark ground; flips
-  focus rings to the lamp), `heading` (section headings), `kicker` (a small
-  label, used sparingly), `link` (a lamp underline).
+  focus rings to the lamp), `glass` (night glass for what floats over the
+  page; flips focus rings too), `heading` (section headings), `kicker` (a
+  small label, used sparingly), `link` (a lamp underline).
 
 ## Search and AI assistants
 
@@ -124,7 +132,7 @@ unconfirmed thing says so in its own data and on the page.
 | Date | Target, Saturday, January 30, 2027 | Set `EVENT.date.confirmed`; every "target date" note keys off it. Then add a schema.org `Event` block in `app/page.tsx`. |
 | Venue | Being finalized. RingCentral's logo shows as the venue sponsor with a "Being finalized" tag (`VENUE_SPONSOR.status: "pending"`); the venue is not named or addressed anywhere else. | Written approval: fill in `EVENT.venue` (name, place, address, map) and set `confirmed: true`, then set `VENUE_SPONSOR.status` to `"confirmed"` with its `line` and `address`. |
 | Applications | Open early, nobody confirmed | The venue and budget are set. |
-| Partners | In kind: CodeCrafters, YRI Fellowship, Art of Problem Solving, Browserbase, Tavus. Supporter: Origami Prep (`PARTNERS`) | A written yes. |
+| Partners | In kind: CodeCrafters, YRI Fellowship, Art of Problem Solving, Browserbase, Tavus. Community: Non-Trivial. Supporter: Origami Prep (`PARTNERS`) | A written yes. |
 | Prizes and perks | CodeCrafters, YRI Fellowship, Origami Prep and AoPS (prizes); Browserbase (a promo code) and Tavus (a free month) (`PRIZES_AND_PERKS`) | A written yes; `status: "pending"` shows "Being finalized". |
 | Judges | Swosti Panda, Vasuki Uday Kiran Vudathala (`JUDGES`) | Agreement in writing plus a bio and headshot. |
 
@@ -143,9 +151,10 @@ flow.
 
 ## Discord
 
-`EVENT.social.discord` in `lib/event.ts` is empty, which hides every Discord
-link. Paste the invite (`https://discord.gg/...`) and the logo appears in the
-header, the phone menu, the FAQ, the footer and as a floating button.
+`EVENT.social.discord` in `lib/event.ts` holds the invite
+(`https://discord.gg/WUV8FtUkmB`, which does not expire). It puts Discord at
+the right of the header, at the end of the phone menu, in the FAQ, in the
+footer and as a floating button. An empty string hides every one of them.
 
 ## Brand
 
@@ -178,5 +187,4 @@ JSON. `.env.example` lists both.
 
 ## Still to fill in
 
-- The Discord invite (see above).
 - A separate sponsors address, if wanted. Everything routes to `team@beaconhacks.com`.
