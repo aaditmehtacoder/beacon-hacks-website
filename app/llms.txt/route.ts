@@ -44,6 +44,7 @@ function llms() {
     "- Teams: 1 to 4 people, with team matching at kickoff",
     `- Planned capacity: ${EVENT.capacityLabel} students`,
     "- Cost: free to apply and to attend",
+    `- Fiscal sponsor: HCB by Hack Club, a 501(c)(3) nonprofit; finances are public at ${EVENT.hcb}`,
     `- Contact: ${EVENT.email.team}`,
     "",
     "## Tracks",

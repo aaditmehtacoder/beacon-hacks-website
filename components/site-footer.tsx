@@ -113,8 +113,18 @@ export function SiteFooter({ closing = false, home = false }: { closing?: boolea
           </nav>
         </div>
 
-        <div className="wrap flex flex-col gap-1.5 border-t border-moon/10 py-6 text-[0.875rem] text-moon-3 sm:flex-row sm:justify-between">
-          <p>© 2026 Beacon Hacks</p>
+        <div className="wrap flex flex-col gap-1.5 border-t border-moon/10 py-6 text-[0.875rem] text-moon-3 lg:flex-row lg:justify-between">
+          <p>
+            © 2026 Beacon Hacks
+            <span aria-hidden="true" className="max-lg:hidden"> · </span>
+            <span className="mt-1.5 block lg:mt-0 lg:inline">
+              Fiscally sponsored by{" "}
+              <a href={EVENT.hcb} target="_blank" rel="noopener noreferrer" className="link">
+                HCB
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </span>
+          </p>
           <p>Run by high school students, for high school students.</p>
         </div>
       </footer>
