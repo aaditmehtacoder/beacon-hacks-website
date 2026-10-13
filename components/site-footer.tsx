@@ -119,8 +119,13 @@ export function SiteFooter({ closing = false, home = false }: { closing?: boolea
             <span aria-hidden="true" className="max-lg:hidden"> · </span>
             <span className="mt-1.5 block lg:mt-0 lg:inline">
               Fiscally sponsored by{" "}
-              <a href={EVENT.hcb} target="_blank" rel="noopener noreferrer" className="link">
+              <a href={EVENT.hcb.page} target="_blank" rel="noopener noreferrer" className="link">
                 HCB
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+              <span aria-hidden="true"> · </span>
+              <a href={EVENT.hcb.donate} target="_blank" rel="noopener noreferrer" className="link">
+                Donate
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>
             </span>

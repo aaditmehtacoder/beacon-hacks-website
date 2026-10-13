@@ -94,9 +94,13 @@ export const EVENT = {
     discord: "https://discord.gg/WUV8FtUkmB",
   },
 
-  /** The fiscal sponsor's public page: HCB, run by Hack Club, holds the
-      money and shows every transaction. The footer links it. */
-  hcb: "https://hcb.hackclub.com/beacon-hacks",
+  /** The fiscal sponsor: HCB, run by Hack Club, holds the money, shows
+      every transaction on `page` and takes donations at `donate`. The
+      footer links both. */
+  hcb: {
+    page: "https://hcb.hackclub.com/beacon-hacks",
+    donate: "https://hcb.hackclub.com/donations/start/beacon-hacks",
+  },
 
   /** The primary host. The apex redirects here, so canonicals point here. */
   url: "https://www.beaconhacks.com",
