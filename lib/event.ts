@@ -96,7 +96,7 @@ export const EVENT = {
 
   /** The fiscal sponsor: HCB, run by Hack Club, holds the money, shows
       every transaction on `page` and takes donations at `donate`. The
-      footer links both. */
+      footer links both; the header and the hero link `donate`. */
   hcb: {
     page: "https://hcb.hackclub.com/beacon-hacks",
     donate: "https://hcb.hackclub.com/donations/start/beacon-hacks",

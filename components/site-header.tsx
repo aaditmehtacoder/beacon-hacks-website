@@ -5,6 +5,7 @@ import Link from "next/link";
 import { EVENT, NAV } from "@/lib/event";
 import { ApplyButton } from "./apply/apply-button";
 import { BeaconMark, DiscordIcon } from "./ui/beacon-mark";
+import { OutArrow } from "./ui/button";
 
 /** Sections that light up a nav item while they fill the middle of the screen. */
 const SECTION_TO_NAV: Record<string, string> = {
@@ -29,7 +30,7 @@ type Props = {
 
 /**
  * The sticky header: a bar of night glass floating at the top of the page,
- * with the Discord invite and Apply at its right. The phone menu is a
+ * with Donate, the Discord invite and Apply at its right. The phone menu is a
  * native <details> disclosure, so it opens and closes even before (or
  * without) JavaScript; script only adds the niceties: Escape, a click
  * outside, or following a link closes it.
@@ -150,6 +151,16 @@ export function SiteHeader({ home = true, showApply = true, overlay = false }: P
           </nav>
 
           <div className="ml-auto flex items-center gap-2 lg:ml-0">
+            <a
+              href={EVENT.hcb.donate}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden h-9 items-center rounded-full border border-moon/20 px-3.5 text-[0.875rem] font-semibold font-stretch-[112.5%] tracking-[-0.005em] whitespace-nowrap text-moon transition-[border-color,color,transform] duration-200 ease-out-quart hover:-translate-y-px hover:border-lamp/70 hover:text-lamp active:translate-y-0 sm:inline-flex"
+            >
+              Donate
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+
             {discord ? (
               <a
                 href={discord}
@@ -198,6 +209,17 @@ export function SiteHeader({ home = true, showApply = true, overlay = false }: P
                       {item.label}
                     </a>
                   ))}
+                  <a
+                    href={EVENT.hcb.donate}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => closeMenu(false)}
+                    className="group mt-2 flex items-center justify-between rounded-[1.25rem] border border-moon/20 px-4 py-3.5 text-[1.0625rem] font-semibold font-stretch-[112.5%] text-moon transition-colors hover:border-lamp/70 hover:text-lamp"
+                  >
+                    Donate
+                    <OutArrow />
+                    <span className="sr-only">(opens in a new tab)</span>
+                  </a>
                   {discord ? (
                     <a
                       href={discord}

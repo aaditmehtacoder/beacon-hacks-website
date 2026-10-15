@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Mona_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { EVENT } from "@/lib/event";
-import { ApplyDialog } from "@/components/apply/apply-dialog";
 import "./globals.css";
 
 /* One family for everything: Mona Sans, a variable grotesque with a width
@@ -60,8 +59,10 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
+  /* Anchor links glide (globals.css); data-scroll-behavior has Next jump,
+     not glide, to the top of a new page. */
   return (
-    <html lang="en" className={mona.variable}>
+    <html lang="en" className={mona.variable} data-scroll-behavior="smooth">
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"
@@ -70,7 +71,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         {children}
-        <ApplyDialog />
         {/* Vercel Analytics. Silent in development, reports only on Vercel. */}
         <Analytics />
       </body>

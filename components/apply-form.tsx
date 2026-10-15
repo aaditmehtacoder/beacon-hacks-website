@@ -24,12 +24,11 @@ const FALLBACK: Record<FieldName, string> = {
 };
 
 /**
- * The application. Six fields, one optional; the pop-up (`quick`) leaves
- * the optional one out. Errors show beside the field they belong to, focus
+ * The application. Six fields, one optional. Errors show beside the field they belong to, focus
  * moves to the first one, and the success state says you are in the
  * queue, not that you have a seat.
  */
-export function ApplyForm({ quick = false, onDone }: { quick?: boolean; onDone?: () => void } = {}) {
+export function ApplyForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [school, setSchool] = useState("");
@@ -124,15 +123,9 @@ export function ApplyForm({ quick = false, onDone }: { quick?: boolean; onDone?:
           confirmed once {EVENT.applications.until}, and we will email you the
           day that happens. One email, when there is real news.
         </p>
-        {onDone ? (
-          <Button type="button" variant="outline" className="mt-8" onClick={onDone}>
-            Done
-          </Button>
-        ) : (
-          <LinkButton href="/" variant="outline" className="mt-8">
-            Back to the site
-          </LinkButton>
-        )}
+        <LinkButton href="/" variant="outline" className="mt-8">
+          Back to the site
+        </LinkButton>
       </div>
     );
   }
@@ -156,7 +149,6 @@ export function ApplyForm({ quick = false, onDone }: { quick?: boolean; onDone?:
               clear("name");
             }}
             autoComplete="name"
-            autoFocus={quick}
             placeholder="First and last"
             aria-invalid={errors.name ? true : undefined}
             aria-describedby={describedBy("apply-name", false, !!errors.name)}
@@ -265,30 +257,28 @@ export function ApplyForm({ quick = false, onDone }: { quick?: boolean; onDone?:
         ) : null}
       </fieldset>
 
-      {quick ? null : (
-        <Field
+      <Field
+        id="apply-idea"
+        label="What would you build?"
+        optional
+        hint={`${IDEA_MAX - idea.length} characters left`}
+        error={errors.idea}
+      >
+        <textarea
           id="apply-idea"
-          label="What would you build?"
-          optional
-          hint={`${IDEA_MAX - idea.length} characters left`}
-          error={errors.idea}
-        >
-          <textarea
-            id="apply-idea"
-            data-field="idea"
-            className={`${fieldClass} min-h-28 resize-y`}
-            value={idea}
-            maxLength={IDEA_MAX}
-            onChange={(e) => {
-              setIdea(e.target.value.slice(0, IDEA_MAX));
-              clear("idea");
-            }}
-            placeholder="A sentence is plenty. Plenty of good projects start as a complaint."
-            aria-invalid={errors.idea ? true : undefined}
-            aria-describedby={describedBy("apply-idea", true, !!errors.idea)}
-          />
-        </Field>
-      )}
+          data-field="idea"
+          className={`${fieldClass} min-h-28 resize-y`}
+          value={idea}
+          maxLength={IDEA_MAX}
+          onChange={(e) => {
+            setIdea(e.target.value.slice(0, IDEA_MAX));
+            clear("idea");
+          }}
+          placeholder="A sentence is plenty. Plenty of good projects start as a complaint."
+          aria-invalid={errors.idea ? true : undefined}
+          aria-describedby={describedBy("apply-idea", true, !!errors.idea)}
+        />
+      </Field>
 
       {formError ? (
         <p role="alert" className="rounded-xl border border-danger/40 bg-danger-wash px-4 py-3 text-[0.9375rem] text-danger">

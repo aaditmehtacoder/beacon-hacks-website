@@ -21,7 +21,7 @@ components/          one file per section, plus ui/ primitives and ui/icons.tsx
   countdown.tsx      the hero's countdown to doors open (client)
   hero.tsx, about.tsx, tracks.tsx, prizes.tsx, schedule.tsx, judges.tsx,
   sponsors.tsx, faq.tsx, site-header.tsx, site-footer.tsx (with the closing)
-  apply/             the Apply button and the pop-up it opens
+  apply/             the Apply button, a link to /apply
   notify/            the updates form at the end of the home page, and its hook
   admin/             the admin header, sign-in and list
 lib/event.ts         every fact about the event that appears twice
@@ -96,9 +96,9 @@ NEXT_DIST_DIR=.next-check npm run build   # build beside a running dev server
 - **Prizes and perks** name only who gives: the sponsors' logos, for the
   winners and for every builder. What each one gives stays off the site and
   out of the code; participants get the details before the day.
-- **Apply** buttons are links to `/apply` that open the application as a
-  pop-up (`components/apply/`, a native `<dialog>`); the form loads on first
-  hover or focus. The pop-up skips the optional question; `/apply` keeps it.
+- **Apply** buttons all go to `/apply`, the application page.
+- **Donate** in the header, the hero and the footer goes to Beacon's HCB
+  donation page (`EVENT.hcb.donate` in `lib/event.ts`).
 - **The schedule, prizes and judges** rise into view as you scroll, driven
   by the scroll itself (`.reveal`, CSS `animation-timeline: view()`); without
   support, under reduced motion, or in print, they simply sit in place.

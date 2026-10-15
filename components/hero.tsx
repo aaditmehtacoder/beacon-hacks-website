@@ -1,5 +1,5 @@
 import { EVENT } from "@/lib/event";
-import { Arrow, LinkButton } from "./ui/button";
+import { AnchorButton, Arrow, LinkButton, OutArrow } from "./ui/button";
 import { ApplyButton } from "./apply/apply-button";
 import { Countdown } from "./countdown";
 import { Shore, Sky } from "./night-scene";
@@ -13,7 +13,7 @@ const FACTS = [
 
 /**
  * The opening screen: the night over the bay, the name, what it is and
- * the two actions, with the lighthouse turning its light behind them. A
+ * the actions, with the lighthouse turning its light behind them. A
  * strip along the bottom holds the facts and the countdown. The sky runs
  * up under the glass header, so the copy starts below --header-h.
  */
@@ -50,6 +50,18 @@ export function Hero() {
             <LinkButton href="#sponsors" variant="outline-night" size="lg">
               Sponsor us
             </LinkButton>
+            <AnchorButton
+              href={EVENT.hcb.donate}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="outline-night"
+              size="lg"
+              className="group"
+            >
+              Donate
+              <OutArrow />
+              <span className="sr-only">(opens in a new tab)</span>
+            </AnchorButton>
           </div>
         </div>
       </div>

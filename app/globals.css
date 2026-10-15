@@ -242,11 +242,6 @@
   to   { opacity: 1; transform: none; }
 }
 
-@keyframes dialog-in {
-  from { opacity: 0; transform: translateY(18px) scale(0.98); }
-  to   { opacity: 1; transform: none; }
-}
-
 /* Scroll reveal: a short rise as a block comes into view, driven by the
    scroll position itself (no script). Browsers without scroll-driven
    animations, and visitors who ask for reduced motion, see it in place. */
@@ -259,9 +254,6 @@
   from { opacity: 0.2; transform: translateY(9px); }
   to   { opacity: 1; transform: none; }
 }
-
-/* The page behind an open dialog holds still. */
-html:has(dialog[open]) { overflow: hidden; }
 
 .beam {
   transform: scaleX(-1);
@@ -291,8 +283,6 @@ html:has(dialog[open]) { overflow: hidden; }
      element a backdrop root, and glass inside it (the phone menu) would
      stop blurring the page. */
   .pop { animation: pop 0.16s var(--ease-out-quart); }
-  dialog[open] { animation: dialog-in 0.4s var(--ease-out-expo) both; }
-  dialog[open]::backdrop { animation: fade 0.3s var(--ease-out-quart) both; }
 }
 
 @supports (animation-timeline: view()) {
