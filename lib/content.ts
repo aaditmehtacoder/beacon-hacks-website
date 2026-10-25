@@ -296,8 +296,7 @@ export type Judge = {
  * 25, 2026 with the bio and photo from their public YC founder profiles,
  * to be swapped for what they send us. Parth Maniar was added the same day
  * from the LinkedIn the user gave (role and employer from his public profile;
- * logo from altoneuroscience.com, recoloured to ink); bio and photo come when
- * he sends them.
+ * logo from altoneuroscience.com, recoloured to ink); bio written from the public profile's posts and education.
  */
 export const JUDGES: Judge[] = [
   {
@@ -345,6 +344,7 @@ export const JUDGES: Judge[] = [
     role: "Senior Software Engineer",
     org: "Alto Neuroscience",
     orgLogo: { src: "/logos/alto-neuroscience.svg", width: 188.15, height: 65.8 },
+    bio: "Senior Software Engineer at Alto Neuroscience, a precision psychiatry company in Mountain View. Writes about machine learning and AI agents, and built a credit card fraud detection app. Studied data science at the University at Buffalo.",
     linkedin: "https://www.linkedin.com/in/parthdmaniar",
     photo: "/photos/judges/parth-maniar.jpg",
     focus: "50% 30%",

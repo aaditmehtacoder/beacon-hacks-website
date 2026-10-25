@@ -129,7 +129,7 @@ unconfirmed thing says so in its own data and on the page.
 | Applications | Open early, nobody confirmed | The venue and budget are set. |
 | Partners | In kind: CodeCrafters, YRI Fellowship, Art of Problem Solving, Browserbase, Tavus, .xyz, Scrimba, Rosebud AI, SunFounder, Algoverse. Community: Non-Trivial. Supporter: Origami Prep (`PARTNERS`) | A written yes. |
 | Prizes and perks | Prizes from CodeCrafters, YRI Fellowship, Origami Prep, AoPS, Scrimba and Algoverse; perks from Browserbase, Tavus, .xyz, Rosebud AI, SunFounder and Algoverse. Who gives, never what (`PRIZES_AND_PERKS`) | A written yes; `status: "pending"` shows "Being finalized". |
-| Judges | Swosti Panda, Vasuki Uday Kiran Vudathala, Anna Zhang and Tiger Wang (Nessie, with their public YC bio and photo for now), Parth Maniar (role, employer, LinkedIn and photo from his public profile; no bio yet) (`JUDGES`) | Agreement in writing plus a bio and headshot; a judge without a photo shows initials. |
+| Judges | Swosti Panda, Vasuki Uday Kiran Vudathala, Anna Zhang and Tiger Wang (Nessie, with their public YC bio and photo for now), Parth Maniar (role, employer, LinkedIn, photo and a short bio from his public profile) (`JUDGES`) | Agreement in writing plus a bio and headshot; a judge without a photo shows initials. |
 | Food | Breakfast, pizza for lunch, dinner, dessert from Simple Delights (schedule notes and the FAQ) | Already free for every student; vendors are in the local `.plans/food.md`. |
 
 No prize-pool total is ever shown, and no sponsor's prize on its own either.
