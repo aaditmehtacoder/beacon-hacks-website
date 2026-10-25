@@ -83,7 +83,7 @@ NEXT_DIST_DIR=.next-check npm run build   # build beside a running dev server
   open (`EVENT.date.starts`, labelled as the target date until
   `EVENT.date.confirmed`). The countdown is worked out in the browser, so the
   static page never holds a stale number; seconds stop under reduced motion.
-- **The sponsor wall** (`components/sponsors.tsx`) shows the venue sponsor,
+- **The sponsor wall** (`components/sponsors.tsx`) shows the venue sponsor, then Hack Club as fiscal sponsor (`FISCAL_SPONSOR`, linking the public HCB ledger and donations),
   then one row per cash tier with its open places drawn dashed (`slots` in
   `PACKAGES`, each an email about that tier), then the in-kind partners. A
   partner with a `tier` fills the first open place in that row.

@@ -115,6 +115,19 @@ export const VENUE_SPONSOR: VenueSponsor | null = {
 };
 
 /**
+ * The fiscal sponsor, shown under the venue sponsor: Hack Club, a 501(c)(3)
+ * nonprofit, holds Beacon's money through HCB. The card links the public
+ * ledger and the donation page (EVENT.hcb). Logo: Hack Club's flag from
+ * assets.hackclub.com (flag-standalone.svg).
+ */
+export const FISCAL_SPONSOR = {
+  name: "Hack Club",
+  website: "https://hackclub.com",
+  logo: { src: "/sponsors/hack-club.svg", width: 526, height: 184 } satisfies Logo,
+  line: "A 501(c)(3) nonprofit. Beacon Hacks runs on HCB, so every transaction is public.",
+};
+
+/**
  * Companies that have committed in writing. In-kind partners have no
  * `tier`; a cash sponsor's `tier` puts its logo in that row of the sponsor
  * wall. Add a company only once they have said yes in writing.

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { PACKAGES, PARTNERS, VENUE_SPONSOR, type Package, type Partner } from "@/lib/content";
+import { FISCAL_SPONSOR, PACKAGES, PARTNERS, VENUE_SPONSOR, type Package, type Partner } from "@/lib/content";
 import { EVENT, mailto } from "@/lib/event";
 import { AnchorButton, Arrow } from "./ui/button";
 import { Section } from "./ui/section";
@@ -22,7 +22,7 @@ const HEIGHT: Record<Package["id"], string> = {
 };
 
 /**
- * The sponsor wall: the venue, then one row per cash tier from the top,
+ * The sponsor wall: the venue, the fiscal sponsor, then one row per cash tier from the top,
  * with open places drawn dashed (each one an email about that tier), then
  * the in-kind partners. A cash sponsor's logo fills the first open place of
  * its tier. No tier is exclusive, so the places are an invitation, not a cap.
@@ -65,6 +65,33 @@ export function Sponsors() {
             </a>
           </Tier>
         ) : null}
+
+        <Tier label="Fiscal sponsor">
+          <div className="flex flex-col gap-6 rounded-3xl border border-line bg-card px-8 py-8 sm:flex-row sm:items-center sm:justify-between sm:gap-10 sm:px-10">
+            <a
+              href={FISCAL_SPONSOR.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex shrink-0 items-center transition-transform duration-300 ease-out-quart hover:scale-[1.03]"
+            >
+              <PartnerLogo logo={FISCAL_SPONSOR.logo} area={11000} />
+              <span className="sr-only">{FISCAL_SPONSOR.name} (opens in a new tab)</span>
+            </a>
+            <div className="flex flex-col gap-2 text-[0.9375rem] text-ink-3 sm:items-end sm:text-right">
+              <p className="max-w-md">{FISCAL_SPONSOR.line}</p>
+              <p className="flex gap-5">
+                <a href={EVENT.hcb.page} target="_blank" rel="noopener noreferrer" className="link text-ink">
+                  See our finances
+                  <span className="sr-only"> (opens in a new tab)</span>
+                </a>
+                <a href={EVENT.hcb.donate} target="_blank" rel="noopener noreferrer" className="link text-ink">
+                  Donate
+                  <span className="sr-only"> (opens in a new tab)</span>
+                </a>
+              </p>
+            </div>
+          </div>
+        </Tier>
 
         {tiers.map((pkg) => {
           const sponsors = PARTNERS.filter((p) => p.tier === pkg.id);
