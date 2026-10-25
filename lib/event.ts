@@ -68,10 +68,11 @@ export const EVENT = {
   capacityLabel: "75 to 100",
 
   /**
-   * Applications are open: anyone can apply now. `until` finishes
-   * the sentence "Spots are confirmed once ...".
+   * Registration is on Luma: every Apply button and link opens `url`.
+   * `until` finishes the sentence "Spots are confirmed once ...".
    */
   applications: {
+    url: "https://luma.com/03m37vgx",
     until: VENUE.confirmed ? "the date and budget are final" : "the venue and budget are set",
   },
 

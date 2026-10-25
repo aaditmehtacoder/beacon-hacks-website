@@ -5,7 +5,6 @@ import { EVENT } from "@/lib/event";
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: EVENT.url, changeFrequency: "weekly", priority: 1 },
-    { url: `${EVENT.url}/apply`, changeFrequency: "weekly", priority: 0.9 },
     {
       url: `${EVENT.url}/code-of-conduct`,
       changeFrequency: "yearly",

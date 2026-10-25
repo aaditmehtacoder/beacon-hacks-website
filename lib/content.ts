@@ -3,7 +3,7 @@
  * so in its own data (`status: "pending"`, a "Planned" tag, a note) and
  * the page shows that rather than stating it as fact.
  */
-import { EVENT } from "./event";
+import { EVENT, mailto } from "./event";
 
 export type Track = { name: string; body: string };
 
@@ -54,7 +54,7 @@ export const SCHEDULE: Phase[] = [
     label: "Afternoon",
     window: "Noon to 6 PM",
     slots: [
-      { time: "1:00 PM", title: "Lunch", note: "Take a break, then back to building." },
+      { time: "1:00 PM", title: "Lunch", note: "Pizza. Take a break, then back to building." },
       { time: "4:00 PM", title: "Workshop (TBD)", note: "Optional.", planned: true },
     ],
   },
@@ -62,7 +62,7 @@ export const SCHEDULE: Phase[] = [
     label: "Evening",
     window: "6 PM to 11 PM",
     slots: [
-      { time: "6:00 PM", title: "Dinner", note: "Three hours of hacking left." },
+      { time: "6:00 PM", title: "Dinner", note: "Dinner, then dessert from Simple Delights: brownies, lemon bars, ube mochi bars, cookies and cake. Three hours of hacking left." },
       { time: "9:00 PM", title: "Hacking ends, demos begin", note: "Submissions close. Judges walk the room, science fair style." },
       { time: "10:30 PM", title: "Awards and closing", note: "Prizes and thank-yous. Everyone heads home by 11 PM." },
     ],
@@ -131,6 +131,20 @@ export const VENUE_SPONSOR: VenueSponsor | null = {
  *    with its empty margin trimmed.
  *  - .xyz: a perk for participants (Oct 9, 2026). Logo from the header of
  *    gen.xyz, recoloured from white to black for the cards.
+ *  - Scrimba: ten one-year Pro subscriptions (Oct 25, 2026). Lockup
+ *    rendered from their app icon's glyph and the "SCRIMBA" wordmark on
+ *    their social card (Mona Sans, bold, expanded).
+ *  - Rosebud AI: credits for participants (Oct 25, 2026). Lockup rendered
+ *    from the header of rosebud.ai (icon and "ROSEBUD AI" in Source Code
+ *    Pro Bold).
+ *  - SunFounder: 10% off for participants (Oct 25, 2026). Logo from their
+ *    social card, on a transparent ground. The code itself goes to
+ *    participants before the day, like every other perk.
+ *  - Algoverse: 15% off for participants and 30% off for winners (Oct 25,
+ *    2026). Lockup rendered from their app icon and the serif wordmark in
+ *    the header of algoverse.us.
+ *  - Cap (cap.so) is free to use but gave no sponsorship, so it is not
+ *    listed.
  */
 export const PARTNERS: Partner[] = [
   {
@@ -181,6 +195,36 @@ export const PARTNERS: Partner[] = [
     role: "Free domains",
   },
   {
+    id: "scrimba",
+    name: "Scrimba",
+    website: "https://scrimba.com",
+    logo: { src: "/sponsors/scrimba.png", width: 1057, height: 100 },
+    logoScale: 0.92,
+    role: "Pro subscriptions",
+  },
+  {
+    id: "rosebud",
+    name: "Rosebud AI",
+    website: "https://www.rosebud.ai",
+    logo: { src: "/sponsors/rosebud.png", width: 732, height: 120 },
+    role: "Credits",
+  },
+  {
+    id: "sunfounder",
+    name: "SunFounder",
+    website: "https://www.sunfounder.com",
+    logo: { src: "/sponsors/sunfounder.png", width: 351, height: 183 },
+    logoScale: 0.8,
+    role: "Hardware discount",
+  },
+  {
+    id: "algoverse",
+    name: "Algoverse",
+    website: "https://algoverse.us",
+    logo: { src: "/sponsors/algoverse.png", width: 709, height: 120 },
+    role: "Program discounts",
+  },
+  {
     id: "non-trivial",
     name: "Non-Trivial",
     website: "https://www.non-trivial.org",
@@ -218,9 +262,14 @@ export const PRIZES_AND_PERKS: Perk[] = [
   { from: "YRI Fellowship", partner: "yri", kind: "prize", status: "confirmed" },
   { from: "Origami Prep", partner: "origami-prep", kind: "prize", status: "confirmed" },
   { from: "Art of Problem Solving", partner: "aops", kind: "prize", status: "confirmed" },
+  { from: "Scrimba", partner: "scrimba", kind: "prize", status: "confirmed" },
+  { from: "Algoverse", partner: "algoverse", kind: "prize", status: "confirmed" },
   { from: "Browserbase", partner: "browserbase", kind: "perk", status: "confirmed" },
   { from: "Tavus", partner: "tavus", kind: "perk", status: "confirmed" },
   { from: ".xyz", partner: "xyz", kind: "perk", status: "confirmed" },
+  { from: "Rosebud AI", partner: "rosebud", kind: "perk", status: "confirmed" },
+  { from: "SunFounder", partner: "sunfounder", kind: "perk", status: "confirmed" },
+  { from: "Algoverse", partner: "algoverse", kind: "perk", status: "confirmed" },
 ];
 
 /* ------------------------------------------------------------ judges */
@@ -229,20 +278,26 @@ export type Judge = {
   name: string;
   role: string;
   org: string;
-  /** The employer's logo, under public/logos, to identify them. */
-  orgLogo: Logo;
+  /** The employer's logo, under public/logos, to identify them. Without
+      one, the card names the organisation in text. */
+  orgLogo?: Logo;
   /** Their own words, lightly trimmed. */
-  bio: string;
-  linkedin: string;
-  /** Under public/photos/judges. The headshot they sent us. */
-  photo: string;
+  bio?: string;
+  linkedin?: string;
+  /** Under public/photos/judges. Without one, the card shows initials. */
+  photo?: string;
   /** object-position for the portrait crop, so the face stays in frame. */
-  focus: string;
+  focus?: string;
 };
 
 /**
- * Only people who have agreed in writing. Each judge sent their own bio
- * and headshot; nobody is listed on a verbal maybe.
+ * Only people who have agreed to judge. Swosti and Uday sent their own bio
+ * and headshot. Anna Zhang and Tiger Wang (Nessie, YC F25) were added Oct
+ * 25, 2026 with the bio and photo from their public YC founder profiles,
+ * to be swapped for what they send us. Parth Maniar was added the same day
+ * from the LinkedIn the user gave (role and employer from his public profile;
+ * logo from altoneuroscience.com, recoloured to ink); bio and photo come when
+ * he sends them.
  */
 export const JUDGES: Judge[] = [
   {
@@ -264,6 +319,35 @@ export const JUDGES: Judge[] = [
     linkedin: "https://www.linkedin.com/in/vasukiudaykiran/",
     photo: "/photos/judges/uday-vudathala.jpg",
     focus: "50% 32%",
+  },
+  {
+    name: "Anna Zhang",
+    role: "Co-founder and CEO",
+    org: "Nessie",
+    orgLogo: { src: "/logos/nessie.png", width: 463, height: 120 },
+    bio: "Co-founded Nessie (YC F25), the shared context layer for recursive companies. Previously an engineer on Amazon’s recommendation service, where she shipped ML features and led an experiment with a $200M-a-year revenue impact. Yale BS ’24.",
+    linkedin: "https://www.linkedin.com/in/anna-zhang-y/",
+    photo: "/photos/judges/anna-zhang.jpg",
+    focus: "50% 35%",
+  },
+  {
+    name: "Tiger Wang",
+    role: "Co-founder and CTO",
+    org: "Nessie",
+    orgLogo: { src: "/logos/nessie.png", width: 463, height: 120 },
+    bio: "Co-founded Nessie (YC F25). Previously at Amazon on authentication systems handling 40 billion requests a day. Shipped an Android app with 70,000+ users at 13 and researched Linux kernel security at Yale. Yale BS ’24.",
+    linkedin: "https://www.linkedin.com/in/tiger-wang-6a9b06189/",
+    photo: "/photos/judges/tiger-wang.jpg",
+    focus: "50% 35%",
+  },
+  {
+    name: "Parth Maniar",
+    role: "Senior Software Engineer",
+    org: "Alto Neuroscience",
+    orgLogo: { src: "/logos/alto-neuroscience.svg", width: 188.15, height: 65.8 },
+    linkedin: "https://www.linkedin.com/in/parthdmaniar",
+    photo: "/photos/judges/parth-maniar.jpg",
+    focus: "50% 30%",
   },
 ];
 
@@ -365,8 +449,8 @@ export const FAQS: Faq[] = [
   },
   {
     q: "Can I apply now?",
-    a: `Yes. Applications are open and take about two minutes. Applying does not guarantee a spot: we confirm spots once ${EVENT.applications.until}, and we will email everyone who applied.`,
-    link: { href: "/apply", label: "Apply" },
+    a: `Yes. Registration is on Luma and takes a minute. Registering does not guarantee a spot: we confirm spots once ${EVENT.applications.until}, and we will email everyone who registered.`,
+    link: { href: EVENT.applications.url, label: "Register on Luma" },
   },
   {
     q: "How much does it cost?",
@@ -375,6 +459,11 @@ export const FAQS: Faq[] = [
   {
     q: "What should I bring?",
     a: "A laptop and charger, your school ID, and anything you need to be comfortable for a long day. If you do not have a laptop, email us before the event.",
+  },
+  {
+    q: "Is there food?",
+    a: "Yes, and it is free. Breakfast when doors open, pizza for lunch, dinner, and dessert from Simple Delights. Email us about allergies or dietary needs before the day.",
+    link: { href: mailto("Allergies or dietary needs at Beacon Hacks"), label: "Email the team" },
   },
   {
     q: "Do I stay overnight?",

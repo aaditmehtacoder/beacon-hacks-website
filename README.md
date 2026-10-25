@@ -8,27 +8,21 @@ library.
 
 ```
 app/                 routes, the font, metadata, generated share card and icons
-  apply/             the early application
   code-of-conduct/   the code of conduct
-  admin/             organizers only: applications and the updates list
   not-found.tsx      the 404: the night over the bay and the way home
-  api/apply/         stores an application
   api/notify/        stores an updates signup
-  api/admin/         sign in, list, CSV, remove
   llms.txt/          /llms.txt, the facts for AI assistants, built from lib/
 components/          one file per section, plus ui/ primitives and ui/icons.tsx
   night-scene.tsx    the sky, the shore, the lighthouse and its beam
   countdown.tsx      the hero's countdown to doors open (client)
   hero.tsx, about.tsx, tracks.tsx, prizes.tsx, schedule.tsx, judges.tsx,
   sponsors.tsx, faq.tsx, site-header.tsx, site-footer.tsx (with the closing)
-  apply/             the Apply button, a link to /apply
+  apply/             the Apply button, a link to the registration page on Luma
   notify/            the updates form at the end of the home page, and its hook
-  admin/             the admin header, sign-in and list
 lib/event.ts         every fact about the event that appears twice
 lib/content.ts       all page copy and data: tracks, schedule, venue sponsor,
                      partners, prizes, judges, packages, FAQ
-lib/store.ts         where signups live (Upstash Redis, or a local file)
-lib/admin-auth.ts    the shared admin password and its cookie
+lib/store.ts         where updates signups live (Upstash Redis, or a local file)
 assets/og/           Mona Sans instances for the generated share card (OFL)
 public/sponsors/     sponsor and partner logos
 public/photos/judges the headshots judges sent
@@ -96,7 +90,7 @@ NEXT_DIST_DIR=.next-check npm run build   # build beside a running dev server
 - **Prizes and perks** name only who gives: the sponsors' logos, for the
   winners and for every builder. What each one gives stays off the site and
   out of the code; participants get the details before the day.
-- **Apply** buttons all go to `/apply`, the application page.
+- **Apply** buttons all open the registration page on Luma (`EVENT.applications.url`), in a new tab. `/apply` redirects there.
 - **Donate** in the header, the hero and the footer goes to Beacon's HCB
   donation page (`EVENT.hcb.donate` in `lib/event.ts`).
 - **The schedule, prizes and judges** rise into view as you scroll, driven
@@ -133,9 +127,10 @@ unconfirmed thing says so in its own data and on the page.
 | Date | Target, Saturday, January 30, 2027 | Set `EVENT.date.confirmed`; every "target date" note keys off it. Then add a schema.org `Event` block in `app/page.tsx`. |
 | Venue | Being finalized. RingCentral's logo shows as the venue sponsor with a "Being finalized" tag (`VENUE_SPONSOR.status: "pending"`); the venue is not named or addressed anywhere else. | Written approval: fill in `EVENT.venue` (name, place, address, map) and set `confirmed: true`, then set `VENUE_SPONSOR.status` to `"confirmed"` with its `line` and `address`. |
 | Applications | Open early, nobody confirmed | The venue and budget are set. |
-| Partners | In kind: CodeCrafters, YRI Fellowship, Art of Problem Solving, Browserbase, Tavus, .xyz. Community: Non-Trivial. Supporter: Origami Prep (`PARTNERS`) | A written yes. |
-| Prizes and perks | Prizes from CodeCrafters, YRI Fellowship, Origami Prep and AoPS; perks from Browserbase, Tavus and .xyz. Who gives, never what (`PRIZES_AND_PERKS`) | A written yes; `status: "pending"` shows "Being finalized". |
-| Judges | Swosti Panda, Vasuki Uday Kiran Vudathala (`JUDGES`) | Agreement in writing plus a bio and headshot. |
+| Partners | In kind: CodeCrafters, YRI Fellowship, Art of Problem Solving, Browserbase, Tavus, .xyz, Scrimba, Rosebud AI, SunFounder, Algoverse. Community: Non-Trivial. Supporter: Origami Prep (`PARTNERS`) | A written yes. |
+| Prizes and perks | Prizes from CodeCrafters, YRI Fellowship, Origami Prep, AoPS, Scrimba and Algoverse; perks from Browserbase, Tavus, .xyz, Rosebud AI, SunFounder and Algoverse. Who gives, never what (`PRIZES_AND_PERKS`) | A written yes; `status: "pending"` shows "Being finalized". |
+| Judges | Swosti Panda, Vasuki Uday Kiran Vudathala, Anna Zhang and Tiger Wang (Nessie, with their public YC bio and photo for now), Parth Maniar (role, employer, LinkedIn and photo from his public profile; no bio yet) (`JUDGES`) | Agreement in writing plus a bio and headshot; a judge without a photo shows initials. |
+| Food | Breakfast, pizza for lunch, dinner, dessert from Simple Delights (schedule notes and the FAQ) | Already free for every student; vendors are in the local `.plans/food.md`. |
 
 No prize-pool total is ever shown, and no sponsor's prize on its own either.
 
@@ -163,24 +158,21 @@ yellow on the night); the favicon (`app/icon.svg`) and the Apple icon are the
 same drawing. The share card (`app/opengraph-image.tsx`) redraws the hero's
 night scene with the title in Mona Sans.
 
-## Applications and the updates list
+## Registration and the updates list
 
-`/apply` takes an early application (six fields). The form at the end of the
-home page takes an email from anyone who is not applying. Both land in the
-same store, one row per email, newest wins, and both are rate limited per IP.
+Registration is on Luma (`EVENT.applications.url` in `lib/event.ts`): every
+Apply button opens it, and `/apply` redirects there. The site no longer takes
+applications itself; the form, its API and the `/admin` page came out on
+Oct 25, 2026. Applications taken before then are still rows in the store.
 
-**Storage** is `lib/store.ts`. With `KV_REST_API_URL` and `KV_REST_API_TOKEN`
-set it uses Upstash Redis (add "Upstash Redis" from the Vercel Marketplace and
-those are set for you); every entry is a field of the `beacon:entries` hash,
-which the Upstash data browser shows. Locally it writes `.data/entries.json`
-(gitignored). On Vercel without a database it keeps entries in `/tmp`, and
-`/admin` says loudly that nothing is being saved.
-
-**`/admin`** shows everyone, newest first: filter, search, copy the emails,
-download a CSV, remove a row. It is behind one shared password,
-`ADMIN_PASSWORD`, which must be set in production (the development default is
-`cwb`, so it works out of the box without a password in git). The page is
-`noindex` and excluded from `robots.txt` and the sitemap.
+The form at the end of the home page takes an email from anyone who is not
+registering, rate limited per IP. **Storage** is `lib/store.ts`. With
+`KV_REST_API_URL` and `KV_REST_API_TOKEN` set it uses Upstash Redis (add
+"Upstash Redis" from the Vercel Marketplace and those are set for you); every
+entry is a field of the `beacon:entries` hash, which the Upstash data browser
+shows. That browser is the only view of the list now. Locally it writes
+`.data/entries.json` (gitignored). On Vercel without a database it keeps
+entries in `/tmp`, which does not survive a redeploy.
 
 Optionally set `NOTIFY_WEBHOOK_URL` and every signup is also POSTed there as
 JSON. `.env.example` lists both.

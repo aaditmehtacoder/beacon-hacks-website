@@ -1,8 +1,8 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { buttonClasses, type Size, type Variant } from "@/components/ui/button";
+import { EVENT } from "@/lib/event";
 
-/** Every Apply button: a link to the application at /apply. */
+/** Every Apply button: the registration page on Luma, in a new tab. */
 export function ApplyButton({
   variant = "lamp",
   size = "md",
@@ -15,8 +15,14 @@ export function ApplyButton({
   children: ReactNode;
 }) {
   return (
-    <Link href="/apply" className={buttonClasses(variant, size, className)}>
+    <a
+      href={EVENT.applications.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={buttonClasses(variant, size, className)}
+    >
       {children}
-    </Link>
+      <span className="sr-only"> (Luma, opens in a new tab)</span>
+    </a>
   );
 }

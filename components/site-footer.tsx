@@ -25,7 +25,7 @@ export function SiteFooter({ closing = false, home = false }: { closing?: boolea
     { label: "Judges", href: at("#judges") },
     { label: "Sponsors", href: at("#sponsors") },
     { label: "FAQ", href: at("#faq") },
-    { label: "Apply", href: "/apply" },
+    { label: "Apply", href: EVENT.applications.url },
     { label: "Code of conduct", href: "/code-of-conduct" },
   ];
 
@@ -44,7 +44,7 @@ export function SiteFooter({ closing = false, home = false }: { closing?: boolea
               See you in Belmont
             </h2>
             <p className="mt-7 max-w-lg text-lg leading-relaxed text-moon-2">
-              Applications are open. They take about two minutes.
+              Registration is open on Luma. It takes a minute.
             </p>
             <ApplyButton size="lg" className="group mt-9">
               Apply

@@ -15,29 +15,10 @@ export const notifySchema = z.object({
   role: z.enum(["student", "parent", "mentor", "sponsor", "other"]).default("other"),
 });
 
-/**
- * An application. Short on purpose: enough to know who is coming and
- * to reach them. Nothing here promises a spot; confirmations go out once the
- * venue and the budget are locked.
- */
-export const applySchema = z.object({
-  name: z.string().trim().min(2, "Tell us your name.").max(80),
-  email,
-  school: z.string().trim().min(2, "Which school?").max(120),
-  grade: z.enum(["9", "10", "11", "12"], { error: "Pick your grade." }),
-  firstHackathon: z.boolean(),
-  idea: z
-    .string()
-    .trim()
-    .max(280, "Keep it under 280 characters.")
-    .optional()
-    .default(""),
-});
-
 export type NotifySignup = z.infer<typeof notifySchema>;
-export type Application = z.infer<typeof applySchema>;
 
-/** One row in the store. An application and a notify signup share a shape. */
+/** One row in the store. Applications were taken here until Oct 25, 2026
+    (registration is on Luma now), so old rows keep that shape. */
 export type Entry = {
   id: string;
   kind: "application" | "notify";
