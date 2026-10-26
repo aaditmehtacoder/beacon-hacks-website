@@ -311,8 +311,10 @@ export type Judge = {
  * from the LinkedIn the user gave (role and employer from his public profile;
  * logo from altoneuroscience.com, recoloured to ink); bio written from the public profile's posts and education.
  * Dan Shalev was added the same day from the LinkedIn the user gave: current
- * role, photo and bio from his public profile; wordmark from garryslist.org.
- * The user asked for Garry's List, not his school, on the card.
+ * photo and bio from his public profile. The user chose the org: first Garry's
+ * List, then wilcoxwbe.com (Wilcox Business Experience, the business club that
+ * runs DECA at Wilcox). Their logo is a bare mark, so public/logos/wilcox-wbe.png
+ * is a lockup: that mark plus "WBE" in Mona Sans, ink. Role from his LinkedIn.
  */
 export const JUDGES: Judge[] = [
   {
@@ -367,10 +369,10 @@ export const JUDGES: Judge[] = [
   },
   {
     name: "Dan Shalev",
-    role: "Political Operations Intern",
-    org: "Garry's List",
-    orgLogo: { src: "/logos/garrys-list.svg", width: 324, height: 85 },
-    bio: "Political operations intern at Garry's List, a Bay Area civic engagement organization. Built four campaign websites for a congressional run and interned on internal tools at Zeal.",
+    role: "DECA Chapter President",
+    org: "Wilcox Business Experience",
+    orgLogo: { src: "/logos/wilcox-wbe.png", width: 415, height: 120 },
+    bio: "Leads the DECA chapter at Wilcox Business Experience, a student-run business club in Santa Clara. Built four campaign websites for a congressional run and interned on internal tools at Zeal.",
     linkedin: "https://www.linkedin.com/in/danshalev1/",
     photo: "/photos/judges/dan-shalev.jpg",
     focus: "50% 50%",
