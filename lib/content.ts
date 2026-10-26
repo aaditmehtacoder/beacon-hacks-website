@@ -310,6 +310,9 @@ export type Judge = {
  * to be swapped for what they send us. Parth Maniar was added the same day
  * from the LinkedIn the user gave (role and employer from his public profile;
  * logo from altoneuroscience.com, recoloured to ink); bio written from the public profile's posts and education.
+ * Dan Shalev was added the same day from the LinkedIn the user gave: current
+ * role, photo and bio from his public profile; wordmark from garryslist.org.
+ * The user asked for Garry's List, not his school, on the card.
  */
 export const JUDGES: Judge[] = [
   {
@@ -361,6 +364,16 @@ export const JUDGES: Judge[] = [
     linkedin: "https://www.linkedin.com/in/parthdmaniar",
     photo: "/photos/judges/parth-maniar.jpg",
     focus: "50% 30%",
+  },
+  {
+    name: "Dan Shalev",
+    role: "Political Operations Intern",
+    org: "Garry's List",
+    orgLogo: { src: "/logos/garrys-list.svg", width: 324, height: 85 },
+    bio: "Political operations intern at Garry's List, a Bay Area civic engagement organization. Built four campaign websites for a congressional run and interned on internal tools at Zeal.",
+    linkedin: "https://www.linkedin.com/in/danshalev1/",
+    photo: "/photos/judges/dan-shalev.jpg",
+    focus: "50% 50%",
   },
 ];
 
