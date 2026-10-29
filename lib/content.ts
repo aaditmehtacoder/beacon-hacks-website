@@ -317,7 +317,7 @@ export type Judge = {
  * is a lockup: that mark plus "WBE" in Mona Sans, ink. Role from his LinkedIn.
  * Tejas Chaphalkar (Oct 28, 2026) emailed team@ offering to judge in a personal
  * capacity and sent his own bio and headshot; the bio here is his, trimmed.
- * Meta wordmark from Wikimedia Commons, viewBox added. No LinkedIn given.
+ * Meta wordmark from Wikimedia Commons, viewBox added. LinkedIn from the user.
  */
 export const JUDGES: Judge[] = [
   {
@@ -386,6 +386,7 @@ export const JUDGES: Judge[] = [
     org: "Meta",
     orgLogo: { src: "/logos/meta.svg", width: 948, height: 191 },
     bio: "Software developer with 11+ years in industry, mostly on mobile. Started as an Android developer at Samsung, then moved to iOS. Five years at Meta, most of it on Instagram and most recently on a team at WhatsApp.",
+    linkedin: "https://www.linkedin.com/in/tejas-chaphalkar-aa1b8953/",
     photo: "/photos/judges/tejas-chaphalkar.jpg",
     focus: "50% 35%",
   },
