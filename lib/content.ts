@@ -315,6 +315,9 @@ export type Judge = {
  * List, then wilcoxwbe.com (Wilcox Business Experience, the business club that
  * runs DECA at Wilcox). Their logo is a bare mark, so public/logos/wilcox-wbe.png
  * is a lockup: that mark plus "WBE" in Mona Sans, ink. Role from his LinkedIn.
+ * Tejas Chaphalkar (Oct 28, 2026) emailed team@ offering to judge in a personal
+ * capacity and sent his own bio and headshot; the bio here is his, trimmed.
+ * Meta wordmark from Wikimedia Commons, viewBox added. No LinkedIn given.
  */
 export const JUDGES: Judge[] = [
   {
@@ -376,6 +379,15 @@ export const JUDGES: Judge[] = [
     linkedin: "https://www.linkedin.com/in/danshalev1/",
     photo: "/photos/judges/dan-shalev.jpg",
     focus: "50% 50%",
+  },
+  {
+    name: "Tejas Chaphalkar",
+    role: "Software Engineer",
+    org: "Meta",
+    orgLogo: { src: "/logos/meta.svg", width: 948, height: 191 },
+    bio: "Software developer with 11+ years in industry, mostly on mobile. Started as an Android developer at Samsung, then moved to iOS. Five years at Meta, most of it on Instagram and most recently on a team at WhatsApp.",
+    photo: "/photos/judges/tejas-chaphalkar.jpg",
+    focus: "50% 35%",
   },
 ];
 
