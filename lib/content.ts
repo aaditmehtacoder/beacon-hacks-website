@@ -159,8 +159,9 @@ export const FISCAL_SPONSOR = {
  *    (HCB invoice sent Oct 30); the user put them in the Supporter row.
  *  - n8n: 100 one-month n8n Cloud Pro licenses for participants (Oct 30,
  *    2026, via their event sponsorship form). The redemption link goes to
- *    participants before the day, not on the site. Logo is the header
- *    lockup of n8n.io in their brand pink and navy.
+ *    participants before the day, not on the site. Logo is the nodes mark
+ *    and wordmark (the one people know, not the 2026 refresh), from
+ *    Wikimedia Commons, cropped to its paths.
  *  - Cap (cap.so) is free to use but gave no sponsorship, so it is not
  *    listed.
  */
@@ -239,8 +240,7 @@ export const PARTNERS: Partner[] = [
     id: "n8n",
     name: "n8n",
     website: "https://n8n.io",
-    logo: { src: "/sponsors/n8n.svg", width: 240, height: 48 },
-    logoScale: 0.9,
+    logo: { src: "/sponsors/n8n.svg", width: 446.74, height: 124.0 },
     role: "Cloud Pro licenses",
   },
   {
