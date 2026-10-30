@@ -155,7 +155,12 @@ export const FISCAL_SPONSOR = {
  *    participants before the day, like every other perk.
  *  - Algoverse: 15% off for participants and 30% off for winners (Oct 25,
  *    2026). Lockup rendered from their app icon and the serif wordmark in
- *    the header of algoverse.us.
+ *    the header of algoverse.us. On Oct 27 they also committed $100 in cash
+ *    (HCB invoice sent Oct 30); the user put them in the Supporter row.
+ *  - n8n: 100 one-month n8n Cloud Pro licenses for participants (Oct 30,
+ *    2026, via their event sponsorship form). The redemption link goes to
+ *    participants before the day, not on the site. Logo is the header
+ *    lockup of n8n.io in their brand pink and navy.
  *  - Cap (cap.so) is free to use but gave no sponsorship, so it is not
  *    listed.
  */
@@ -231,11 +236,20 @@ export const PARTNERS: Partner[] = [
     role: "Hardware discount",
   },
   {
+    id: "n8n",
+    name: "n8n",
+    website: "https://n8n.io",
+    logo: { src: "/sponsors/n8n.svg", width: 240, height: 48 },
+    logoScale: 0.9,
+    role: "Cloud Pro licenses",
+  },
+  {
     id: "algoverse",
     name: "Algoverse",
     website: "https://algoverse.us",
     logo: { src: "/sponsors/algoverse.png", width: 709, height: 120 },
-    role: "Program discounts",
+    role: "Supporter, and discounts",
+    tier: "supporter",
   },
   {
     id: "non-trivial",
@@ -283,6 +297,7 @@ export const PRIZES_AND_PERKS: Perk[] = [
   { from: "Rosebud AI", partner: "rosebud", kind: "perk", status: "confirmed" },
   { from: "SunFounder", partner: "sunfounder", kind: "perk", status: "confirmed" },
   { from: "Algoverse", partner: "algoverse", kind: "perk", status: "confirmed" },
+  { from: "n8n", partner: "n8n", kind: "perk", status: "confirmed" },
 ];
 
 /* ------------------------------------------------------------ judges */
