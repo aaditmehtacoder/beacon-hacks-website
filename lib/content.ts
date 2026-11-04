@@ -156,12 +156,18 @@ export const FISCAL_SPONSOR = {
  *  - Algoverse: 15% off for participants and 30% off for winners (Oct 25,
  *    2026). Lockup rendered from their app icon and the serif wordmark in
  *    the header of algoverse.us. On Oct 27 they also committed $100 in cash
- *    (HCB invoice sent Oct 30); the user put them in the Supporter row.
+ *    (HCB invoice sent Oct 30, paid Nov 3); the user put them in the
+ *    Supporter row.
  *  - n8n: 100 one-month n8n Cloud Pro licenses for participants (Oct 30,
  *    2026, via their event sponsorship form). The redemption link goes to
  *    participants before the day, not on the site. Logo is the nodes mark
  *    and wordmark (the one people know, not the 2026 refresh), from
  *    Wikimedia Commons, cropped to its paths.
+ *  - San Carlos Elms: Supporter tier, $250 (agreed Oct 30, 2026; HCB
+ *    invoice paid Nov 2). An assisted living and memory care community in
+ *    San Carlos. Logo is the colour one from the header of
+ *    sancarloselms.com, with the tagline cropped off so the name stays
+ *    legible at Supporter size.
  *  - Cap (cap.so) is free to use but gave no sponsorship, so it is not
  *    listed.
  */
@@ -266,6 +272,15 @@ export const PARTNERS: Partner[] = [
     website: "https://origamiprep.com",
     logo: { src: "/sponsors/origami-prep.png", width: 673, height: 103 },
     role: "Supporter, and a prize",
+    tier: "supporter",
+  },
+  {
+    id: "san-carlos-elms",
+    name: "San Carlos Elms",
+    website: "https://sancarloselms.com",
+    logo: { src: "/sponsors/san-carlos-elms.png", width: 440, height: 186 },
+    logoScale: 1.15,
+    role: "Supporter",
     tier: "supporter",
   },
 ];
