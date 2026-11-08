@@ -125,7 +125,7 @@ unconfirmed thing says so in its own data and on the page.
 | Fact | State | Unlock by |
 |---|---|---|
 | Date | Target, Saturday, January 30, 2027 | Set `EVENT.date.confirmed`; every "target date" note keys off it. Then add a schema.org `Event` block in `app/page.tsx`. |
-| Venue | Being finalized. RingCentral's logo shows as the venue sponsor with a "Being finalized" tag (`VENUE_SPONSOR.status: "pending"`); the venue is not named or addressed anywhere else. | Written approval: fill in `EVENT.venue` (name, place, address, map) and set `confirmed: true`, then set `VENUE_SPONSOR.status` to `"confirmed"` with its `line` and `address`. |
+| Venue | Being finalized. No venue sponsor is listed (`VENUE_SPONSOR` is `null`), and the venue is not named or addressed anywhere. | Written approval: fill in `EVENT.venue` (name, place, address, map) and set `confirmed: true`, then add `VENUE_SPONSOR` with status `"confirmed"`, its `line` and `address`. |
 | Applications | Open early, nobody confirmed | The venue and budget are set. |
 | Partners | In kind: CodeCrafters, YRI Fellowship, Art of Problem Solving, Browserbase, Tavus, .xyz, Scrimba, Rosebud AI, SunFounder, n8n. Community: Non-Trivial. Supporter: Origami Prep, Algoverse ($100, plus their discounts), San Carlos Elms ($250) (`PARTNERS`) | A written yes. |
 | Prizes and perks | Prizes from CodeCrafters, YRI Fellowship, Origami Prep, AoPS, Scrimba and Algoverse; perks from Browserbase, Tavus, .xyz, Rosebud AI, SunFounder and Algoverse. Who gives, never what (`PRIZES_AND_PERKS`) | A written yes; `status: "pending"` shows "Being finalized". |

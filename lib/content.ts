@@ -102,17 +102,11 @@ export type VenueSponsor = {
 };
 
 /**
- * The venue sponsor, shown first in the sponsors section. RingCentral is
- * being finalized: the logo shows with a "Being finalized" tag, and the
- * venue stays unnamed elsewhere (EVENT.venue in lib/event.ts) until the
- * written approval. Logo from the header of ringcentral.com.
+ * The venue sponsor, shown first in the sponsors section when set. None is
+ * listed: the venue stays unnamed (EVENT.venue in lib/event.ts) until the
+ * host approves in writing.
  */
-export const VENUE_SPONSOR: VenueSponsor | null = {
-  name: "RingCentral",
-  website: "https://www.ringcentral.com",
-  logo: { src: "/sponsors/ringcentral.svg", width: 961, height: 146 },
-  status: "pending",
-};
+export const VENUE_SPONSOR: VenueSponsor | null = null;
 
 /**
  * The fiscal sponsor, shown under the venue sponsor: Hack Club, a 501(c)(3)
@@ -168,6 +162,10 @@ export const FISCAL_SPONSOR = {
  *    San Carlos. Logo is the colour one from the header of
  *    sancarloselms.com, with the tagline cropped off so the name stays
  *    legible at Supporter size.
+ *  - Simple Delights: dessert for the day (bakery in San Mateo). Their
+ *    pastry chef sent the round logo by email on Oct 30, 2026; the same
+ *    file, "Simple Delights Logo Round Transparent", is on
+ *    simple-delights.com, which is where this copy comes from.
  *  - Cap (cap.so) is free to use but gave no sponsorship, so it is not
  *    listed.
  */
@@ -248,6 +246,16 @@ export const PARTNERS: Partner[] = [
     website: "https://n8n.io",
     logo: { src: "/sponsors/n8n.svg", width: 446.74, height: 124.0 },
     role: "Cloud Pro licenses",
+  },
+  {
+    id: "simple-delights",
+    name: "Simple Delights",
+    website: "https://www.simple-delights.com",
+    logo: { src: "/sponsors/simple-delights.png", width: 480, height: 493 },
+    /* Round, so it overflows the 40px logo slot a little; the card's gap
+       takes it without touching the caption. */
+    logoScale: 0.85,
+    role: "Dessert",
   },
   {
     id: "algoverse",

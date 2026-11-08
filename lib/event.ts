@@ -22,11 +22,10 @@ type Venue = {
 };
 
 /**
- * The venue is being finalized. The venue sponsor's logo shows in the
- * sponsors section (VENUE_SPONSOR in lib/content.ts), but the venue is not
- * named or addressed anywhere else until the host approves in writing.
- * Then fill in `name`, `place`, `address` and `map`, set `confirmed: true`,
- * and set VENUE_SPONSOR's status to "confirmed" with its line and address.
+ * The venue is being finalized and is not named or addressed anywhere
+ * until the host approves in writing. Then fill in `name`, `place`,
+ * `address` and `map`, set `confirmed: true`, and add VENUE_SPONSOR in
+ * lib/content.ts with status "confirmed", its line and address.
  * The hero, schedule, FAQ, apply page, footer and share card follow.
  */
 const VENUE: Venue = {
