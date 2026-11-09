@@ -166,6 +166,9 @@ export const FISCAL_SPONSOR = {
  *    pastry chef sent the round logo by email on Oct 30, 2026; the same
  *    file, "Simple Delights Logo Round Transparent", is on
  *    simple-delights.com, which is where this copy comes from.
+ *  - OpenRubric: judging partner, in kind (Nov 8, 2026), the user's word.
+ *    Logo is the four-square mark from the header of openrubric.vercel.app with the
+ *    wordmark traced from Geist SemiBold, as their header sets it.
  *  - Cap (cap.so) is free to use but gave no sponsorship, so it is not
  *    listed.
  */
@@ -256,6 +259,13 @@ export const PARTNERS: Partner[] = [
        takes it without touching the caption. */
     logoScale: 0.85,
     role: "Dessert",
+  },
+  {
+    id: "openrubric",
+    name: "OpenRubric",
+    website: "https://openrubric.vercel.app",
+    logo: { src: "/sponsors/openrubric.svg", width: 1298.09, height: 181.19 },
+    role: "Judging partner",
   },
   {
     id: "algoverse",
