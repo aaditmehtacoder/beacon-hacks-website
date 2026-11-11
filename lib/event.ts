@@ -57,12 +57,12 @@ export const EVENT = {
 
   /**
    * The shape of the day, from the draft schedule in lib/content.ts.
-   * The day runs 8:30 AM to 11 PM; building runs 10 AM to 9 PM.
+   * The day runs 8:30 AM to 11 PM; building runs 10 AM to 6:30 PM, then judging.
    */
   hours: {
     label: "8:30 AM to 11 PM",
-    hacking: "10 AM to 9 PM",
-    hackingHours: 11,
+    hacking: "10 AM to 6:30 PM",
+    hackingHours: 8.5,
   },
 
   venue: VENUE,

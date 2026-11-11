@@ -36,7 +36,7 @@ export type Phase = { label: string; window: string; slots: Slot[] };
 
 /**
  * The draft schedule. The day runs 8:30 AM to 11 PM and hacking runs 10 AM
- * to 9 PM (eleven hours); EVENT.hours repeats those two spans, so change
+ * to 6:30 PM, when judging starts; EVENT.hours repeats those two spans, so change
  * them together. Times move if the venue's hours differ.
  */
 export const SCHEDULE: Phase[] = [
@@ -62,8 +62,8 @@ export const SCHEDULE: Phase[] = [
     label: "Evening",
     window: "6 PM to 11 PM",
     slots: [
-      { time: "6:00 PM", title: "Dinner", note: "Dinner, then dessert from Simple Delights: brownies, lemon bars, ube mochi bars, cookies and cake. Three hours of hacking left." },
-      { time: "9:00 PM", title: "Hacking ends, demos begin", note: "Submissions close. Judges walk the room, science fair style." },
+      { time: "6:00 PM", title: "Dinner", note: "Dinner, then dessert from Simple Delights: brownies, lemon bars, ube mochi bars, cookies and cake. Half an hour of hacking left." },
+      { time: "6:30 PM", title: "Hacking ends, judging begins", note: "Submissions close. Judges walk the room, science fair style." },
       { time: "10:30 PM", title: "Awards and closing", note: "Prizes and thank-yous. Everyone heads home by 11 PM." },
     ],
   },

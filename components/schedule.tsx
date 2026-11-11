@@ -49,7 +49,7 @@ const SKY = [
 
 /**
  * The draft schedule, morning to night. The summary keeps the two spans
- * apart: the day runs 8:30 AM to 11 PM, building runs 10 AM to 9 PM.
+ * apart: the day runs 8:30 AM to 11 PM, building runs 10 AM to 6:30 PM.
  */
 export function Schedule() {
   const target = EVENT.date.confirmed ? "" : ", our target date";
