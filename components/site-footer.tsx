@@ -41,7 +41,7 @@ export function SiteFooter({ closing = false, home = false }: { closing?: boolea
               id="closing-title"
               className="max-w-[12ch] text-[clamp(3rem,8vw,6.5rem)] leading-[0.9] font-extrabold font-stretch-125% tracking-[-0.045em]"
             >
-              See you in Belmont
+              See you in {EVENT.venue.city}
             </h2>
             <p className="mt-7 max-w-lg text-lg leading-relaxed text-moon-2">
               Registration is open on Luma. It takes a minute.

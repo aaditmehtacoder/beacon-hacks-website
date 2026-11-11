@@ -15,7 +15,7 @@ export const TRACKS: Track[] = [
   },
   {
     name: "Landfall",
-    body: "Build for Belmont and the Peninsula. Civic data, schools, transit, small business: anything that makes the place around you work better.",
+    body: "Build for Cupertino and the South Bay. Civic data, schools, transit, small business: anything that makes the place around you work better.",
   },
   {
     name: "First Light",
@@ -102,11 +102,20 @@ export type VenueSponsor = {
 };
 
 /**
- * The venue sponsor, shown first in the sponsors section when set. None is
- * listed: the venue stays unnamed (EVENT.venue in lib/event.ts) until the
- * host approves in writing.
+ * The venue sponsor, shown first in the sponsors section: Cupertino Odd
+ * Fellows Lodge #70 hosts the day at its hall (named Nov 10, 2026, the
+ * user's word). Logo: their three-link FLT emblem, redrawn as vectors in
+ * their colours from the 150px header PNG on cupertinooddfellows.org, with
+ * the lodge's name in Arial Bold, the face their site sets it in.
  */
-export const VENUE_SPONSOR: VenueSponsor | null = null;
+export const VENUE_SPONSOR: VenueSponsor | null = {
+  name: "Cupertino Odd Fellows Lodge #70",
+  website: "https://www.cupertinooddfellows.org",
+  logo: { src: "/sponsors/cupertino-odd-fellows.svg", width: 728.1, height: 73.3 },
+  status: "confirmed",
+  line: "Hosting Beacon Hacks at Odd Fellows Hall in Cupertino.",
+  address: "20589 W. Homestead Rd, Cupertino, CA 95014",
+};
 
 /**
  * The fiscal sponsor, shown under the venue sponsor: Hack Club, a 501(c)(3)
@@ -169,6 +178,14 @@ export const FISCAL_SPONSOR = {
  *  - OpenRubric: judging partner, in kind (Nov 8, 2026), the user's word.
  *    Logo is the four-square mark from the header of openrubric.vercel.app with the
  *    wordmark traced from Geist SemiBold, as their header sets it.
+ *  - ElevenLabs: in kind (Zia Espiritu, ElevenLabs hackathons team, by
+ *    email Nov 10, 2026). A free month of the Creator tier for every
+ *    participant (claimed through their Discord bot; they need the
+ *    participant email CSV 72 hours before the event), 3 months of Pro
+ *    for each member of the overall winning team, and 3 months of Scale
+ *    for each member of the best project built with ElevenLabs. They ask
+ *    for their logo per elevenlabs.io/brand: this is their black wordmark
+ *    SVG from that page, unaltered.
  *  - Cap (cap.so) is free to use but gave no sponsorship, so it is not
  *    listed.
  */
@@ -268,6 +285,13 @@ export const PARTNERS: Partner[] = [
     role: "Judging partner",
   },
   {
+    id: "elevenlabs",
+    name: "ElevenLabs",
+    website: "https://elevenlabs.io",
+    logo: { src: "/sponsors/elevenlabs.svg", width: 694, height: 90 },
+    role: "Credits and prizes",
+  },
+  {
     id: "algoverse",
     name: "Algoverse",
     website: "https://algoverse.us",
@@ -324,6 +348,7 @@ export const PRIZES_AND_PERKS: Perk[] = [
   { from: "Art of Problem Solving", partner: "aops", kind: "prize", status: "confirmed" },
   { from: "Scrimba", partner: "scrimba", kind: "prize", status: "confirmed" },
   { from: "Algoverse", partner: "algoverse", kind: "prize", status: "confirmed" },
+  { from: "ElevenLabs", partner: "elevenlabs", kind: "prize", status: "confirmed" },
   { from: "Browserbase", partner: "browserbase", kind: "perk", status: "confirmed" },
   { from: "Tavus", partner: "tavus", kind: "perk", status: "confirmed" },
   { from: ".xyz", partner: "xyz", kind: "perk", status: "confirmed" },
@@ -331,6 +356,7 @@ export const PRIZES_AND_PERKS: Perk[] = [
   { from: "SunFounder", partner: "sunfounder", kind: "perk", status: "confirmed" },
   { from: "Algoverse", partner: "algoverse", kind: "perk", status: "confirmed" },
   { from: "n8n", partner: "n8n", kind: "perk", status: "confirmed" },
+  { from: "ElevenLabs", partner: "elevenlabs", kind: "perk", status: "confirmed" },
 ];
 
 /* ------------------------------------------------------------ judges */
@@ -561,8 +587,8 @@ export const FAQS: Faq[] = [
   {
     q: "Where is it?",
     a: EVENT.venue.place
-      ? `At ${EVENT.venue.place}, ${EVENT.venue.address}. There is parking, and Belmont Caltrain is within walking distance.`
-      : "In Belmont, California. The venue is being finalized; we will publish the address once it is confirmed, and applicants will hear first.",
+      ? `At ${EVENT.venue.place}, ${EVENT.venue.address}. Parking on site is free.`
+      : `In ${EVENT.venue.label}. The venue is being finalized; we will publish the address once it is confirmed, and applicants will hear first.`,
   },
   {
     q: "How can my company sponsor?",

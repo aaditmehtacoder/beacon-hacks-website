@@ -112,7 +112,7 @@ NEXT_DIST_DIR=.next-check npm run build   # build beside a running dev server
 build time from `lib/event.ts` and `lib/content.ts`. The home page carries
 Organization, WebSite and FAQPage structured data (no Event until the date
 is confirmed: schema.org has no "tentative"), the layout sets city-level geo
-tags for Belmont (never the venue), and `robots.txt` names the AI crawlers it
+tags for the venue’s city, and `robots.txt` names the AI crawlers it
 welcomes.
 
 ## The honesty rule
@@ -125,9 +125,9 @@ unconfirmed thing says so in its own data and on the page.
 | Fact | State | Unlock by |
 |---|---|---|
 | Date | Target, Saturday, January 30, 2027 | Set `EVENT.date.confirmed`; every "target date" note keys off it. Then add a schema.org `Event` block in `app/page.tsx`. |
-| Venue | Being finalized. No venue sponsor is listed (`VENUE_SPONSOR` is `null`), and the venue is not named or addressed anywhere. | Written approval: fill in `EVENT.venue` (name, place, address, map) and set `confirmed: true`, then add `VENUE_SPONSOR` with status `"confirmed"`, its `line` and `address`. |
+| Venue | Confirmed: Cupertino Odd Fellows Lodge #70, Odd Fellows Hall, 20589 W. Homestead Road, Cupertino (named by the organizers Nov 10, 2026). Shown as the venue sponsor and named across the site. | — |
 | Applications | Open early, nobody confirmed | The venue and budget are set. |
-| Partners | In kind: CodeCrafters, YRI Fellowship, Art of Problem Solving, Browserbase, Tavus, .xyz, Scrimba, Rosebud AI, SunFounder, n8n. Community: Non-Trivial. Supporter: Origami Prep, Algoverse ($100, plus their discounts), San Carlos Elms ($250) (`PARTNERS`) | A written yes. |
+| Partners | In kind: CodeCrafters, YRI Fellowship, Art of Problem Solving, Browserbase, Tavus, .xyz, Scrimba, Rosebud AI, SunFounder, n8n, Simple Delights, OpenRubric, ElevenLabs. Community: Non-Trivial. Supporter: Origami Prep, Algoverse ($100, plus their discounts), San Carlos Elms ($250) (`PARTNERS`) | A written yes. |
 | Prizes and perks | Prizes from CodeCrafters, YRI Fellowship, Origami Prep, AoPS, Scrimba and Algoverse; perks from Browserbase, Tavus, .xyz, Rosebud AI, SunFounder and Algoverse. Who gives, never what (`PRIZES_AND_PERKS`) | A written yes; `status: "pending"` shows "Being finalized". |
 | Judges | Swosti Panda, Vasuki Uday Kiran Vudathala, Anna Zhang and Tiger Wang (Nessie, with their public YC bio and photo for now), Parth Maniar (role, employer, LinkedIn, photo and a short bio from his public profile), Dan Shalev (Wilcox Business Experience, with a lockup made from their mark; role, photo and bio from his public LinkedIn), Tejas Chaphalkar (Meta; his own bio and headshot by email) (`JUDGES`) | Agreement in writing plus a bio and headshot; a judge without a photo shows initials. |
 | Food | Breakfast, pizza for lunch, dinner, dessert from Simple Delights (schedule notes and the FAQ) | Already free for every student; vendors are in the local `.plans/food.md`. |

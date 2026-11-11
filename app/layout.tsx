@@ -15,7 +15,7 @@ const mona = Mona_Sans({
 
 const TITLE = "Beacon Hacks · Free hackathon for Bay Area high school students";
 const HOSTED = EVENT.venue.name ? `, hosted by ${EVENT.venue.name}` : "";
-const DESCRIPTION = `A free one-day hackathon for Bay Area high school builders${HOSTED} in Belmont, California. Target date Saturday, January 30, 2027. Grades 9 to 12, no experience needed. Applications are open.`;
+const DESCRIPTION = `A free one-day hackathon for Bay Area high school builders${HOSTED} in ${EVENT.venue.label}. Target date Saturday, January 30, 2027. Grades 9 to 12, no experience needed. Applications are open.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(EVENT.url),
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   applicationName: "Beacon Hacks",
   creator: "Beacon Hacks",
-  keywords: ["hackathon", "high school hackathon", "Bay Area", "Belmont", "students", "coding"],
+  keywords: ["hackathon", "high school hackathon", "Bay Area", EVENT.venue.city, "students", "coding"],
   /* Canonical URLs are set per page; one here would be inherited by every
      page and point them all at the home page. */
   openGraph: {
@@ -43,13 +43,13 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
   },
   robots: { index: true, follow: true },
-  /* Where the event is, at city level (never the venue): read by local and
-     generative search. llms.txt carries the full facts for AI assistants. */
+  /* Where the event is, at city level: read by local and generative
+     search. llms.txt carries the full address for AI assistants. */
   other: {
     "geo.region": "US-CA",
-    "geo.placename": "Belmont, California",
-    "geo.position": "37.518;-122.292",
-    ICBM: "37.518, -122.292",
+    "geo.placename": EVENT.venue.label,
+    "geo.position": "37.323;-122.032",
+    ICBM: "37.323, -122.032",
   },
 };
 

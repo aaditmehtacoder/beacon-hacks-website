@@ -5,7 +5,7 @@ import { Countdown } from "./countdown";
 import { Shore, Sky } from "./night-scene";
 
 const FACTS = [
-  EVENT.venue.place ? `${EVENT.venue.place}, ${EVENT.venue.city}` : "Belmont, CA",
+  EVENT.venue.place ? `${EVENT.venue.place}, ${EVENT.venue.city}` : `${EVENT.venue.city}, CA`,
   "Grades 9–12",
   "Teams of up to four",
   "Free",

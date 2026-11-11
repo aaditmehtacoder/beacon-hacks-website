@@ -22,17 +22,21 @@ type Venue = {
 };
 
 /**
- * The venue is being finalized and is not named or addressed anywhere
- * until the host approves in writing. Then fill in `name`, `place`,
- * `address` and `map`, set `confirmed: true`, and add VENUE_SPONSOR in
- * lib/content.ts with status "confirmed", its line and address.
- * The hero, schedule, FAQ, apply page, footer and share card follow.
+ * The venue: Cupertino Odd Fellows Lodge #70, which the organizers named
+ * as the new venue on November 10, 2026 (it replaced the earlier Belmont
+ * plan). VENUE_SPONSOR in lib/content.ts shows its logo and address; the
+ * hero, schedule (with a map link), FAQ, footer, share card, page
+ * descriptions and llms.txt all read from here.
  */
 const VENUE: Venue = {
-  confirmed: false,
-  city: "Belmont",
-  label: "Belmont, California",
-  note: "Venue being finalized",
+  confirmed: true,
+  city: "Cupertino",
+  label: "Cupertino, California",
+  note: "Odd Fellows Hall",
+  name: "Cupertino Odd Fellows Lodge #70",
+  place: "Odd Fellows Hall",
+  address: "20589 W. Homestead Road, Cupertino, CA 95014",
+  map: "https://www.google.com/maps/search/?api=1&query=20589+W+Homestead+Rd+Cupertino+CA+95014",
 };
 
 export const EVENT = {
