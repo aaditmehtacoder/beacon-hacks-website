@@ -392,6 +392,19 @@ export type Judge = {
  * Tejas Chaphalkar (Oct 28, 2026) emailed team@ offering to judge in a personal
  * capacity and sent his own bio and headshot; the bio here is his, trimmed.
  * Meta wordmark from Wikimedia Commons, viewBox added. LinkedIn from the user.
+ * Nov 11, 2026, from the team@ inbox, everyone who said yes:
+ *  - Rucha Gurav volunteered Oct 31, accepted Nov 1, and confirmed Cupertino.
+ *    She has not sent a bio or headshot yet: the bio is drawn from her email
+ *    and her LinkedIn, the photo is her LinkedIn photo cropped clear of its
+ *    #OpenToWork banner.
+ *  - Animesh (Ani) Alang said "I'd be glad to judge" on Nov 6. Bio from his
+ *    email; LinkedIn found by name (UCSC, links his site); photo from it,
+ *    cropped to him alone.
+ *  - Jayati Sinha and Naman Modi confirmed Nov 11 and sent their own bios;
+ *    Jayati sent her headshot. Naman's LinkedIn found by name (Apple contract
+ *    through Red Oak, Rowan University) and his photo is from it.
+ * Logos from Wikimedia Commons; the Apple glyph's viewBox is padded on the
+ * right so it carries the same weight as the wordmarks.
  */
 export const JUDGES: Judge[] = [
   {
@@ -462,6 +475,46 @@ export const JUDGES: Judge[] = [
     bio: "Software developer with 11+ years in industry, mostly on mobile. Started as an Android developer at Samsung, then moved to iOS. Five years at Meta, most of it on Instagram and most recently on a team at WhatsApp.",
     linkedin: "https://www.linkedin.com/in/tejas-chaphalkar-aa1b8953/",
     photo: "/photos/judges/tejas-chaphalkar.jpg",
+    focus: "50% 35%",
+  },
+  {
+    name: "Rucha Gurav",
+    role: "Software Developer",
+    org: "IBM",
+    orgLogo: { src: "/logos/ibm.svg", width: 1075, height: 401.15 },
+    bio: "Builds backend distributed systems, REST APIs and observability tools at IBM in San Jose. Built an LLM assistant that cut incident triage from about three hours to under ten minutes, and mentors engineering interns.",
+    linkedin: "https://www.linkedin.com/in/rugurav/",
+    photo: "/photos/judges/rucha-gurav.jpg",
+    focus: "50% 40%",
+  },
+  {
+    name: "Animesh Alang",
+    role: "Founder, SlugAI",
+    org: "UC Santa Cruz",
+    orgLogo: { src: "/logos/uc-santa-cruz.svg", width: 250, height: 60.757 },
+    bio: "Student at UC Santa Cruz, where he founded SlugAI. Building dino.study, a live AI learning app, and works on LLMs and agents for Amazon fleets. Did NLP research in Prof. Ian Lane’s lab and grew a newsletter to 70,000 monthly readers.",
+    linkedin: "https://www.linkedin.com/in/animesh-alang-232713132/",
+    photo: "/photos/judges/animesh-alang.jpg",
+    focus: "35% 35%",
+  },
+  {
+    name: "Jayati Sinha",
+    role: "VP of Experience Design",
+    org: "J.P. Morgan Private Bank",
+    orgLogo: { src: "/logos/jpmorgan.svg", width: 98, height: 21 },
+    bio: "Previously a Product Design Lead at Accenture Song / Fjord and a Senior Designer at fuseproject. Has spent her career designing products people use every day, and judging design work quickly, kindly and with feedback people can act on. Former Secretary of Women in Design SF (IDSA).",
+    linkedin: "https://www.linkedin.com/in/jayatisinha/",
+    photo: "/photos/judges/jayati-sinha.jpg",
+    focus: "50% 35%",
+  },
+  {
+    name: "Naman Modi",
+    role: "UX Designer (contract)",
+    org: "Apple",
+    orgLogo: { src: "/logos/apple.svg", width: 2600, height: 1000 },
+    bio: "Works with Apple’s Marcom team through a contract and runs his own practice, Design with Naman. Holds a B.A. in Computing and Informatics from Rowan University and has published peer-reviewed research on trust in AI-powered marketing. Has judged hackathons before and loves helping first-time builders.",
+    linkedin: "https://www.linkedin.com/in/namanitsolutions/",
+    photo: "/photos/judges/naman-modi.jpg",
     focus: "50% 35%",
   },
 ];
