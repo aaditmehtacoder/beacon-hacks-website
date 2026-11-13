@@ -163,7 +163,13 @@ function LogoCard({ partner, className, caption = false }: { partner: Partner; c
       className={`group flex flex-col items-center justify-center gap-4 rounded-2xl border border-line bg-card px-4 transition-[border-color,box-shadow] duration-300 sm:px-6 hover:border-line-2 hover:shadow-[0_20px_40px_-30px_rgb(15_24_40/0.4)] ${className}`}
     >
       <span className="flex h-10 items-center transition-transform duration-300 ease-out-quart group-hover:scale-[1.03]">
-        <PartnerLogo logo={partner.logo} scale={partner.logoScale} area={4400} />
+        {partner.logo ? (
+          <PartnerLogo logo={partner.logo} scale={partner.logoScale} area={4400} />
+        ) : (
+          <span aria-hidden className="text-balance text-center text-[1.125rem] leading-[1.1] font-bold font-stretch-[112.5%] tracking-[-0.01em] text-ink">
+            {partner.name}
+          </span>
+        )}
       </span>
       {caption ? <span className="text-[0.875rem] text-ink-3">{partner.role}</span> : null}
       <span className="sr-only">{partner.name} (opens in a new tab)</span>

@@ -41,7 +41,7 @@ function Giver({ perk }: { perk: Perk }) {
   return (
     <li className="reveal flex flex-col gap-1">
       <span className="flex h-10 items-center">
-        {partner ? (
+        {partner?.logo ? (
           <>
             <PartnerLogo logo={partner.logo} scale={partner.logoScale} area={3400} />
             <span className="sr-only">{perk.from}</span>

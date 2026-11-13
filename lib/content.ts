@@ -78,8 +78,9 @@ export type Partner = {
   name: string;
   /** Where the logo links. YRI asked for its referral link everywhere. */
   website: string;
-  /** Under public/sponsors, on a transparent ground, with its real size. */
-  logo: Logo;
+  /** Under public/sponsors, on a transparent ground, with its real size.
+      Without one, the card sets the name in type instead. */
+  logo?: Logo;
   /** Optical size correction on top of the computed logo size. */
   logoScale?: number;
   /** What they give, in a word or two. The terms are theirs to announce. */
@@ -186,6 +187,10 @@ export const FISCAL_SPONSOR = {
  *    for each member of the best project built with ElevenLabs. They ask
  *    for their logo per elevenlabs.io/brand: this is their black wordmark
  *    SVG from that page, unaltered.
+ *  - Century Graphics: T-shirts at a sponsor price (Marshall Johnson, by
+ *    email Nov 10, 2026: "Yes we would love to partner with you", a
+ *    sponsor amount rather than free; quote pending). A Sunnyvale print
+ *    shop. Listed by name with no logo, at the user's word (Nov 12).
  *  - Cap (cap.so) is free to use but gave no sponsorship, so it is not
  *    listed.
  */
@@ -290,6 +295,12 @@ export const PARTNERS: Partner[] = [
     website: "https://elevenlabs.io",
     logo: { src: "/sponsors/elevenlabs.svg", width: 694, height: 90 },
     role: "Credits and prizes",
+  },
+  {
+    id: "century-graphics",
+    name: "Century Graphics",
+    website: "https://www.cgshirts.com",
+    role: "T-shirts",
   },
   {
     id: "algoverse",
