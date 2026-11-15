@@ -124,17 +124,13 @@ export function Sponsors() {
                 key={partner.id}
                 className="basis-[calc((100%-0.75rem)/2)] sm:basis-[calc((100%-1.5rem)/3)] xl:basis-[calc((100%-3.75rem)/6)]"
               >
-                <LogoCard partner={partner} className="h-32 sm:h-36" caption />
+                <LogoCard partner={partner} className="h-24 sm:h-28" />
               </li>
             ))}
           </ul>
         </Tier>
       </div>
 
-      <p className="mt-12 max-w-3xl text-[0.9375rem] leading-relaxed text-ink-3">
-        Each tier includes everything in the one below it. No exclusivity, and we
-        never share participant contact information.
-      </p>
     </Section>
   );
 }

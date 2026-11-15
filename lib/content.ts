@@ -164,9 +164,9 @@ export const FISCAL_SPONSOR = {
  *    Supporter row.
  *  - n8n: 100 one-month n8n Cloud Pro licenses for participants (Oct 30,
  *    2026, via their event sponsorship form). The redemption link goes to
- *    participants before the day, not on the site. Logo is the nodes mark
- *    and wordmark (the one people know, not the 2026 refresh), from
- *    Wikimedia Commons, cropped to its paths.
+ *    participants before the day, not on the site. Logo is n8n's own
+ *    lockup from guidelines.n8n.design (n8n-logo-black-accent.svg),
+ *    swapped in Nov 14, 2026 at the user's word.
  *  - San Carlos Elms: Supporter tier, $250 (agreed Oct 30, 2026; HCB
  *    invoice paid Nov 2). An assisted living and memory care community in
  *    San Carlos. Logo is the colour one from the header of
@@ -187,10 +187,12 @@ export const FISCAL_SPONSOR = {
  *    for each member of the best project built with ElevenLabs. They ask
  *    for their logo per elevenlabs.io/brand: this is their black wordmark
  *    SVG from that page, unaltered.
- *  - Century Graphics: T-shirts at a sponsor price (Marshall Johnson, by
- *    email Nov 10, 2026: "Yes we would love to partner with you", a
- *    sponsor amount rather than free; quote pending). A Sunnyvale print
- *    shop. Listed by name with no logo, at the user's word (Nov 12).
+ *  - Century Graphics (T-shirts at a sponsor price, Nov 10) was listed
+ *    Nov 12 and taken off Nov 14, 2026, at the user's word.
+ *  - PCBWay: in kind, at the user's word (Nov 14, 2026); what they give
+ *    is not recorded here. Logo is the wordmark from the header sprite on
+ *    pcbway.com (they publish no larger file), at its native 141 x 39.
+ *  - In-kind cards show the logo only, no caption (user, Nov 14, 2026).
  *  - Cap (cap.so) is free to use but gave no sponsorship, so it is not
  *    listed.
  */
@@ -269,7 +271,7 @@ export const PARTNERS: Partner[] = [
     id: "n8n",
     name: "n8n",
     website: "https://n8n.io",
-    logo: { src: "/sponsors/n8n.svg", width: 446.74, height: 124.0 },
+    logo: { src: "/sponsors/n8n.svg", width: 480, height: 96 },
     role: "Cloud Pro licenses",
   },
   {
@@ -297,10 +299,11 @@ export const PARTNERS: Partner[] = [
     role: "Credits and prizes",
   },
   {
-    id: "century-graphics",
-    name: "Century Graphics",
-    website: "https://www.cgshirts.com",
-    role: "T-shirts",
+    id: "pcbway",
+    name: "PCBWay",
+    website: "https://www.pcbway.com",
+    logo: { src: "/sponsors/pcbway.png", width: 141, height: 39 },
+    role: "In kind",
   },
   {
     id: "algoverse",
