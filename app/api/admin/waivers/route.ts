@@ -3,7 +3,7 @@ import { ADMIN_COOKIE, isAdmin } from "@/lib/admin-auth";
 import { getWaiver, listWaivers, removeWaiver, setCheckedIn, setGuardianToken, updateWaiver } from "@/lib/waiver-store";
 import { approvedEmail, guardianSignEmail, mailConfigured, sendMail, teamReviewEmail } from "@/lib/waiver-mail";
 import { guardianLink, newGuardianToken } from "@/lib/guardian-token";
-import { DIETS, guardianSigned, type Waiver } from "@/lib/waiver";
+import { DIETS, guardianSigned, teamSummary, type Waiver } from "@/lib/waiver";
 
 function unauthorized() {
   return NextResponse.json({ ok: false, error: "Sign in first." }, { status: 401 });
@@ -23,6 +23,9 @@ const COLUMNS: [string, (w: Waiver) => unknown][] = [
   ["Grade", (w) => w.grade],
   ["School", (w) => w.school],
   ["Shirt size", (w) => w.shirtSize],
+  ["Team", (w) => (w.teamStatus === "team" ? "Has a team" : teamSummary(w))],
+  ["Team name", (w) => w.teamName],
+  ["Teammates", (w) => (w.teammates ?? []).join("; ")],
   ["Guardian name", (w) => w.guardianName],
   ["Guardian relationship", (w) => w.guardianRelationship],
   ["Guardian email", (w) => w.guardianEmail],

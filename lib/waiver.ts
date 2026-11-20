@@ -31,6 +31,15 @@ export const GRADES = ["9", "10", "11", "12"] as const;
 export const GUARDIAN_METHODS = ["here", "email", "paper"] as const;
 export type GuardianMethod = (typeof GUARDIAN_METHODS)[number];
 export const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
+export const TEAM_STATUSES = [
+  { value: "team", label: "I have a team" },
+  { value: "looking", label: "Find me a team" },
+  { value: "solo", label: "Working solo" },
+] as const;
+export type TeamStatus = (typeof TEAM_STATUSES)[number]["value"];
+/** Teams are up to four, so up to three others. */
+export const MAX_TEAMMATES = 3;
+
 export const DIETS = [
   { value: "vegetarian", label: "Vegetarian" },
   { value: "vegan", label: "Vegan" },
@@ -93,6 +102,16 @@ export const waiverSchema = z
     school: text("your school", 160),
     shirtSize: z.enum(SHIRT_SIZES, { error: "Pick a shirt size." }),
 
+    /* Who they are building with, so organizers can see teams and match
+       anyone still looking at kickoff. */
+    teamStatus: z.enum(TEAM_STATUSES.map((t) => t.value) as [TeamStatus, ...TeamStatus[]], { error: "Pick one." }),
+    teamName: z.string().trim().max(60, "Keep the team name under 60 characters.").default(""),
+    teammates: z
+      .array(z.string().trim().max(80, "Keep each name under 80 characters."))
+      .max(MAX_TEAMMATES, `Teams are up to four, so up to ${MAX_TEAMMATES} teammates.`)
+      .default([])
+      .transform((names) => names.filter(Boolean)),
+
     guardianName: z.string().trim().max(120).default(""),
     guardianRelationship: z.string().trim().max(60).default(""),
     guardianEmail: z.string().trim().toLowerCase().max(200).default(""),
@@ -145,6 +164,12 @@ export const waiverSchema = z
         participantDrew: str(r.participantSignatureImage).length > 0,
         guardianDrew: str(r.guardianSignatureImage).length > 0,
       };
+      /* With a team: at least one teammate's name. */
+      const mates = Array.isArray(r.teammates) ? r.teammates.filter((x) => typeof x === "string" && x.trim()) : [];
+      if (str(r.teamStatus) === "team" && mates.length === 0) {
+        ctx.addIssue({ code: "custom", path: ["teammates"], message: "Add a teammate's name, or pick another option." });
+      }
+
       const age = ageOnEventDay(v.dateOfBirth);
       if (age === null || age < 12 || age > 20) {
         ctx.addIssue({ code: "custom", path: ["dateOfBirth"], message: "Check your date of birth." });
@@ -231,4 +256,13 @@ export const guardianSigned = (w: Pick<Waiver, "minor" | "guardianSignature" | "
 export function waiverStage(w: Waiver): "guardian" | "review" | "approved" {
   if (!guardianSigned(w)) return "guardian";
   return w.approvedAt ? "approved" : "review";
+}
+
+/** A waiver's team in a few words, e.g. "Night Owls: Ana Ruiz, Ben Cho". */
+export function teamSummary(w: Pick<Waiver, "teamStatus" | "teamName" | "teammates">): string {
+  if (w.teamStatus === "looking") return "Looking for a team";
+  if (w.teamStatus === "solo") return "Working solo";
+  if (w.teamStatus !== "team") return "Not asked";
+  const mates = (w.teammates ?? []).join(", ");
+  return [w.teamName, mates ? `with ${mates}` : ""].filter(Boolean).join(", ") || "Has a team";
 }

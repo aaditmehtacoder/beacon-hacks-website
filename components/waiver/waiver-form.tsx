@@ -6,12 +6,15 @@ import {
   ADULT_AGE,
   DIETS,
   GRADES,
+  MAX_TEAMMATES,
+  TEAM_STATUSES,
   SHIRT_SIZES,
   WAIVER_VERSION,
   ageOnEventDay,
   waiverSchema,
   type Diet,
   type GuardianMethod,
+  type TeamStatus,
   type Waiver,
   type WaiverField,
 } from "@/lib/waiver";
@@ -32,6 +35,9 @@ type Form = {
   grade: string;
   school: string;
   shirtSize: string;
+  teamStatus: "" | TeamStatus;
+  teamName: string;
+  teammates: string[];
   guardianName: string;
   guardianRelationship: string;
   guardianEmail: string;
@@ -68,6 +74,9 @@ const EMPTY: Form = {
   grade: "",
   school: "",
   shirtSize: "",
+  teamStatus: "",
+  teamName: "",
+  teammates: [""],
   guardianName: "",
   guardianRelationship: "",
   guardianEmail: "",
@@ -128,7 +137,7 @@ function check(form: Form): Errors {
 
 /**
  * The participant waiver, one column of plain questions like a paper form:
- * about you, a parent or guardian (only under 18 on the day), an emergency
+ * about you, your team, a parent or guardian (only under 18 on the day), an emergency
  * contact, health and food, the agreement, then signatures, drawn or typed.
  * Nothing is checked until the first submit; after that, problems clear as
  * they are fixed.
@@ -354,9 +363,66 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
         />
       </Card>
 
+      <Card n={2} title="Your team" lede="Teams are up to four people. No team yet? We match people at kickoff.">
+        <Choices
+          id="w-teamStatus"
+          label="Are you on a team?"
+          options={TEAM_STATUSES.map((t) => ({ value: t.value, label: t.label }))}
+          value={form.teamStatus}
+          onChange={(v) => update("teamStatus", v as TeamStatus)}
+          error={errors.teamStatus}
+        />
+        {form.teamStatus === "team" ? (
+          <>
+            <Field id="w-teamName" label="Team name" optional error={errors.teamName}>
+              {input("teamName", { autoComplete: "off", placeholder: "If you have one" })}
+            </Field>
+            <fieldset className="flex flex-col gap-2" aria-describedby={describedBy("w-teammates", true, !!errors.teammates)}>
+              <legend className="mb-2 text-[0.9375rem] font-semibold text-ink">Your teammates</legend>
+              {form.teammates.map((name, i) => (
+                <div key={i} className="flex gap-2">
+                  <input
+                    id={i === 0 ? "w-teammates" : `w-teammates-${i}`}
+                    className={fieldClass}
+                    value={name}
+                    onChange={(e) => update("teammates", latest.current.teammates.map((n, j) => (j === i ? e.target.value : n)))}
+                    placeholder={`Teammate ${i + 1}, full name`}
+                    aria-label={`Teammate ${i + 1}, full name`}
+                    aria-invalid={i === 0 && errors.teammates ? true : undefined}
+                    autoComplete="off"
+                  />
+                  {form.teammates.length > 1 ? (
+                    <button
+                      type="button"
+                      onClick={() => update("teammates", latest.current.teammates.filter((_, j) => j !== i))}
+                      className="shrink-0 rounded-xl border border-line-2 bg-card px-3 text-[0.875rem] font-semibold text-ink-3 hover:border-ink hover:text-ink"
+                    >
+                      Remove<span className="sr-only"> teammate {i + 1}</span>
+                    </button>
+                  ) : null}
+                </div>
+              ))}
+              {form.teammates.length < MAX_TEAMMATES ? (
+                <button
+                  type="button"
+                  onClick={() => update("teammates", [...latest.current.teammates, ""])}
+                  className="w-fit text-[0.9375rem] font-semibold text-ink underline decoration-lamp decoration-2 underline-offset-4 hover:decoration-[0.3em]"
+                >
+                  + Add another teammate
+                </button>
+              ) : null}
+              <p id="w-teammates-hint" className="text-[0.8125rem] text-ink-3">
+                Each teammate signs their own waiver.
+              </p>
+              {errors.teammates ? <FieldError id="w-teammates-error">{errors.teammates}</FieldError> : null}
+            </fieldset>
+          </>
+        ) : null}
+      </Card>
+
       {minor ? (
         <Card
-          n={2}
+          n={3}
           title="Parent or guardian"
           lede={
             age === null
@@ -386,10 +452,10 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
           </div>
         </Card>
       ) : (
-        <Card n={2} title="Parent or guardian" lede={`You will be ${age} on the day, so you sign for yourself. Skip ahead.`} />
+        <Card n={3} title="Parent or guardian" lede={`You will be ${age} on the day, so you sign for yourself. Skip ahead.`} />
       )}
 
-      <Card n={3} title="Emergency contact" lede="Someone we can reach during the event if anything happens.">
+      <Card n={4} title="Emergency contact" lede="Someone we can reach during the event if anything happens.">
         {minor ? (
           <Check checked={sameAsGuardian} onChange={toggleSame}>
             Same as my parent or guardian
@@ -408,7 +474,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
         </Field>
       </Card>
 
-      <Card n={4} title="Health and food" lede="Only organizers who need it, and anyone treating you, will see this. Leave blank if none.">
+      <Card n={5} title="Health and food" lede="Only organizers who need it, and anyone treating you, will see this. Leave blank if none.">
         <Field id="w-allergies" label="Allergies" optional error={errors.allergies}>
           {area("allergies", "Food, medicine, insect stings…")}
         </Field>
@@ -450,7 +516,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
         </Field>
       </Card>
 
-      <Card n={5} title="The agreement" lede="Read each part, then tick to agree. Your parent or guardian reads it too when they sign.">
+      <Card n={6} title="The agreement" lede="Read each part, then tick to agree. Your parent or guardian reads it too when they sign.">
         {CLAUSES.map((clause) => {
           const key = AGREE[clause.id] as WaiverField | undefined;
           return (
@@ -499,7 +565,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
         })}
       </Card>
 
-      <Card n={6} title="Sign" lede={ESIGN}>
+      <Card n={7} title="Sign" lede={ESIGN}>
         <SignBlock
           id="w-participantSignature"
           label="Participant signature"

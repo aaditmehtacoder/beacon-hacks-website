@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import { EVENT } from "./event";
-import { DIETS, type Waiver } from "./waiver";
+import { DIETS, teamSummary, type Waiver } from "./waiver";
 
 /**
  * The two waiver emails, and sending them.
@@ -104,6 +104,7 @@ export function teamReviewEmail(w: Waiver): Mail {
     ["Date of birth", esc(`${w.dateOfBirth} (${w.age} on the day)`)],
     ["School", esc(`${w.school}, grade ${w.grade}`)],
     ["T-shirt", esc(w.shirtSize)],
+    ["Team", esc(teamSummary(w))],
     ...(w.minor
       ? ([
           ["Parent or guardian", esc(`${w.guardianName} (${w.guardianRelationship})`)],

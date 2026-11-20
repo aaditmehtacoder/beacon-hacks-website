@@ -61,6 +61,8 @@ export async function POST(request: Request) {
   try {
     const saved = await saveWaiver({
       ...data,
+      /* Only a team has a name and teammates. */
+      ...(data.teamStatus === "team" ? {} : { teamName: "", teammates: [] }),
       /* With a drawing, the typed field records the signer's printed name. */
       ...(data.participantSignatureImage ? { participantSignature: `${data.firstName} ${data.lastName}` } : {}),
       ...(minor && data.guardianSignatureImage ? { guardianSignature: data.guardianName } : {}),

@@ -5,10 +5,10 @@ import { useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { AnchorButton, Button } from "@/components/ui/button";
 import { fieldClass } from "@/components/ui/field";
-import { DIETS, SHIRT_SIZES, waiverStage, type Waiver } from "@/lib/waiver";
+import { DIETS, SHIRT_SIZES, teamSummary, waiverStage, type Waiver } from "@/lib/waiver";
 import type { WaiverBackend } from "@/lib/waiver-store";
 
-type Filter = "all" | "parent" | "review" | "waiting" | "in" | "health" | "nophoto" | "minor";
+type Filter = "all" | "looking" | "parent" | "review" | "waiting" | "in" | "health" | "nophoto" | "minor";
 
 const DIET_LABEL: Record<string, string> = Object.fromEntries(DIETS.map((d) => [d.value, d.label]));
 
@@ -67,6 +67,9 @@ export function WaiverDashboard({
       checkedIn: waivers.filter((w) => w.checkedInAt).length,
       toReview: waivers.filter((w) => waiverStage(w) === "review").length,
       parent: waivers.filter((w) => waiverStage(w) === "guardian").length,
+      looking: waivers.filter((w) => w.teamStatus === "looking").length,
+      teams: new Set(waivers.filter((w) => w.teamStatus === "team" && w.teamName).map((w) => w.teamName.trim().toLowerCase())).size,
+      solo: waivers.filter((w) => w.teamStatus === "solo").length,
       health: waivers.filter(hasHealth).length,
       noPhoto: waivers.filter((w) => w.mediaConsent === "no").length,
       shirts,
@@ -81,6 +84,7 @@ export function WaiverDashboard({
         filter === "all" ||
         (filter === "review" && waiverStage(w) === "review") ||
         (filter === "parent" && waiverStage(w) === "guardian") ||
+        (filter === "looking" && w.teamStatus === "looking") ||
         (filter === "waiting" && !w.checkedInAt) ||
         (filter === "in" && !!w.checkedInAt) ||
         (filter === "health" && hasHealth(w)) ||
@@ -88,7 +92,7 @@ export function WaiverDashboard({
         (filter === "minor" && w.minor);
       if (!pass) return false;
       if (!q) return true;
-      return [w.firstName, w.lastName, `${w.firstName} ${w.lastName}`, w.email, w.school, w.guardianName, w.phone]
+      return [w.firstName, w.lastName, `${w.firstName} ${w.lastName}`, w.email, w.school, w.guardianName, w.phone, w.teamName, ...(w.teammates ?? [])]
         .filter(Boolean)
         .some((v) => v.toLowerCase().includes(q));
     });
@@ -196,10 +200,18 @@ export function WaiverDashboard({
         <Stat label="No photos" value={stats.noPhoto} />
       </dl>
 
-      <div className="grid gap-3 text-[0.9375rem] sm:grid-cols-2">
+      <div className="grid gap-3 text-[0.9375rem] sm:grid-cols-3">
         <Tally
           title="T-shirts"
           items={SHIRT_SIZES.map((s) => [s, stats.shirts[s] ?? 0] as [string, number])}
+        />
+        <Tally
+          title="Teams"
+          items={[
+            ["Named teams", stats.teams],
+            ["Looking", stats.looking],
+            ["Solo", stats.solo],
+          ]}
         />
         <Tally
           title="Food"
@@ -216,6 +228,7 @@ export function WaiverDashboard({
             {tab("all", "All", stats.total)}
             {tab("review", "To approve", stats.toReview)}
             {tab("parent", "Waiting for parent", stats.parent)}
+            {tab("looking", "Looking for a team", stats.looking)}
             {tab("waiting", "Not checked in", stats.total - stats.checkedIn)}
             {tab("in", "Checked in", stats.checkedIn)}
             {tab("health", "Health notes", stats.health)}
@@ -227,7 +240,7 @@ export function WaiverDashboard({
             <input
               type="search"
               className={`${fieldClass} py-2.5`}
-              placeholder="Search name, email, school, parent…"
+              placeholder="Search name, email, school, team…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -262,6 +275,7 @@ export function WaiverDashboard({
                     {hasHealth(w) ? <Tag tone="danger">Health notes</Tag> : null}
                     {w.diet.length ? <Tag>{w.diet.map((d) => DIET_LABEL[d]).join(", ")}</Tag> : null}
                     {w.mediaConsent === "no" ? <Tag tone="warn">No photos</Tag> : null}
+                    {w.teamStatus ? <Tag tone={w.teamStatus === "looking" ? "warn" : undefined}>{teamSummary(w)}</Tag> : null}
                     <Tag>Shirt {w.shirtSize}</Tag>
                   </p>
                 </div>

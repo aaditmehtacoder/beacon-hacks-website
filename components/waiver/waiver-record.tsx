@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { CLAUSES, ESIGN, WAIVER_FOOTER } from "@/lib/waiver-text";
-import { DIETS, guardianSigned, type Waiver } from "@/lib/waiver";
+import { DIETS, guardianSigned, teamSummary, type Waiver } from "@/lib/waiver";
 
 const DIET_LABEL: Record<string, string> = Object.fromEntries(DIETS.map((d) => [d.value, d.label]));
 
@@ -29,6 +29,15 @@ export function WaiverRecord({ waiver, showAudit = false }: { waiver: Waiver; sh
         <Row label="School and grade">{`${waiver.school}, grade ${waiver.grade}`}</Row>
         <Row label="Shirt size">{waiver.shirtSize}</Row>
       </Block>
+
+      {waiver.teamStatus ? (
+        <Block title="Team">
+          <Row label="Team">
+            {waiver.teamStatus === "team" ? waiver.teamName || "No name yet" : teamSummary(waiver)}
+          </Row>
+          {waiver.teamStatus === "team" ? <Row label="Teammates">{(waiver.teammates ?? []).join(", ")}</Row> : null}
+        </Block>
+      ) : null}
 
       {waiver.minor ? (
         <Block title="Parent or guardian">
