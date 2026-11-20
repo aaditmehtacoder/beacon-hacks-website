@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { CLAUSES, ESIGN, WAIVER_FOOTER } from "@/lib/waiver-text";
-import { DIETS, type Waiver } from "@/lib/waiver";
+import { DIETS, guardianSigned, type Waiver } from "@/lib/waiver";
 
 const DIET_LABEL: Record<string, string> = Object.fromEntries(DIETS.map((d) => [d.value, d.label]));
 
@@ -77,15 +77,33 @@ export function WaiverRecord({ waiver, showAudit = false }: { waiver: Waiver; sh
         </Row>
         {waiver.minor ? (
           <Row label="Parent or guardian">
-            <Signature name={waiver.guardianSignature} image={waiver.guardianSignatureImage} />
+            {guardianSigned(waiver) ? (
+              <Signature name={waiver.guardianSignature} image={waiver.guardianSignatureImage} />
+            ) : waiver.guardianMethod === "paper" ? (
+              <PaperLine name={waiver.guardianName} />
+            ) : (
+              <>
+                <span className="text-ink-3 print:hidden">Waiting for {waiver.guardianName} to sign from the link we emailed</span>
+                <span className="hidden print:block">
+                  <PaperLine name={waiver.guardianName} />
+                </span>
+              </>
+            )}
           </Row>
         ) : null}
-        <Row label="Signed">{signedWhen(waiver.signedAt)}</Row>
+        <Row label={waiver.minor && waiver.guardianSignedAt ? "Participant signed" : "Signed"}>{signedWhen(waiver.signedAt)}</Row>
+        {waiver.minor && waiver.guardianSignedAt ? (
+          <Row label="Guardian signed">
+            {signedWhen(waiver.guardianSignedAt)}
+            {waiver.guardianMethod === "paper" ? " (paper copy received)" : waiver.guardianMethod === "email" ? " (from the emailed link)" : ""}
+          </Row>
+        ) : null}
         <Row label="Confirmation">{waiver.id.slice(0, 8).toUpperCase()}</Row>
         {showAudit ? (
           <>
             <Row label="Version">{`${waiver.version}${waiver.revision > 1 ? `, signed ${waiver.revision} times (latest kept)` : ""}`}</Row>
             <Row label="IP">{waiver.ip}</Row>
+            {waiver.guardianIp ? <Row label="Guardian IP">{waiver.guardianIp}</Row> : null}
             <Row label="Browser">
               <span className="break-all text-[0.8125rem] text-ink-3">{waiver.userAgent}</span>
             </Row>
@@ -129,4 +147,25 @@ function Signature({ name, image }: { name: string; image?: string }) {
     );
   }
   return <span className="text-[1.25rem] italic font-semibold tracking-[-0.01em]">{name}</span>;
+}
+
+/* For a parent signing on paper: the statement, a line to sign on and the date. */
+function PaperLine({ name }: { name: string }) {
+  return (
+    <span className="flex flex-col gap-4">
+      <span className="text-[0.875rem] leading-relaxed text-ink-2">
+        By signing, I agree to this waiver for myself and for my child, and confirm the information above is correct.
+      </span>
+      <span className="grid gap-6 sm:grid-cols-[1fr_9rem]">
+        <span className="flex flex-col gap-1">
+          <span className="h-12 border-b-2 border-ink" />
+          <span className="text-[0.8125rem] text-ink-3">Signature of {name}</span>
+        </span>
+        <span className="flex flex-col gap-1">
+          <span className="h-12 border-b-2 border-ink" />
+          <span className="text-[0.8125rem] text-ink-3">Date</span>
+        </span>
+      </span>
+    </span>
+  );
 }

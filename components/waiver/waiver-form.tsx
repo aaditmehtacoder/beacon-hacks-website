@@ -11,6 +11,7 @@ import {
   ageOnEventDay,
   waiverSchema,
   type Diet,
+  type GuardianMethod,
   type Waiver,
   type WaiverField,
 } from "@/lib/waiver";
@@ -50,9 +51,10 @@ type Form = {
   participantSignatureImage: string;
   guardianSignature: string;
   guardianSignatureImage: string;
+  guardianMethod: GuardianMethod;
 };
 
-type Mode = "draw" | "type";
+export type Mode = "draw" | "type";
 type Modes = { participant: Mode; guardian: Mode };
 
 const EMPTY: Form = {
@@ -85,6 +87,7 @@ const EMPTY: Form = {
   participantSignatureImage: "",
   guardianSignature: "",
   guardianSignatureImage: "",
+  guardianMethod: "here",
 };
 
 /* The order fields appear in, so the first problem gets focus. */
@@ -105,8 +108,8 @@ function payload(form: Form, modes: Modes): Form {
     ...form,
     participantSignature: modes.participant === "type" ? form.participantSignature : "",
     participantSignatureImage: modes.participant === "draw" ? form.participantSignatureImage : "",
-    guardianSignature: modes.guardian === "type" ? form.guardianSignature : "",
-    guardianSignatureImage: modes.guardian === "draw" ? form.guardianSignatureImage : "",
+    guardianSignature: form.guardianMethod === "here" && modes.guardian === "type" ? form.guardianSignature : "",
+    guardianSignatureImage: form.guardianMethod === "here" && modes.guardian === "draw" ? form.guardianSignatureImage : "",
   };
 }
 
@@ -397,7 +400,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
         </Field>
       </Card>
 
-      <Card n={5} title="The agreement" lede={`Read each part${minor ? " together with your parent or guardian" : ""}, then tick to agree.`}>
+      <Card n={5} title="The agreement" lede="Read each part, then tick to agree. Your parent or guardian reads it too when they sign.">
         {CLAUSES.map((clause) => {
           const key = AGREE[clause.id] as WaiverField | undefined;
           return (
@@ -419,7 +422,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
                       onChange={(v) => update(key as keyof Form, v as never)}
                       invalid={!!errors[key]}
                     >
-                      I have read and agree{minor ? ", and so does my parent or guardian" : ""}
+                      I have read and agree
                     </Check>
                     {errors[key] ? (
                       <div className="mt-2">
@@ -460,21 +463,55 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
         />
         {minor ? (
           <div className="rounded-xl bg-lamp-wash p-5">
-            <p className="mb-4 text-[0.9375rem] leading-relaxed text-ink-2">
-              <strong className="font-semibold text-ink">Parent or guardian:</strong> by signing, you agree to this
-              waiver for yourself and for your child, and confirm the information above is correct.
-            </p>
-            <SignBlock
-              id="w-guardianSignature"
-              label="Parent or guardian signature"
-              printed={form.guardianName}
-              mode={modes.guardian}
-              onMode={(m) => setMode("guardian", m)}
-              image={form.guardianSignatureImage}
-              onImage={(v) => update("guardianSignatureImage", v)}
-              error={errors.guardianSignature ?? errors.guardianSignatureImage}
-              typed={input("guardianSignature", { autoComplete: "off", className: `${fieldClass} text-[1.25rem] italic font-semibold` }, true)}
+            <Choices
+              id="w-guardianMethod"
+              label="How will your parent or guardian sign?"
+              options={[
+                { value: "here", label: "Here, now" },
+                { value: "email", label: "Email them a link" },
+                { value: "paper", label: "Print it" },
+              ]}
+              value={form.guardianMethod}
+              onChange={(v) => update("guardianMethod", v as GuardianMethod)}
             />
+            <div className="mt-5">
+              {form.guardianMethod === "here" ? (
+                <>
+                  <p className="mb-4 text-[0.9375rem] leading-relaxed text-ink-2">
+                    <strong className="font-semibold text-ink">Hand the device to your parent or guardian.</strong> By
+                    signing, you agree to this waiver for yourself and for your child, and confirm the information
+                    above is correct.
+                  </p>
+                  <SignBlock
+                    id="w-guardianSignature"
+                    label="Parent or guardian signature"
+                    printed={form.guardianName}
+                    mode={modes.guardian}
+                    onMode={(m) => setMode("guardian", m)}
+                    image={form.guardianSignatureImage}
+                    onImage={(v) => update("guardianSignatureImage", v)}
+                    error={errors.guardianSignature ?? errors.guardianSignatureImage}
+                    typed={input("guardianSignature", { autoComplete: "off", className: `${fieldClass} text-[1.25rem] italic font-semibold` }, true)}
+                  />
+                </>
+              ) : form.guardianMethod === "email" ? (
+                <p className="text-[0.9375rem] leading-relaxed text-ink-2">
+                  When you submit, we email{" "}
+                  <strong className="font-semibold text-ink">{form.guardianEmail || "your parent or guardian"}</strong> a
+                  private link. They check what you entered, read the agreement and sign from their own phone or
+                  computer. Your waiver is complete once they do.
+                </p>
+              ) : (
+                <p className="text-[0.9375rem] leading-relaxed text-ink-2">
+                  When you submit, you get a copy to <strong className="font-semibold text-ink">print or save as a PDF</strong>.
+                  Your parent or guardian signs it by hand; then email a photo or scan to{" "}
+                  <a href={`mailto:${EVENT.email.team}`} className="link text-ink">
+                    {EVENT.email.team}
+                  </a>{" "}
+                  or bring it to check-in.
+                </p>
+              )}
+            </div>
           </div>
         ) : null}
         <p className="text-[0.875rem] text-ink-3">Date: {today}</p>
@@ -607,7 +644,7 @@ function Check({
  * above. Under a drawing, their printed name; under typing, a hint with
  * the name to type.
  */
-function SignBlock({
+export function SignBlock({
   id,
   label,
   printed,
@@ -678,28 +715,47 @@ function SignBlock({
 /* ------------------------------------------------------------ done */
 
 function Signed({ waiver }: { waiver: Waiver }) {
+  const waitingOn = waiver.minor && waiver.guardianMethod !== "here" ? waiver.guardianMethod : null;
+  const code = waiver.id.slice(0, 8).toUpperCase();
   return (
     <div className="flex flex-col gap-6">
       <div className="night relative overflow-hidden rounded-2xl p-7 sm:p-9 print:hidden">
         <span aria-hidden="true" className="pointer-events-none absolute -top-20 -right-20 size-64 rounded-full bg-lamp/25 blur-3xl" />
-        <p className="kicker relative text-lamp">Waiver signed</p>
+        <p className="kicker relative text-lamp">{waitingOn ? "Almost done" : "Waiver submitted"}</p>
         <h2 className="relative mt-3 text-[clamp(2rem,5vw,3rem)] leading-none font-extrabold font-stretch-125% tracking-[-0.04em]">
-          You&rsquo;re all set, {waiver.firstName}.
+          {waitingOn === "email"
+            ? `Now ${waiver.guardianName.split(" ")[0] || "your parent"} signs.`
+            : waitingOn === "paper"
+              ? "Print it for your parent to sign."
+              : `Thanks, ${waiver.firstName}. It\u2019s in for review.`}
         </h2>
         <p className="relative mt-4 max-w-xl text-[1.0625rem] leading-relaxed text-moon-2">
-          Your confirmation number is{" "}
-          <strong className="font-semibold text-moon">{waiver.id.slice(0, 8).toUpperCase()}</strong>. Keep a copy of
-          what you signed: print it or save it as a PDF. Need to change something? Fill the form in again with the same
-          email and the new one replaces this.
+          {waitingOn === "email" ? (
+            <>
+              We emailed <strong className="font-semibold text-moon">{waiver.guardianEmail}</strong> a link to sign. Once they
+              do, we review it and email you when you&rsquo;re in. Tell them to check spam if it doesn&rsquo;t arrive.{" "}
+            </>
+          ) : waitingOn === "paper" ? (
+            <>
+              Print this page or save it as a PDF. Your parent or guardian signs on the line at the end; then email a photo
+              or scan to <strong className="font-semibold text-moon">{EVENT.email.team}</strong>, or bring it to check-in.
+              Once we have it, we review it and email you when you&rsquo;re in.{" "}
+            </>
+          ) : (
+            <>
+              We&rsquo;ll email <strong className="font-semibold text-moon">{waiver.email}</strong>
+              {waiver.minor ? <> and {waiver.guardianEmail}</> : null} once it&rsquo;s approved. Keep a copy of what you
+              signed: print it or save it as a PDF.{" "}
+            </>
+          )}
+          Your confirmation number is <strong className="font-semibold text-moon">{code}</strong>.
         </p>
         <Button type="button" variant="lamp" size="lg" className="relative mt-6" onClick={() => window.print()}>
-          Print or save a copy
+          {waitingOn === "paper" ? "Print or save as PDF" : "Print or save a copy"}
         </Button>
       </div>
       <div className="rounded-2xl border border-line bg-card p-6 sm:p-8 print:border-0 print:p-0">
-        <h2 className="mb-6 text-[1.375rem] font-bold font-stretch-[112.5%]">
-          {EVENT.name} participant waiver
-        </h2>
+        <h2 className="mb-6 text-[1.375rem] font-bold font-stretch-[112.5%]">{EVENT.name} participant waiver</h2>
         <WaiverRecord waiver={waiver} />
       </div>
     </div>

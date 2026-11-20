@@ -34,8 +34,9 @@ export default async function WaiverPage({ searchParams }: PageProps<"/waiver">)
               Participant waiver
             </h1>
             <p className="mt-5 text-lg leading-relaxed text-ink-3">
-              Every participant signs this before the day. It takes about five minutes. Under 18 on January 30? Have a
-              parent or guardian nearby: they sign at the end.
+              Every participant signs this before the day. It takes about five minutes. Under 18 on January 30? A parent
+              or guardian signs too: right here, from a link we email them, or on a printed copy. We review each waiver and
+              email you when you&rsquo;re in.
             </p>
             <p className="mt-3 text-[0.9375rem] text-ink-3">
               Questions? Email{" "}

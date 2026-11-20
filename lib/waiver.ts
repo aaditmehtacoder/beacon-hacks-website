@@ -10,7 +10,7 @@ import { EVENT } from "./event";
  * agreement text in lib/waiver-text.ts changes, so each record says which
  * words were agreed to.
  */
-export const WAIVER_VERSION = "2027.2";
+export const WAIVER_VERSION = "2027.3";
 
 /** Age of majority in California. */
 export const ADULT_AGE = 18;
@@ -27,6 +27,8 @@ export function ageOnEventDay(dob: string): number | null {
 }
 
 export const GRADES = ["9", "10", "11", "12"] as const;
+export const GUARDIAN_METHODS = ["here", "email", "paper"] as const;
+export type GuardianMethod = (typeof GUARDIAN_METHODS)[number];
 export const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
 export const DIETS = [
   { value: "vegetarian", label: "Vegetarian" },
@@ -116,6 +118,9 @@ export const waiverSchema = z
     participantSignatureImage: drawn,
     guardianSignature: z.string().trim().max(120).default(""),
     guardianSignatureImage: drawn,
+    /* Under 18: the parent or guardian signs here now, by a link we email
+       them, or on a printed copy. */
+    guardianMethod: z.enum(GUARDIAN_METHODS).default("here"),
   })
   /* Runs even when other fields have problems (`when`), so every problem
      shows at once. The value may be unparsed then: read it defensively. */
@@ -134,6 +139,7 @@ export const waiverSchema = z
         guardianPhone: str(r.guardianPhone),
         participantSignature: str(r.participantSignature),
         guardianSignature: str(r.guardianSignature),
+        guardianMethod: str(r.guardianMethod) || "here",
         participantDrew: str(r.participantSignatureImage).length > 0,
         guardianDrew: str(r.guardianSignatureImage).length > 0,
       };
@@ -165,7 +171,10 @@ export const waiverSchema = z
       if (v.guardianEmail && v.guardianEmail === v.email) {
         ctx.addIssue({ code: "custom", path: ["guardianEmail"], message: "Use your parent or guardian's own email." });
       }
-      if (v.guardianDrew) {
+      /* Signing later, by link or on paper: nothing to sign now. */
+      if (v.guardianMethod !== "here") {
+        /* nothing */
+      } else if (v.guardianDrew) {
         /* drawn: nothing to match */
       } else if (!v.guardianSignature) {
         ctx.addIssue({ code: "custom", path: ["guardianSignature"], message: "Your parent or guardian signs here." });
@@ -194,4 +203,30 @@ export type Waiver = WaiverData & {
   /** 1 on the first signature; signing again with the same email replaces it. */
   revision: number;
   checkedInAt?: string;
+  /** When the parent or guardian signed, and from where, if not at the
+      same time as the participant (by link, or on paper). */
+  guardianSignedAt?: string;
+  guardianIp?: string;
+  guardianUserAgent?: string;
+  /** SHA-256 of the one-time signing link emailed to the guardian. */
+  guardianTokenHash?: string;
+  guardianRequestedAt?: string;
+  /** Set when an organizer approves it in /admin. Signing again clears it,
+      so a changed waiver is reviewed again. */
+  approvedAt?: string;
+  /** When the "you're in" email went out, or why it did not. */
+  approvalEmailedAt?: string;
+  approvalEmailError?: string;
 };
+
+export const isApproved = (w: Pick<Waiver, "approvedAt">) => !!w.approvedAt;
+
+/** Whether the parent or guardian has signed (or does not need to). */
+export const guardianSigned = (w: Pick<Waiver, "minor" | "guardianSignature" | "guardianSignatureImage">) =>
+  !w.minor || !!(w.guardianSignature || w.guardianSignatureImage);
+
+/** Where a waiver is: waiting on a parent, waiting on us, or done. */
+export function waiverStage(w: Waiver): "guardian" | "review" | "approved" {
+  if (!guardianSigned(w)) return "guardian";
+  return w.approvedAt ? "approved" : "review";
+}

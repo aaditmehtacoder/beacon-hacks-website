@@ -3,17 +3,35 @@ import { EVENT } from "./event";
 import { DIETS, type Waiver } from "./waiver";
 
 /**
- * Every signed waiver is emailed to the team inbox, so a copy lands in
- * Gmail even before anyone opens /admin. Signers get no email (the user,
- * Nov 19, 2026); they print or save their copy on the page.
+ * The two waiver emails, and sending them.
+ *
+ *  1. teamReviewEmail: when someone signs, a copy to the team inbox with a
+ *     button to review and approve it in /admin.
+ *  2. approvedEmail: when an organizer approves it, "you're in" to the
+ *     participant, with the parent or guardian copied under 18.
+ *  3. guardianSignEmail: under 18, when the participant chose to have their
+ *     parent or guardian sign by link, the link.
+ *
+ * Both are previewed in /admin/emails, and the approval email is shown in
+ * full before an organizer sends it.
  *
  * Sent through Gmail with an app password for the team account:
  *   GMAIL_USER          team.beaconhacks@gmail.com
- *   GMAIL_APP_PASSWORD  16 characters, from myaccount.google.com/apppasswords
- *                       (needs 2-Step Verification on the account)
- *   WAIVER_NOTIFY_TO    optional; defaults to GMAIL_USER
- * Without them, nothing is sent and the waiver is still saved.
+ *   GMAIL_APP_PASSWORD  from myaccount.google.com/apppasswords
+ *   WAIVER_NOTIFY_TO    optional; where review emails go (GMAIL_USER)
+ * Without them, nothing is sent; waivers are still saved and approvable.
  */
+
+export type Mail = {
+  fromName: string;
+  to: string;
+  cc?: string;
+  replyTo?: string;
+  subject: string;
+  html: string;
+  text: string;
+  attachments: { filename: string; content: Buffer; contentType: string; cid: string }[];
+};
 
 const DIET_LABEL: Record<string, string> = Object.fromEntries(DIETS.map((d) => [d.value, d.label]));
 
@@ -21,7 +39,9 @@ export function mailConfigured() {
   return !!(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD);
 }
 
-/* Everything in the email came from a form: escape it. */
+const teamInbox = () => process.env.WAIVER_NOTIFY_TO || process.env.GMAIL_USER || "team.beaconhacks@gmail.com";
+
+/* Everything from the form is escaped before it goes in the HTML. */
 const esc = (s: string | number | undefined) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
@@ -29,99 +49,255 @@ const esc = (s: string | number | undefined) =>
 const line = (s: string) => s.replace(/[\r\n\t]+/g, " ").trim();
 
 const WHEN = new Intl.DateTimeFormat("en-US", { timeZone: "America/Los_Angeles", dateStyle: "medium", timeStyle: "short" });
+const confirmation = (w: Waiver) => w.id.slice(0, 8).toUpperCase();
 
-export async function sendWaiverEmail(w: Waiver): Promise<"sent" | "skipped"> {
-  if (!mailConfigured()) return "skipped";
-  const user = process.env.GMAIL_USER!;
-  const to = process.env.WAIVER_NOTIFY_TO || user;
+/* ------------------------------------------------------------ layout */
+
+const INK = "#151d2e";
+const MUTED = "#5b6474";
+const RULE = "#e3e7ee";
+
+function frame(kicker: string, title: string, sub: string, body: string) {
+  return `<!doctype html><html><head><meta name="viewport" content="width=device-width"><meta name="color-scheme" content="light"></head>
+<body style="margin:0;background:#f4f6f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:${INK};-webkit-font-smoothing:antialiased">
+<div style="max-width:600px;margin:0 auto;padding:24px 16px">
+<div style="background:#060d1b;color:#f7f3ea;border-radius:16px;padding:26px 26px 24px">
+<div style="color:#ffc72c;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700">${kicker}</div>
+<div style="font-size:28px;line-height:1.1;font-weight:800;letter-spacing:-.02em;margin-top:8px">${title}</div>
+${sub ? `<div style="color:#c3cad8;margin-top:8px;font-size:15px;line-height:1.5">${sub}</div>` : ""}
+</div>
+${body}
+<p style="color:${MUTED};font-size:12px;line-height:1.5;margin:24px 4px 0">${esc(EVENT.name)} · ${esc(EVENT.venue.place ?? EVENT.venue.label)}, ${esc(EVENT.venue.city)} · <a href="${EVENT.url}" style="color:${MUTED}">${esc(EVENT.url.replace(/^https?:\/\/(www\.)?/, ""))}</a></p>
+</div></body></html>`;
+}
+
+function table(rows: [string, string][]) {
+  return `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:16px;font-size:15px;background:#fff;border-radius:12px">
+${rows
+  .map(
+    ([k, v]) =>
+      `<tr><td style="padding:9px 16px;color:${MUTED};border-bottom:1px solid ${RULE};vertical-align:top;width:36%">${esc(k)}</td><td style="padding:9px 16px;border-bottom:1px solid ${RULE};line-height:1.45">${v}</td></tr>`,
+  )
+  .join("\n")}
+</table>`;
+}
+
+function button(href: string, label: string) {
+  return `<p style="margin:22px 0 0"><a href="${esc(href)}" style="display:inline-block;background:#ffc72c;color:${INK};font-weight:700;text-decoration:none;padding:13px 22px;border-radius:999px">${esc(label)}</a></p>`;
+}
+
+/* ------------------------------------------------------------ 1. to the team */
+
+export function teamReviewEmail(w: Waiver): Mail {
   const name = `${w.firstName} ${w.lastName}`;
-
   const flags = [
     w.minor ? "under 18" : "18+",
     w.allergies || w.medications || w.conditions ? "health notes" : "",
     w.mediaConsent === "no" ? "no photos" : "",
-    w.revision > 1 ? `re-signed (${w.revision})` : "",
+    w.revision > 1 ? `signed again (${w.revision})` : "",
   ].filter(Boolean);
-
   const diet = [w.diet.map((d) => DIET_LABEL[d] ?? d).join(", "), w.dietNotes].filter(Boolean).join(". ");
+
   const rows: [string, string][] = [
-    ["Email", w.email],
-    ["Phone", w.phone],
-    ["Date of birth", `${w.dateOfBirth} (${w.age} on the day)`],
-    ["School", `${w.school}, grade ${w.grade}`],
-    ["T-shirt", w.shirtSize],
+    ["Email", esc(w.email)],
+    ["Phone", esc(w.phone)],
+    ["Date of birth", esc(`${w.dateOfBirth} (${w.age} on the day)`)],
+    ["School", esc(`${w.school}, grade ${w.grade}`)],
+    ["T-shirt", esc(w.shirtSize)],
     ...(w.minor
       ? ([
-          ["Parent or guardian", `${w.guardianName} (${w.guardianRelationship})`],
-          ["Their email", w.guardianEmail],
-          ["Their phone", w.guardianPhone],
+          ["Parent or guardian", esc(`${w.guardianName} (${w.guardianRelationship})`)],
+          ["Their email", esc(w.guardianEmail)],
+          ["Their phone", esc(w.guardianPhone)],
         ] as [string, string][])
       : []),
-    ["Emergency contact", `${w.emergencyName} (${w.emergencyRelationship}), ${w.emergencyPhone}`],
-    ["Allergies", w.allergies || "None"],
-    ["Medications", w.medications || "None"],
-    ["Conditions", w.conditions || "None"],
-    ["Food", diet || "None"],
+    ["Emergency contact", esc(`${w.emergencyName} (${w.emergencyRelationship}), ${w.emergencyPhone}`)],
+    ["Allergies", esc(w.allergies || "None")],
+    ["Medications", esc(w.medications || "None")],
+    ["Conditions", esc(w.conditions || "None")],
+    ["Food", esc(diet || "None")],
     ["Photos and video", w.mediaConsent === "yes" ? "Yes" : "No"],
-    ["Signed", `${WHEN.format(new Date(w.signedAt))} Pacific, version ${w.version}`],
+    ["Signed", esc(`${WHEN.format(new Date(w.signedAt))} Pacific, version ${w.version}`)],
   ];
 
   /* Drawn signatures travel as inline images; Gmail blocks data: URLs. */
-  const attachments: { filename: string; content: Buffer; contentType: string; cid: string }[] = [];
-  const signature = (label: string, typed: string, image: string | undefined, cid: string) => {
-    if (image) {
-      attachments.push({
-        filename: `${cid}.png`,
-        content: Buffer.from(image.split(",")[1] ?? "", "base64"),
-        contentType: "image/png",
-        cid,
-      });
-      return `<tr><td style="padding:6px 16px;color:#5b6474;vertical-align:top;width:38%">${esc(label)}</td><td style="padding:6px 0"><img src="cid:${cid}" alt="Signature of ${esc(typed)}" height="70" style="display:block;height:70px"><span style="color:#5b6474;font-size:13px">${esc(typed)}, drawn</span></td></tr>`;
-    }
-    return `<tr><td style="padding:6px 16px;color:#5b6474;width:38%">${esc(label)}</td><td style="padding:6px 0;font-style:italic;font-weight:600;font-size:17px">${esc(typed)} <span style="font-style:normal;font-weight:400;color:#5b6474;font-size:13px">typed</span></td></tr>`;
+  const attachments: Mail["attachments"] = [];
+  const signature = (label: string, typed: string, image: string | undefined, cid: string): [string, string] => {
+    if (!image) return [label, `<span style="font-style:italic;font-weight:600;font-size:17px">${esc(typed)}</span> <span style="color:${MUTED};font-size:13px">typed</span>`];
+    attachments.push({ filename: `${cid}.png`, content: Buffer.from(image.split(",")[1] ?? "", "base64"), contentType: "image/png", cid });
+    return [label, `<img src="cid:${cid}" alt="Signature of ${esc(typed)}" height="64" style="display:block;height:64px"><span style="color:${MUTED};font-size:13px">${esc(typed)}, drawn</span>`];
   };
+  rows.push(signature("Participant signature", w.participantSignature, w.participantSignatureImage, "participant-signature"));
+  if (w.minor) rows.push(signature("Guardian signature", w.guardianSignature, w.guardianSignatureImage, "guardian-signature"));
 
   const link = `${EVENT.url}/admin/waivers/${w.id}`;
-  const html = `<!doctype html><html><body style="margin:0;background:#f4f6f9;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:#151d2e">
-<div style="max-width:600px;margin:0 auto;padding:24px">
-<div style="background:#060d1b;color:#f7f3ea;border-radius:16px;padding:22px 24px">
-<div style="color:#ffc72c;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700">Waiver signed</div>
-<div style="font-size:24px;font-weight:800;margin-top:6px">${esc(name)}</div>
-<div style="color:#c3cad8;margin-top:4px">${esc(flags.join(" · "))}</div>
-</div>
-<table style="width:100%;border-collapse:collapse;margin-top:18px;font-size:15px;background:#fff;border-radius:12px">
-${rows.map(([k, v]) => `<tr><td style="padding:8px 16px;color:#5b6474;border-bottom:1px solid #e3e7ee;vertical-align:top;width:38%">${esc(k)}</td><td style="padding:8px 16px;border-bottom:1px solid #e3e7ee">${esc(v)}</td></tr>`).join("\n")}
-</table>
-<table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:15px">
-${signature("Participant", w.participantSignature, w.participantSignatureImage, "participant-signature")}
-${w.minor ? signature("Parent or guardian", w.guardianSignature, w.guardianSignatureImage, "guardian-signature") : ""}
-</table>
-<p style="margin-top:20px"><a href="${esc(link)}" style="color:#151d2e;font-weight:600">Open the full signed waiver in admin</a></p>
-<p style="color:#5b6474;font-size:12px">Confirmation ${esc(w.id.slice(0, 8).toUpperCase())}. Reply to reach ${esc(w.minor ? w.guardianName : name)}.</p>
-</div></body></html>`;
-
+  const html = frame(
+    "Waiver to review",
+    esc(name),
+    esc(flags.join(" · ")),
+    `${table(rows)}
+${button(link, "Review and approve")}
+<p style="color:${MUTED};font-size:13px;line-height:1.5;margin:14px 4px 0">Approving sends ${esc(w.firstName)} the &ldquo;you&rsquo;re in&rdquo; email${w.minor ? `, with ${esc(w.guardianName)} copied` : ""}. Reply here to reach ${esc(w.minor ? w.guardianName : name)}. Confirmation ${confirmation(w)}.</p>`,
+  );
   const text = [
-    `Waiver signed: ${name} (${flags.join(", ")})`,
+    `Waiver to review: ${name} (${flags.join(", ")})`,
     "",
-    ...rows.map(([k, v]) => `${k}: ${v}`),
-    `Participant signature: ${w.participantSignature}${w.participantSignatureImage ? " (drawn)" : " (typed)"}`,
-    ...(w.minor ? [`Guardian signature: ${w.guardianSignature}${w.guardianSignatureImage ? " (drawn)" : " (typed)"}`] : []),
+    ...rows.slice(0, -1 - (w.minor ? 1 : 0)).map(([k, v]) => `${k}: ${v.replace(/<[^>]+>/g, "").replace(/&amp;/g, "&")}`),
     "",
-    `Full waiver: ${link}`,
+    `Review and approve: ${link}`,
   ].join("\n");
 
+  return {
+    fromName: "Beacon Hacks waivers",
+    to: teamInbox(),
+    replyTo: w.minor ? w.guardianEmail : w.email,
+    subject: line(`Waiver to review: ${name}, grade ${w.grade}, ${w.school}${flags.length > 1 ? ` [${flags.slice(1).join(", ")}]` : ""}`),
+    html,
+    text,
+    attachments,
+  };
+}
+
+/* ------------------------------------------------------------ 2. to the participant */
+
+export function approvedEmail(w: Waiver): Mail {
+  const v = EVENT.venue;
+  const date = EVENT.date.confirmed ? EVENT.date.label : `${EVENT.date.label} (our target date; we will email you if it changes)`;
+  const where = v.address ? `${v.place}, ${v.address}` : v.label;
+  const health = !!(w.medications || w.allergies);
+
+  const bring = [
+    "Your laptop and charger",
+    "Your school ID, for check-in",
+    "A water bottle",
+    ...(health ? ["Any medication you need, like the one you listed on your waiver"] : []),
+  ];
+
+  const rows: [string, string][] = [
+    ["When", esc(date)],
+    ["Times", esc(`Doors open 8:30 AM. Hacking ${EVENT.hours.hacking}. Done by 11 PM.`)],
+    ["Where", v.map ? `<a href="${esc(v.map)}" style="color:${INK};font-weight:600">${esc(where)}</a>` : esc(where)],
+    ["Confirmation", `<strong>${confirmation(w)}</strong>`],
+  ];
+
+  const links = [
+    EVENT.social.discord ? `<a href="${esc(EVENT.social.discord)}" style="color:${INK};font-weight:600">Join the Discord</a> to meet other builders and hear updates first.` : "",
+    `Read the <a href="${EVENT.url}/code-of-conduct" style="color:${INK};font-weight:600">code of conduct</a> before the day.`,
+  ].filter(Boolean);
+
+  const html = frame(
+    "Waiver approved",
+    `You&rsquo;re in, ${esc(w.firstName)}.`,
+    `Your waiver for ${esc(EVENT.name)} is approved. See you in ${esc(v.city)}.`,
+    `${table(rows)}
+<div style="background:#fff;border-radius:12px;padding:16px 18px;margin-top:12px;font-size:15px;line-height:1.5">
+<div style="font-weight:700;margin-bottom:6px">Bring</div>
+${bring.map((b) => `<div style="padding:2px 0">&bull;&nbsp; ${esc(b)}</div>`).join("")}
+</div>
+<div style="font-size:15px;line-height:1.6;margin:18px 4px 0">
+${links.map((l) => `<p style="margin:0 0 8px">${l}</p>`).join("")}
+${w.minor ? `<p style="margin:12px 0 0;color:${MUTED}">${esc(w.guardianName)}, you are copied because you signed for ${esc(w.firstName)}. Please plan for pickup by 11 PM; there is no overnight stay.</p>` : ""}
+<p style="margin:12px 0 0;color:${MUTED}">Questions? Reply to this email.</p>
+</div>`,
+  );
+
+  const text = [
+    `You're in, ${w.firstName}.`,
+    "",
+    `Your waiver for ${EVENT.name} is approved. See you in ${v.city}.`,
+    "",
+    `When: ${date}`,
+    `Times: Doors open 8:30 AM. Hacking ${EVENT.hours.hacking}. Done by 11 PM.`,
+    `Where: ${where}`,
+    `Confirmation: ${confirmation(w)}`,
+    "",
+    "Bring:",
+    ...bring.map((b) => `- ${b}`),
+    "",
+    ...(EVENT.social.discord ? [`Discord: ${EVENT.social.discord}`] : []),
+    `Code of conduct: ${EVENT.url}/code-of-conduct`,
+    ...(w.minor ? ["", `${w.guardianName}, you are copied because you signed for ${w.firstName}. Please plan for pickup by 11 PM; there is no overnight stay.`] : []),
+    "",
+    "Questions? Reply to this email.",
+  ].join("\n");
+
+  return {
+    fromName: EVENT.name,
+    to: w.email,
+    cc: w.minor && w.guardianEmail ? w.guardianEmail : undefined,
+    replyTo: EVENT.email.team,
+    subject: line(`You're in: ${EVENT.name}, ${EVENT.date.short}`),
+    html,
+    text,
+    attachments: [],
+  };
+}
+
+/* ------------------------------------------------------------ 3. to the parent */
+
+/**
+ * When a participant under 18 chose to have their parent or guardian sign
+ * by link: the link, and what they are signing. The link is one-time and
+ * only in this email.
+ */
+export function guardianSignEmail(w: Waiver, link: string): Mail {
+  const child = `${w.firstName} ${w.lastName}`;
+  const html = frame(
+    "Signature needed",
+    `Please sign ${esc(w.firstName)}&rsquo;s waiver`,
+    `${esc(child)} filled in the waiver for ${esc(EVENT.name)} and listed you as their ${esc(w.guardianRelationship.toLowerCase() || "parent or guardian")}.`,
+    `<div style="background:#fff;border-radius:12px;padding:18px 20px;margin-top:16px;font-size:15px;line-height:1.6">
+<p style="margin:0">${esc(EVENT.name)} is a free, one-day hackathon for high school students on ${esc(EVENT.date.label)}${EVENT.date.confirmed ? "" : " (target date)"} at ${esc(EVENT.venue.place ?? EVENT.venue.label)}, ${esc(EVENT.venue.city)}, from ${esc(EVENT.hours.label)}.</p>
+<p style="margin:12px 0 0">Because ${esc(w.firstName)} is under 18, a parent or guardian signs too. It takes about two minutes: check what ${esc(w.firstName)} entered, read the agreement and sign with your finger, mouse or by typing your name.</p>
+</div>
+${button(link, "Review and sign")}
+<p style="color:${MUTED};font-size:13px;line-height:1.5;margin:14px 4px 0">This link is just for you, ${esc(w.guardianName)}; please don&rsquo;t forward it. Prefer paper? Open the link and print the waiver instead. Not expecting this? You can ignore it, or reply and tell us.</p>`,
+  );
+  const text = [
+    `Please sign ${w.firstName}'s waiver for ${EVENT.name}`,
+    "",
+    `${child} filled in the waiver for ${EVENT.name} (${EVENT.date.label}, ${EVENT.venue.place ?? EVENT.venue.label}, ${EVENT.venue.city}) and listed you as their parent or guardian. Because ${w.firstName} is under 18, you sign too. It takes about two minutes.`,
+    "",
+    `Review and sign: ${link}`,
+    "",
+    "This link is just for you; please don't forward it. Not expecting this? Ignore it, or reply and tell us.",
+  ].join("\n");
+  return {
+    fromName: EVENT.name,
+    to: w.guardianEmail,
+    replyTo: EVENT.email.team,
+    subject: line(`Please sign ${w.firstName}'s ${EVENT.name} waiver`),
+    html,
+    text,
+    attachments: [],
+  };
+}
+
+/* ------------------------------------------------------------ send, preview */
+
+export async function sendMail(m: Mail): Promise<void> {
+  if (!mailConfigured()) throw new Error("Email is not set up: GMAIL_USER and GMAIL_APP_PASSWORD are missing.");
+  const user = process.env.GMAIL_USER!;
   const transport = nodemailer.createTransport({
     service: "gmail",
     auth: { user, pass: process.env.GMAIL_APP_PASSWORD!.replace(/\s+/g, "") },
   });
   await transport.sendMail({
-    from: { name: "Beacon Hacks waivers", address: user },
-    to,
-    replyTo: w.minor ? w.guardianEmail : w.email,
-    subject: line(`Waiver signed: ${name}, grade ${w.grade}, ${w.school}${flags.length > 1 ? ` [${flags.slice(1).join(", ")}]` : ""}`),
-    text,
-    html,
-    attachments,
+    from: { name: m.fromName, address: user },
+    to: m.to,
+    cc: m.cc,
+    replyTo: m.replyTo,
+    subject: m.subject,
+    text: m.text,
+    html: m.html,
+    attachments: m.attachments,
   });
-  return "sent";
+}
+
+/** The HTML as a browser can show it: inline images swapped for data URLs. */
+export function previewHtml(m: Mail): string {
+  return m.attachments.reduce(
+    (html, a) => html.replaceAll(`cid:${a.cid}`, `data:${a.contentType};base64,${a.content.toString("base64")}`),
+    m.html,
+  );
 }

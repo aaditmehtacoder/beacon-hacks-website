@@ -5,10 +5,10 @@ import { useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { AnchorButton, Button } from "@/components/ui/button";
 import { fieldClass } from "@/components/ui/field";
-import { DIETS, SHIRT_SIZES, type Waiver } from "@/lib/waiver";
+import { DIETS, SHIRT_SIZES, waiverStage, type Waiver } from "@/lib/waiver";
 import type { WaiverBackend } from "@/lib/waiver-store";
 
-type Filter = "all" | "waiting" | "in" | "health" | "nophoto" | "minor";
+type Filter = "all" | "parent" | "review" | "waiting" | "in" | "health" | "nophoto" | "minor";
 
 const DIET_LABEL: Record<string, string> = Object.fromEntries(DIETS.map((d) => [d.value, d.label]));
 
@@ -65,6 +65,8 @@ export function WaiverDashboard({
       total: waivers.length,
       minors: waivers.filter((w) => w.minor).length,
       checkedIn: waivers.filter((w) => w.checkedInAt).length,
+      toReview: waivers.filter((w) => waiverStage(w) === "review").length,
+      parent: waivers.filter((w) => waiverStage(w) === "guardian").length,
       health: waivers.filter(hasHealth).length,
       noPhoto: waivers.filter((w) => w.mediaConsent === "no").length,
       shirts,
@@ -77,6 +79,8 @@ export function WaiverDashboard({
     return waivers.filter((w) => {
       const pass =
         filter === "all" ||
+        (filter === "review" && waiverStage(w) === "review") ||
+        (filter === "parent" && waiverStage(w) === "guardian") ||
         (filter === "waiting" && !w.checkedInAt) ||
         (filter === "in" && !!w.checkedInAt) ||
         (filter === "health" && hasHealth(w)) ||
@@ -98,7 +102,7 @@ export function WaiverDashboard({
       const res = await fetch("/api/admin/waivers", {
         method: "PATCH",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ id: w.id, checkedIn: next }),
+        body: JSON.stringify({ id: w.id, action: next ? "checkin" : "uncheckin" }),
       });
       if (!res.ok) throw new Error(String(res.status));
       const { waiver } = (await res.json()) as { waiver: Waiver };
@@ -142,8 +146,11 @@ export function WaiverDashboard({
             Waivers
           </h1>
           <p className="mt-3 text-[0.9375rem] text-ink-3">
-            Share <span className="font-semibold text-ink">beaconhacks.com/waiver</span> with registered students.
-            Signing again with the same email replaces the earlier waiver.
+            Share <span className="font-semibold text-ink">beaconhacks.com/waiver</span> with registered students. Each
+            waiver waits for your approval; approving emails them that they&rsquo;re in.{" "}
+            <Link href="/admin/emails" className="link text-ink">
+              See the email drafts
+            </Link>
           </p>
         </div>
         <div className="flex flex-wrap gap-2 lg:flex-nowrap">
@@ -175,12 +182,14 @@ export function WaiverDashboard({
 
       {!emailing ? (
         <p role="status" className="rounded-xl bg-fog-2 px-5 py-3.5 text-[0.9375rem] leading-relaxed text-ink-2">
-          Emailing each waiver to the team inbox is off. Set GMAIL_USER and GMAIL_APP_PASSWORD to turn it on.
+          Email is off: waivers still come in and can be approved, but no one is emailed. Set GMAIL_USER and
+          GMAIL_APP_PASSWORD to turn it on.
         </p>
       ) : null}
 
-      <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">
+      <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3 lg:grid-cols-6">
         <Stat label="Signed" value={stats.total} />
+        <Stat label="To approve" value={stats.toReview} />
         <Stat label="Checked in" value={`${stats.checkedIn}`} note={stats.total ? `of ${stats.total}` : undefined} />
         <Stat label="Under 18, guardian signed" value={stats.minors} />
         <Stat label="Health notes" value={stats.health} />
@@ -205,6 +214,8 @@ export function WaiverDashboard({
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-1">
             {tab("all", "All", stats.total)}
+            {tab("review", "To approve", stats.toReview)}
+            {tab("parent", "Waiting for parent", stats.parent)}
             {tab("waiting", "Not checked in", stats.total - stats.checkedIn)}
             {tab("in", "Checked in", stats.checkedIn)}
             {tab("health", "Health notes", stats.health)}
@@ -238,6 +249,15 @@ export function WaiverDashboard({
                     {w.email} · {w.school}, grade {w.grade}
                   </p>
                   <p className="mt-1.5 flex flex-wrap gap-1.5">
+                    {waiverStage(w) === "guardian" ? (
+                      <Tag>{w.guardianMethod === "paper" ? "Waiting for paper copy" : "Waiting for parent to sign"}</Tag>
+                    ) : !w.approvedAt ? (
+                      <Tag tone="warn">Waiting for approval</Tag>
+                    ) : w.approvalEmailedAt ? (
+                      <Tag tone="ok">Approved</Tag>
+                    ) : (
+                      <Tag tone="danger">Approved, email failed</Tag>
+                    )}
                     {w.minor ? <Tag>Under 18 · {w.guardianName}</Tag> : <Tag>18+</Tag>}
                     {hasHealth(w) ? <Tag tone="danger">Health notes</Tag> : null}
                     {w.diet.length ? <Tag>{w.diet.map((d) => DIET_LABEL[d]).join(", ")}</Tag> : null}
@@ -246,23 +266,36 @@ export function WaiverDashboard({
                   </p>
                 </div>
                 <p className="text-[0.8125rem] text-ink-3 sm:w-32 sm:text-right">Signed {when(w.signedAt)}</p>
-                <button
-                  type="button"
-                  onClick={() => checkIn(w)}
-                  disabled={busy === w.id}
-                  aria-pressed={!!w.checkedInAt}
-                  className={`h-10 shrink-0 rounded-full px-5 text-[0.875rem] font-semibold transition-colors sm:w-40 ${
-                    w.checkedInAt
-                      ? "bg-[oklch(0.93_0.07_150)] text-[oklch(0.36_0.09_150)] hover:bg-[oklch(0.9_0.08_150)]"
-                      : "bg-lamp text-ink hover:bg-lamp-hi"
-                  }`}
-                >
-                  {w.checkedInAt ? `In · ${when(w.checkedInAt).split(", ")[1]}` : "Check in"}
-                  <span className="sr-only">
-                    {" "}
-                    {w.firstName} {w.lastName}
-                  </span>
-                </button>
+                {!w.approvedAt ? (
+                  <Link
+                    href={`/admin/waivers/${w.id}`}
+                    className="flex h-10 shrink-0 items-center justify-center rounded-full bg-ink px-5 text-[0.875rem] font-semibold text-fog transition-colors hover:bg-ink-2 sm:w-40"
+                  >
+                    Review
+                    <span className="sr-only">
+                      {" "}
+                      {w.firstName} {w.lastName}
+                    </span>
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => checkIn(w)}
+                    disabled={busy === w.id}
+                    aria-pressed={!!w.checkedInAt}
+                    className={`h-10 shrink-0 rounded-full px-5 text-[0.875rem] font-semibold transition-colors sm:w-40 ${
+                      w.checkedInAt
+                        ? "bg-[oklch(0.93_0.07_150)] text-[oklch(0.36_0.09_150)] hover:bg-[oklch(0.9_0.08_150)]"
+                        : "bg-lamp text-ink hover:bg-lamp-hi"
+                    }`}
+                  >
+                    {w.checkedInAt ? `In · ${when(w.checkedInAt).split(", ")[1]}` : "Check in"}
+                    <span className="sr-only">
+                      {" "}
+                      {w.firstName} {w.lastName}
+                    </span>
+                  </button>
+                )}
               </li>
             ))}
           </ul>
@@ -305,9 +338,15 @@ function Tally({ title, items, empty }: { title: string; items: [string, number]
   );
 }
 
-function Tag({ children, tone }: { children: ReactNode; tone?: "danger" | "warn" }) {
+function Tag({ children, tone }: { children: ReactNode; tone?: "danger" | "warn" | "ok" }) {
   const color =
-    tone === "danger" ? "bg-danger-wash text-danger" : tone === "warn" ? "bg-lamp-wash text-lamp-deep" : "bg-fog-2 text-ink-2";
+    tone === "danger"
+      ? "bg-danger-wash text-danger"
+      : tone === "warn"
+        ? "bg-lamp-wash text-lamp-deep"
+        : tone === "ok"
+          ? "bg-[oklch(0.93_0.07_150)] text-[oklch(0.36_0.09_150)]"
+          : "bg-fog-2 text-ink-2";
   return <span className={`rounded-full px-2.5 py-0.5 text-[0.75rem] font-semibold ${color}`}>{children}</span>;
 }
 

@@ -1,13 +1,15 @@
 import { NextResponse, after } from "next/server";
-import { ADULT_AGE, WAIVER_VERSION, ageOnEventDay, waiverSchema } from "@/lib/waiver";
-import { saveWaiver, waiverBackend } from "@/lib/waiver-store";
-import { sendWaiverEmail } from "@/lib/waiver-mail";
+import { ADULT_AGE, WAIVER_VERSION, ageOnEventDay, guardianSigned, waiverSchema } from "@/lib/waiver";
+import { saveWaiver, setGuardianToken, waiverBackend } from "@/lib/waiver-store";
+import { guardianSignEmail, mailConfigured, sendMail, teamReviewEmail } from "@/lib/waiver-mail";
+import { guardianLink, newGuardianToken } from "@/lib/guardian-token";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 
 /**
  * A signed waiver. Checked with the same schema as the form, then stored
  * with the time, the version of the text, the signer's IP and browser:
- * the record that shows who agreed to what, and when.
+ * the record that shows who agreed to what, and when. It waits for an
+ * organizer to approve it; the team inbox gets it to review.
  */
 export async function POST(request: Request) {
   if (rateLimited(`waiver:${clientIp(request)}`, 6)) {
@@ -47,10 +49,20 @@ export async function POST(request: Request) {
       /* With a drawing, the typed field records the signer's printed name. */
       ...(data.participantSignatureImage ? { participantSignature: `${data.firstName} ${data.lastName}` } : {}),
       ...(minor && data.guardianSignatureImage ? { guardianSignature: data.guardianName } : {}),
+      /* Signing later: whatever is in the guardian signature fields now is not theirs. */
+      ...(minor && data.guardianMethod !== "here" ? { guardianSignature: "", guardianSignatureImage: "" } : {}),
       /* An adult signs alone: drop anything left in the guardian fields. */
       ...(minor
         ? {}
-        : { guardianName: "", guardianRelationship: "", guardianEmail: "", guardianPhone: "", guardianSignature: "", guardianSignatureImage: "" }),
+        : {
+            guardianName: "",
+            guardianRelationship: "",
+            guardianEmail: "",
+            guardianPhone: "",
+            guardianSignature: "",
+            guardianSignatureImage: "",
+            guardianMethod: "here" as const,
+          }),
       id: crypto.randomUUID(),
       version: WAIVER_VERSION,
       signedAt: new Date().toISOString(),
@@ -59,12 +71,22 @@ export async function POST(request: Request) {
       ip: clientIp(request),
       userAgent: (request.headers.get("user-agent") ?? "").slice(0, 300),
     });
-    /* A copy to the team inbox, once the signer has their answer. A
-       failed email never loses the waiver: it is already saved. */
+    /* By link: a one-time token for the parent or guardian. */
+    let link: string | null = null;
+    if (saved.minor && saved.guardianMethod === "email") {
+      const { token, hash } = newGuardianToken();
+      await setGuardianToken(saved.id, hash);
+      link = guardianLink(token, request);
+    }
+
+    /* Emails go out once the signer has their answer; a failed email never
+       loses the waiver, which is saved and waits in /admin either way.
+       The team reviews it once every signature is in. */
     after(async () => {
+      if (!mailConfigured()) return console.info("[waiver] email not configured; saved without emailing");
       try {
-        const result = await sendWaiverEmail(saved);
-        if (result === "skipped") console.info("[waiver] email not configured; saved without emailing");
+        if (link) await sendMail(guardianSignEmail(saved, link));
+        else if (guardianSigned(saved)) await sendMail(teamReviewEmail(saved));
       } catch (error) {
         console.error("[waiver] email failed", error);
       }

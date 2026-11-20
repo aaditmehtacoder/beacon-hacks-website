@@ -1,7 +1,9 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, after, type NextRequest } from "next/server";
 import { ADMIN_COOKIE, isAdmin } from "@/lib/admin-auth";
-import { listWaivers, removeWaiver, setCheckedIn } from "@/lib/waiver-store";
-import { DIETS, type Waiver } from "@/lib/waiver";
+import { getWaiver, listWaivers, removeWaiver, setCheckedIn, setGuardianToken, updateWaiver } from "@/lib/waiver-store";
+import { approvedEmail, guardianSignEmail, mailConfigured, sendMail, teamReviewEmail } from "@/lib/waiver-mail";
+import { guardianLink, newGuardianToken } from "@/lib/guardian-token";
+import { DIETS, guardianSigned, type Waiver } from "@/lib/waiver";
 
 function unauthorized() {
   return NextResponse.json({ ok: false, error: "Sign in first." }, { status: 401 });
@@ -37,9 +39,12 @@ const COLUMNS: [string, (w: Waiver) => unknown][] = [
   ["Participant signature", (w) => w.participantSignature],
   ["Participant signed by", (w) => (w.participantSignatureImage ? "drawing" : "typing")],
   ["Guardian signature", (w) => w.guardianSignature],
-  ["Guardian signed by", (w) => (w.minor ? (w.guardianSignatureImage ? "drawing" : "typing") : "")],
+  ["Guardian signed by", (w) => (!w.minor ? "" : !guardianSigned(w) ? `not yet (${w.guardianMethod ?? "here"})` : w.guardianMethod === "paper" ? "paper" : w.guardianSignatureImage ? "drawing" : "typing")],
+  ["Guardian signed at", (w) => w.guardianSignedAt ?? (w.minor && guardianSigned(w) ? w.signedAt : "")],
   ["Waiver version", (w) => w.version],
   ["Revision", (w) => w.revision],
+  ["Approved at", (w) => w.approvedAt],
+  ["Approval emailed at", (w) => w.approvalEmailedAt],
   ["Checked in at", (w) => w.checkedInAt],
   ["IP", (w) => w.ip],
   ["Browser", (w) => w.userAgent],
@@ -71,15 +76,78 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ ok: true, waivers: rows }, { headers: { "cache-control": "no-store" } });
 }
 
-/** Check in, or undo it: { id, checkedIn }. */
+/**
+ * Approve and email it, send the email again, or check in:
+ *   { id, action: "approve" | "resend" | "checkin" | "uncheckin" | "remind-guardian" | "paper-received" }
+ * Approving saves the approval first, then sends "you're in"; if the email
+ * fails, the approval stands and the error is kept for a resend.
+ */
 export async function PATCH(request: NextRequest) {
   if (!isAdmin(request.cookies.get(ADMIN_COOKIE)?.value)) return unauthorized();
-  const body = (await request.json().catch(() => ({}))) as { id?: unknown; checkedIn?: unknown };
-  if (typeof body.id !== "string" || typeof body.checkedIn !== "boolean") {
-    return NextResponse.json({ ok: false, error: "Send an id and checkedIn." }, { status: 400 });
+  const body = (await request.json().catch(() => ({}))) as { id?: unknown; action?: unknown };
+  const id = typeof body.id === "string" ? body.id : "";
+  const action = body.action;
+  if (!id || !["approve", "resend", "checkin", "uncheckin", "remind-guardian", "paper-received"].includes(String(action))) {
+    return NextResponse.json({ ok: false, error: "Send an id and an action." }, { status: 400 });
   }
-  const row = await setCheckedIn(body.id, body.checkedIn);
-  return row ? NextResponse.json({ ok: true, waiver: row }) : NextResponse.json({ ok: false, error: "Not found." }, { status: 404 });
+
+  if (action === "checkin" || action === "uncheckin") {
+    const row = await setCheckedIn(id, action === "checkin");
+    return row ? NextResponse.json({ ok: true, waiver: row }) : NextResponse.json({ ok: false, error: "Not found." }, { status: 404 });
+  }
+
+  const current = await getWaiver(id);
+  if (!current) return NextResponse.json({ ok: false, error: "Not found." }, { status: 404 });
+  if (action === "remind-guardian") {
+    if (guardianSigned(current)) return NextResponse.json({ ok: false, error: "Their parent or guardian has already signed." }, { status: 409 });
+    if (!mailConfigured()) return NextResponse.json({ ok: false, error: "Email is not set up." }, { status: 503 });
+    const { token, hash } = newGuardianToken();
+    const row = await setGuardianToken(id, hash);
+    try {
+      await sendMail(guardianSignEmail(row!, guardianLink(token, request)));
+      if (row!.guardianMethod !== "email") await updateWaiver(id, { guardianMethod: "email" });
+      return NextResponse.json({ ok: true, waiver: await getWaiver(id) });
+    } catch (error) {
+      return NextResponse.json({ ok: false, error: `The email did not send: ${error instanceof Error ? error.message : error}` }, { status: 502 });
+    }
+  }
+  if (action === "paper-received") {
+    if (guardianSigned(current)) return NextResponse.json({ ok: false, error: "Their parent or guardian has already signed." }, { status: 409 });
+    const row = await updateWaiver(id, {
+      guardianSignature: `${current.guardianName} (signed on paper)`,
+      guardianSignatureImage: "",
+      guardianMethod: "paper",
+      guardianSignedAt: new Date().toISOString(),
+      guardianIp: "",
+      guardianUserAgent: "Paper copy, marked received in admin",
+    });
+    after(async () => {
+      if (!row || !mailConfigured()) return;
+      await sendMail(teamReviewEmail(row)).catch((e) => console.error("[waiver] review email failed", e));
+    });
+    return NextResponse.json({ ok: true, waiver: row });
+  }
+  if (!guardianSigned(current)) {
+    return NextResponse.json({ ok: false, error: "Their parent or guardian has not signed yet." }, { status: 409 });
+  }
+  if (action === "resend" && !current.approvedAt) {
+    return NextResponse.json({ ok: false, error: "Approve it first." }, { status: 409 });
+  }
+  if (action === "approve" && current.approvedAt && current.approvalEmailedAt) {
+    return NextResponse.json({ ok: true, waiver: current, emailed: false, note: "Already approved and emailed." });
+  }
+
+  const approved = current.approvedAt ? current : (await updateWaiver(id, { approvedAt: new Date().toISOString() }))!;
+  try {
+    await sendMail(approvedEmail(approved));
+    const row = await updateWaiver(id, { approvalEmailedAt: new Date().toISOString(), approvalEmailError: undefined });
+    return NextResponse.json({ ok: true, waiver: row, emailed: true });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("[waiver] approval email failed", error);
+    const row = await updateWaiver(id, { approvalEmailError: message.slice(0, 300) });
+    return NextResponse.json({ ok: true, waiver: row, emailed: false, error: `Approved, but the email did not send: ${message}` });
+  }
 }
 
 export async function DELETE(request: NextRequest) {

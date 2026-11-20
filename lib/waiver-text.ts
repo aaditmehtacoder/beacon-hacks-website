@@ -52,7 +52,7 @@ export const CLAUSES: Clause[] = [
     id: "privacy",
     title: "How we use this information",
     paragraphs: [
-      "The Organizers use this form only to run the event and keep people safe: to check people in, plan food around allergies and diets, and reach a parent, guardian or emergency contact.",
+      "The Organizers use this form only to run the event and keep people safe: to review and confirm it by email, check people in, plan food around allergies and diets, and reach a parent, guardian or emergency contact.",
       "Health details are seen only by organizers who need them and by anyone giving treatment. The participant's email may be given to a sponsor only to deliver a perk the participant can claim, such as software credits. Nothing on this form is sold.",
       "The Organizers delete these records within a year of the event, unless the law or an incident report requires keeping them longer. To see or correct a record, write to " + EVENT.email.team + ".",
     ],
