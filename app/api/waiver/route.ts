@@ -4,6 +4,7 @@ import { saveWaiver, setGuardianToken, waiverBackend } from "@/lib/waiver-store"
 import { guardianSignEmail, mailConfigured, sendMail, teamReviewEmail } from "@/lib/waiver-mail";
 import { guardianLink, newGuardianToken } from "@/lib/guardian-token";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
+import { domainReceivesMail } from "@/lib/email-domain";
 
 /**
  * A signed waiver. Checked with the same schema as the form, then stored
@@ -42,6 +43,20 @@ export async function POST(request: Request) {
   const data = parsed.data;
   const age = ageOnEventDay(data.dateOfBirth)!;
   const minor = age < ADULT_AGE;
+
+  /* Every email has to be able to receive mail: a misspelled or made-up
+     domain is turned back before anything is saved. */
+  const fields: Record<string, string> = {};
+  const [own, guardian] = await Promise.all([
+    domainReceivesMail(data.email),
+    minor ? domainReceivesMail(data.guardianEmail) : Promise.resolve(true),
+  ]);
+  const nope = (e: string) => `We can't find “${e.split("@")[1]}”, so email there would never arrive. Check for a typo.`;
+  if (!own) fields.email = nope(data.email);
+  if (!guardian) fields.guardianEmail = nope(data.guardianEmail);
+  if (Object.keys(fields).length) {
+    return NextResponse.json({ ok: false, error: "Check the highlighted fields.", fields }, { status: 422 });
+  }
 
   try {
     const saved = await saveWaiver({

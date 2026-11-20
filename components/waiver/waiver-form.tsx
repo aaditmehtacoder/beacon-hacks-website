@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ComponentProps, type FormEvent, type ReactNode } from "react";
+import { useRef, useState, type ChangeEvent, type ComponentProps, type FormEvent, type ReactNode } from "react";
 import { EVENT } from "@/lib/event";
 import {
   ADULT_AGE,
@@ -16,6 +16,8 @@ import {
   type WaiverField,
 } from "@/lib/waiver";
 import { CLAUSES, ESIGN } from "@/lib/waiver-text";
+import { formatPhone } from "@/lib/phone";
+import { suggestEmail } from "@/lib/email-typos";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, describedBy, fieldClass } from "@/components/ui/field";
 import { SignaturePad } from "./signature-pad";
@@ -143,23 +145,44 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
   const [signed, setSigned] = useState<Waiver | null>(null);
   const [sameAsGuardian, setSameAsGuardian] = useState(false);
   const [modes, setModes] = useState<Modes>({ participant: "draw", guardian: "draw" });
+  /* Emails the signer confirmed are right after we suggested a fix. */
+  const [kept, setKept] = useState<string[]>([]);
 
   const age = ageOnEventDay(form.dateOfBirth);
   const minor = age === null || age < ADULT_AGE;
   const today = new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(new Date());
+
+  /* A likely typo in an email stops the form until the signer fixes it or says it's right. */
+  function typoErrors(f: Form, keep = kept): Errors {
+    const out: Errors = {};
+    const a = ageOnEventDay(f.dateOfBirth);
+    const keys: ("email" | "guardianEmail")[] = a === null || a < ADULT_AGE ? ["email", "guardianEmail"] : ["email"];
+    for (const key of keys) {
+      const fix = suggestEmail(f[key]);
+      if (fix && !keep.includes(f[key].trim().toLowerCase())) out[key] = `${TYPO}${fix}`;
+    }
+    return out;
+  }
+  const validate = (f: Form, m: Modes = modes, keep = kept): Errors => ({ ...typoErrors(f, keep), ...check(payload(f, m)) });
+
+  function keepEmail(key: "email" | "guardianEmail") {
+    const next = [...kept, latest.current[key].trim().toLowerCase()];
+    setKept(next);
+    if (tried) setErrors(validate(latest.current, modes, next));
+  }
 
   function update<K extends keyof Form>(key: K, value: Form[K]) {
     let next = { ...latest.current, [key]: value };
     if (sameAsGuardian && key.startsWith("guardian")) next = copyGuardian(next);
     latest.current = next;
     setForm(next);
-    if (tried) setErrors(check(payload(next, modes)));
+    if (tried) setErrors(validate(next));
   }
 
   function setMode(who: keyof Modes, mode: Mode) {
     const next = { ...modes, [who]: mode };
     setModes(next);
-    if (tried) setErrors(check(payload(latest.current, next)));
+    if (tried) setErrors(validate(latest.current, next));
   }
 
   function copyGuardian(f: Form): Form {
@@ -172,7 +195,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
       const next = copyGuardian(latest.current);
       latest.current = next;
       setForm(next);
-      if (tried) setErrors(check(payload(next, modes)));
+      if (tried) setErrors(validate(next));
     }
   }
 
@@ -181,7 +204,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
     setTried(true);
     setFailure(null);
     const body = payload(latest.current, modes);
-    const found = check(body);
+    const found = { ...typoErrors(latest.current), ...check(body) };
     setErrors(found);
     const firstBad = ORDER.find((k) => found[k]);
     if (firstBad) {
@@ -234,6 +257,21 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
 
   if (signed) return <Signed waiver={signed} />;
 
+  /* Phone fields format as you type; the caret stays after the same digit. */
+  function onPhone(key: "phone" | "guardianPhone" | "emergencyPhone", e: ChangeEvent<HTMLInputElement>) {
+    const el = e.target;
+    const caret = el.selectionStart ?? el.value.length;
+    const digitsBefore = el.value.slice(0, caret).replace(/\D/g, "").length;
+    const next = formatPhone(el.value);
+    update(key, next);
+    requestAnimationFrame(() => {
+      if (document.activeElement !== el) return;
+      let i = 0;
+      for (let seen = 0; i < next.length && seen < digitsBefore; i++) if (/\d/.test(next[i])) seen++;
+      el.setSelectionRange(i, i);
+    });
+  }
+
   /* Shorthand for a text input wired to the form. */
   const input = (key: keyof Form & WaiverField, props: ComponentProps<"input"> = {}, hint = false) => (
     <input
@@ -276,13 +314,19 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
           id="w-email"
           label="Email"
           hint="The same email you registered with on Luma, so we can match your waiver to your ticket."
-          error={errors.email}
+          error={typo(errors.email) ? null : errors.email}
         >
           {input("email", { type: "email", autoComplete: "email", inputMode: "email" }, true)}
+          <EmailSuggestion
+            value={form.email}
+            kept={kept}
+            onUse={(fix) => update("email", fix)}
+            onKeep={() => keepEmail("email")}
+          />
         </Field>
         <div className="grid gap-5 sm:grid-cols-2">
           <Field id="w-phone" label="Your phone number" error={errors.phone}>
-            {input("phone", { type: "tel", autoComplete: "tel", inputMode: "tel", placeholder: "(408) 555-0123" })}
+            {input("phone", { type: "tel", autoComplete: "tel", inputMode: "tel", placeholder: "(408) 555-0123", onChange: (e) => onPhone("phone", e) })}
           </Field>
           <Field id="w-dateOfBirth" label="Date of birth" error={errors.dateOfBirth}>
             {input("dateOfBirth", { type: "date", autoComplete: "bday", max: EVENT.date.iso })}
@@ -327,11 +371,17 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
             <Field id="w-guardianRelationship" label="Relationship to you" error={errors.guardianRelationship}>
               {input("guardianRelationship", { placeholder: "Mother, father, guardian…" })}
             </Field>
-            <Field id="w-guardianEmail" label="Their email" error={errors.guardianEmail}>
+            <Field id="w-guardianEmail" label="Their email" error={typo(errors.guardianEmail) ? null : errors.guardianEmail}>
               {input("guardianEmail", { type: "email", inputMode: "email", autoComplete: "off" })}
+              <EmailSuggestion
+                value={form.guardianEmail}
+                kept={kept}
+                onUse={(fix) => update("guardianEmail", fix)}
+                onKeep={() => keepEmail("guardianEmail")}
+              />
             </Field>
             <Field id="w-guardianPhone" label="Their phone number" error={errors.guardianPhone}>
-              {input("guardianPhone", { type: "tel", inputMode: "tel", autoComplete: "off" })}
+              {input("guardianPhone", { type: "tel", inputMode: "tel", autoComplete: "off", placeholder: "(408) 555-0123", onChange: (e) => onPhone("guardianPhone", e) })}
             </Field>
           </div>
         </Card>
@@ -354,7 +404,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
           </Field>
         </div>
         <Field id="w-emergencyPhone" label="Their phone number" error={errors.emergencyPhone}>
-          {input("emergencyPhone", { type: "tel", inputMode: "tel", autoComplete: "off", readOnly: sameAsGuardian })}
+          {input("emergencyPhone", { type: "tel", inputMode: "tel", autoComplete: "off", readOnly: sameAsGuardian, placeholder: "(408) 555-0123", onChange: (e) => onPhone("emergencyPhone", e) })}
         </Field>
       </Card>
 
@@ -536,6 +586,48 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
 }
 
 /* ------------------------------------------------------------ pieces */
+
+/* A typo error is shown as the suggestion box, not as a red line. */
+const TYPO = "Did you mean ";
+const typo = (message?: string) => !!message?.startsWith(TYPO);
+
+/**
+ * Under an email field, while it looks like a typo: the likely address,
+ * one tap to use it, or one to keep what was typed.
+ */
+function EmailSuggestion({
+  value,
+  kept,
+  onUse,
+  onKeep,
+}: {
+  value: string;
+  kept: string[];
+  onUse: (fix: string) => void;
+  onKeep: () => void;
+}) {
+  const fix = suggestEmail(value);
+  const show = fix && !kept.includes(value.trim().toLowerCase());
+  return (
+    <div aria-live="polite">
+      {show ? (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl bg-lamp-wash px-4 py-3 text-[0.9375rem] text-ink-2">
+          <span>
+            Did you mean <strong className="font-semibold text-ink">{fix}</strong>?
+          </span>
+          <span className="flex gap-2">
+            <button type="button" onClick={() => onUse(fix)} className="rounded-full bg-ink px-3.5 py-1 text-[0.875rem] font-semibold text-fog hover:bg-ink-2">
+              Use it
+            </button>
+            <button type="button" onClick={onKeep} className="rounded-full border border-line-2 bg-card px-3.5 py-1 text-[0.875rem] font-semibold text-ink hover:border-ink">
+              Keep mine
+            </button>
+          </span>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function Card({ n, title, lede, children }: { n: number; title: string; lede?: string; children?: ReactNode }) {
   return (

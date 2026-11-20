@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { EVENT } from "./event";
+import { formatPhone } from "./phone";
 
 /**
  * The participant waiver at /waiver: what a student (and, under 18, a
@@ -66,7 +67,8 @@ const phone = (label = "a phone number") =>
     .refine((v) => {
       const digits = v.replace(/\D/g, "");
       return digits.length >= 10 && digits.length <= 15;
-    }, "Use a full phone number, with area code.");
+    }, "Use a full phone number, with area code.")
+    .transform(formatPhone);
 
 const yes = (message: string) => z.literal(true, { error: message });
 
