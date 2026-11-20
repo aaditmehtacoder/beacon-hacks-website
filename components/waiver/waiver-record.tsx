@@ -1,3 +1,4 @@
+import { Linkify } from "./linkify";
 import type { ReactNode } from "react";
 import { CLAUSES, ESIGN, WAIVER_FOOTER } from "@/lib/waiver-text";
 import { DIETS, guardianSigned, teamSummary, type Waiver } from "@/lib/waiver";
@@ -69,7 +70,7 @@ export function WaiverRecord({ waiver, showAudit = false }: { waiver: Waiver; sh
             <p className="font-semibold">{clause.title}</p>
             {clause.paragraphs.map((p) => (
               <p key={p.slice(0, 32)} className="mt-1.5 text-[0.875rem] leading-relaxed text-ink-2">
-                {p}
+                <Linkify text={p} />
               </p>
             ))}
             <p className="mt-2 text-[0.875rem] font-semibold text-ink">

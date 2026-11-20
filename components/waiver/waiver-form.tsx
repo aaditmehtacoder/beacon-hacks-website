@@ -1,5 +1,6 @@
 "use client";
 
+import { Linkify } from "./linkify";
 import { useRef, useState, type ChangeEvent, type ComponentProps, type FormEvent, type ReactNode } from "react";
 import { EVENT } from "@/lib/event";
 import {
@@ -525,7 +526,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
                 <h3 className="text-[1rem] font-bold font-stretch-[112.5%] tracking-[-0.01em]">{clause.title}</h3>
                 {clause.paragraphs.map((p) => (
                   <p key={p.slice(0, 32)} className="mt-2 text-[0.9375rem] leading-relaxed text-ink-2">
-                    {p}
+                    <Linkify text={p} />
                   </p>
                 ))}
               </div>

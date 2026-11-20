@@ -50,6 +50,10 @@
   --color-lamp-deep: oklch(0.52 0.115 72);  /* accent text on fog */
   --color-lamp-wash: oklch(0.975 0.045 92); /* tint behind notes */
 
+  /* --- links inside long legal text (the waiver), where a lamp underline
+     would be lost: plain web blue, 6:1 on card --- */
+  --color-link-blue: #1a56db;
+
   /* --- the day passing, for the schedule --- */
   --color-morning:   oklch(0.945 0.02 240);
   --color-afternoon: oklch(0.955 0.06 88);
