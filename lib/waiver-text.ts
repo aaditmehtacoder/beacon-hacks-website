@@ -68,6 +68,6 @@ export const CLAUSES: Clause[] = [
 ];
 
 export const ESIGN =
-  "Typing a name below is an electronic signature with the same effect as a handwritten one. The signer has read this waiver, understands it, and agrees to it.";
+  "Signing below, by drawing a signature or typing a full name, is an electronic signature with the same effect as a handwritten one. The signer has read this waiver, understands it, and agrees to it.";
 
 export const WAIVER_FOOTER = `Beacon Hacks participant waiver, version ${WAIVER_VERSION}.`;

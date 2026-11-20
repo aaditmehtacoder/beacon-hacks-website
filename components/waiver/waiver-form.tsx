@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ComponentProps, type FormEvent, type ReactNode } from "react";
+import { useRef, useState, type ComponentProps, type FormEvent, type ReactNode } from "react";
 import { EVENT } from "@/lib/event";
 import {
   ADULT_AGE,
@@ -17,6 +17,7 @@ import {
 import { CLAUSES, ESIGN } from "@/lib/waiver-text";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, describedBy, fieldClass } from "@/components/ui/field";
+import { SignaturePad } from "./signature-pad";
 import { WaiverRecord } from "./waiver-record";
 
 type Form = {
@@ -46,8 +47,13 @@ type Form = {
   agreePrivacy: boolean;
   mediaConsent: "" | "yes" | "no";
   participantSignature: string;
+  participantSignatureImage: string;
   guardianSignature: string;
+  guardianSignatureImage: string;
 };
+
+type Mode = "draw" | "type";
+type Modes = { participant: Mode; guardian: Mode };
 
 const EMPTY: Form = {
   firstName: "",
@@ -76,7 +82,9 @@ const EMPTY: Form = {
   agreePrivacy: false,
   mediaConsent: "",
   participantSignature: "",
+  participantSignatureImage: "",
   guardianSignature: "",
+  guardianSignatureImage: "",
 };
 
 /* The order fields appear in, so the first problem gets focus. */
@@ -90,6 +98,17 @@ const AGREE: Record<string, keyof Form> = {
 };
 
 type Errors = Partial<Record<WaiverField, string>>;
+
+/* What is sent: each signer's drawing or typed name, whichever they chose. */
+function payload(form: Form, modes: Modes): Form {
+  return {
+    ...form,
+    participantSignature: modes.participant === "type" ? form.participantSignature : "",
+    participantSignatureImage: modes.participant === "draw" ? form.participantSignatureImage : "",
+    guardianSignature: modes.guardian === "type" ? form.guardianSignature : "",
+    guardianSignatureImage: modes.guardian === "draw" ? form.guardianSignatureImage : "",
+  };
+}
 
 function check(form: Form): Errors {
   const result = waiverSchema.safeParse(form);
@@ -105,28 +124,39 @@ function check(form: Form): Errors {
 /**
  * The participant waiver, one column of plain questions like a paper form:
  * about you, a parent or guardian (only under 18 on the day), an emergency
- * contact, health and food, the agreement, then typed signatures.
+ * contact, health and food, the agreement, then signatures, drawn or typed.
  * Nothing is checked until the first submit; after that, problems clear as
  * they are fixed.
  */
 export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
   const [form, setForm] = useState<Form>({ ...EMPTY, email: initialEmail });
+  /* The latest form, for updates that land in the same tick (two
+     signature pads, or a pad and a field) so none overwrites another. */
+  const latest = useRef(form);
   const [errors, setErrors] = useState<Errors>({});
   const [tried, setTried] = useState(false);
   const [sending, setSending] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [signed, setSigned] = useState<Waiver | null>(null);
   const [sameAsGuardian, setSameAsGuardian] = useState(false);
+  const [modes, setModes] = useState<Modes>({ participant: "draw", guardian: "draw" });
 
   const age = ageOnEventDay(form.dateOfBirth);
   const minor = age === null || age < ADULT_AGE;
   const today = new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(new Date());
 
   function update<K extends keyof Form>(key: K, value: Form[K]) {
-    let next = { ...form, [key]: value };
+    let next = { ...latest.current, [key]: value };
     if (sameAsGuardian && key.startsWith("guardian")) next = copyGuardian(next);
+    latest.current = next;
     setForm(next);
-    if (tried) setErrors(check(next));
+    if (tried) setErrors(check(payload(next, modes)));
+  }
+
+  function setMode(who: keyof Modes, mode: Mode) {
+    const next = { ...modes, [who]: mode };
+    setModes(next);
+    if (tried) setErrors(check(payload(latest.current, next)));
   }
 
   function copyGuardian(f: Form): Form {
@@ -136,9 +166,10 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
   function toggleSame(on: boolean) {
     setSameAsGuardian(on);
     if (on) {
-      const next = copyGuardian(form);
+      const next = copyGuardian(latest.current);
+      latest.current = next;
       setForm(next);
-      if (tried) setErrors(check(next));
+      if (tried) setErrors(check(payload(next, modes)));
     }
   }
 
@@ -146,7 +177,8 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
     e.preventDefault();
     setTried(true);
     setFailure(null);
-    const found = check(form);
+    const body = payload(latest.current, modes);
+    const found = check(body);
     setErrors(found);
     const firstBad = ORDER.find((k) => found[k]);
     if (firstBad) {
@@ -159,7 +191,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
       const res = await fetch("/api/waiver", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(body),
       });
       const payload = (await res.json().catch(() => null)) as
         | { ok: true; id: string; signedAt: string; revision: number }
@@ -175,9 +207,11 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
         setFailure((payload && !payload.ok && payload.error) || "That did not go through. Try again.");
         return;
       }
-      const data = waiverSchema.parse(form);
+      const data = waiverSchema.parse(body);
       setSigned({
         ...data,
+        participantSignature: data.participantSignatureImage ? `${data.firstName} ${data.lastName}` : data.participantSignature,
+        guardianSignature: data.guardianSignatureImage ? data.guardianName : data.guardianSignature,
         id: payload.id,
         signedAt: payload.signedAt,
         revision: payload.revision,
@@ -413,28 +447,34 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
       </Card>
 
       <Card n={6} title="Sign" lede={ESIGN}>
-        <Field
+        <SignBlock
           id="w-participantSignature"
           label="Participant signature"
-          hint={form.firstName || form.lastName ? `Type your full name: ${form.firstName} ${form.lastName}`.trim() : "Type your full name."}
-          error={errors.participantSignature}
-        >
-          {input("participantSignature", { autoComplete: "off", className: `${fieldClass} text-[1.25rem] italic font-semibold` }, true)}
-        </Field>
+          printed={`${form.firstName} ${form.lastName}`.trim()}
+          mode={modes.participant}
+          onMode={(m) => setMode("participant", m)}
+          image={form.participantSignatureImage}
+          onImage={(v) => update("participantSignatureImage", v)}
+          error={errors.participantSignature ?? errors.participantSignatureImage}
+          typed={input("participantSignature", { autoComplete: "off", className: `${fieldClass} text-[1.25rem] italic font-semibold` }, true)}
+        />
         {minor ? (
           <div className="rounded-xl bg-lamp-wash p-5">
             <p className="mb-4 text-[0.9375rem] leading-relaxed text-ink-2">
               <strong className="font-semibold text-ink">Parent or guardian:</strong> by signing, you agree to this
               waiver for yourself and for your child, and confirm the information above is correct.
             </p>
-            <Field
+            <SignBlock
               id="w-guardianSignature"
               label="Parent or guardian signature"
-              hint={form.guardianName ? `Type your full name: ${form.guardianName}` : "Type your full name."}
-              error={errors.guardianSignature}
-            >
-              {input("guardianSignature", { autoComplete: "off", className: `${fieldClass} text-[1.25rem] italic font-semibold` }, true)}
-            </Field>
+              printed={form.guardianName}
+              mode={modes.guardian}
+              onMode={(m) => setMode("guardian", m)}
+              image={form.guardianSignatureImage}
+              onImage={(v) => update("guardianSignatureImage", v)}
+              error={errors.guardianSignature ?? errors.guardianSignatureImage}
+              typed={input("guardianSignature", { autoComplete: "off", className: `${fieldClass} text-[1.25rem] italic font-semibold` }, true)}
+            />
           </div>
         ) : null}
         <p className="text-[0.875rem] text-ink-3">Date: {today}</p>
@@ -559,6 +599,79 @@ function Check({
       />
       <span>{children}</span>
     </label>
+  );
+}
+
+/**
+ * One signer: draw (finger, mouse or pen) or type, switched by two pills
+ * above. Under a drawing, their printed name; under typing, a hint with
+ * the name to type.
+ */
+function SignBlock({
+  id,
+  label,
+  printed,
+  mode,
+  onMode,
+  image,
+  onImage,
+  error,
+  typed,
+}: {
+  id: string;
+  label: string;
+  printed: string;
+  mode: Mode;
+  onMode: (m: Mode) => void;
+  image: string;
+  onImage: (v: string) => void;
+  error?: string;
+  typed: ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <span className="text-[0.9375rem] font-semibold text-ink">{label}</span>
+        <div role="group" aria-label={`How to sign: ${label}`} className="inline-flex rounded-full bg-fog-2 p-1">
+          {(["draw", "type"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              aria-pressed={mode === m}
+              onClick={() => onMode(m)}
+              className={`rounded-full px-3.5 py-1 text-[0.8125rem] font-semibold transition-colors ${
+                mode === m ? "bg-card text-ink shadow-[0_1px_3px_rgb(15_24_40/0.12)]" : "text-ink-3 hover:text-ink"
+              }`}
+            >
+              {m === "draw" ? "Draw" : "Type"}
+            </button>
+          ))}
+        </div>
+      </div>
+      {mode === "draw" ? (
+        <>
+          <SignaturePad
+            id={id}
+            label={label}
+            value={image}
+            onChange={onImage}
+            invalid={!!error}
+            describedBy={describedBy(id, true, !!error)}
+          />
+          <p id={`${id}-hint`} className="-mt-7 text-[0.8125rem] text-ink-3">
+            {printed ? `Signing as ${printed}` : "Sign with your finger, mouse or pen."}
+          </p>
+        </>
+      ) : (
+        <>
+          {typed}
+          <p id={`${id}-hint`} className="text-[0.8125rem] text-ink-3">
+            {printed ? `Type your full name: ${printed}` : "Type your full name."}
+          </p>
+        </>
+      )}
+      {error ? <FieldError id={`${id}-error`}>{error}</FieldError> : null}
+    </div>
   );
 }
 

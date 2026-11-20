@@ -10,7 +10,7 @@ import { EVENT } from "./event";
  * agreement text in lib/waiver-text.ts changes, so each record says which
  * words were agreed to.
  */
-export const WAIVER_VERSION = "2027.1";
+export const WAIVER_VERSION = "2027.2";
 
 /** Age of majority in California. */
 export const ADULT_AGE = 18;
@@ -68,6 +68,13 @@ const phone = (label = "a phone number") =>
 
 const yes = (message: string) => z.literal(true, { error: message });
 
+/** A drawn signature: a PNG from the signature pad, as a data URL. */
+const drawn = z
+  .string()
+  .max(300_000, "That signature is too large. Clear it and sign again.")
+  .regex(/^(data:image\/png;base64,[A-Za-z0-9+/]+=*)?$/, "Sign again.")
+  .default("");
+
 /** A typed signature counts if it is the signer's name, give or take case and spaces. */
 const squash = (s: string) => s.toLowerCase().replace(/[^a-zÀ-ɏ]+/g, "");
 
@@ -103,8 +110,12 @@ export const waiverSchema = z
     agreePrivacy: yes("Agree to how we use this information to continue."),
     mediaConsent: z.enum(["yes", "no"], { error: "Choose yes or no for photos." }),
 
-    participantSignature: text("your signature", 120),
+    /* Each signer types their name or draws a signature. With a drawing,
+       the typed field holds their printed name. */
+    participantSignature: z.string().trim().max(120).default(""),
+    participantSignatureImage: drawn,
     guardianSignature: z.string().trim().max(120).default(""),
+    guardianSignatureImage: drawn,
   })
   /* Runs even when other fields have problems (`when`), so every problem
      shows at once. The value may be unparsed then: read it defensively. */
@@ -123,6 +134,8 @@ export const waiverSchema = z
         guardianPhone: str(r.guardianPhone),
         participantSignature: str(r.participantSignature),
         guardianSignature: str(r.guardianSignature),
+        participantDrew: str(r.participantSignatureImage).length > 0,
+        guardianDrew: str(r.guardianSignatureImage).length > 0,
       };
       const age = ageOnEventDay(v.dateOfBirth);
       if (age === null || age < 12 || age > 20) {
@@ -130,7 +143,11 @@ export const waiverSchema = z
         return;
       }
 
-      if (v.participantSignature && squash(v.participantSignature) !== squash(`${v.firstName}${v.lastName}`)) {
+      if (v.participantDrew) {
+        /* drawn: nothing to match */
+      } else if (!v.participantSignature) {
+        ctx.addIssue({ code: "custom", path: ["participantSignature"], message: "Sign here: draw your signature or type your name." });
+      } else if (squash(v.participantSignature) !== squash(`${v.firstName}${v.lastName}`)) {
         ctx.addIssue({ code: "custom", path: ["participantSignature"], message: "Type your full name exactly as above." });
       }
 
@@ -148,7 +165,9 @@ export const waiverSchema = z
       if (v.guardianEmail && v.guardianEmail === v.email) {
         ctx.addIssue({ code: "custom", path: ["guardianEmail"], message: "Use your parent or guardian's own email." });
       }
-      if (!v.guardianSignature) {
+      if (v.guardianDrew) {
+        /* drawn: nothing to match */
+      } else if (!v.guardianSignature) {
         ctx.addIssue({ code: "custom", path: ["guardianSignature"], message: "Your parent or guardian signs here." });
       } else if (v.guardianName && squash(v.guardianSignature) !== squash(v.guardianName)) {
         ctx.addIssue({ code: "custom", path: ["guardianSignature"], message: "Type their full name exactly as above." });

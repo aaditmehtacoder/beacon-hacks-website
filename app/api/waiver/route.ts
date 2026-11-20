@@ -43,8 +43,13 @@ export async function POST(request: Request) {
   try {
     const saved = await saveWaiver({
       ...data,
+      /* With a drawing, the typed field records the signer's printed name. */
+      ...(data.participantSignatureImage ? { participantSignature: `${data.firstName} ${data.lastName}` } : {}),
+      ...(minor && data.guardianSignatureImage ? { guardianSignature: data.guardianName } : {}),
       /* An adult signs alone: drop anything left in the guardian fields. */
-      ...(minor ? {} : { guardianName: "", guardianRelationship: "", guardianEmail: "", guardianPhone: "", guardianSignature: "" }),
+      ...(minor
+        ? {}
+        : { guardianName: "", guardianRelationship: "", guardianEmail: "", guardianPhone: "", guardianSignature: "", guardianSignatureImage: "" }),
       id: crypto.randomUUID(),
       version: WAIVER_VERSION,
       signedAt: new Date().toISOString(),

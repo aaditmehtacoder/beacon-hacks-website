@@ -73,11 +73,11 @@ export function WaiverRecord({ waiver, showAudit = false }: { waiver: Waiver; sh
       <Block title="Signatures">
         <p className="pb-3 text-[0.875rem] leading-relaxed text-ink-2">{ESIGN}</p>
         <Row label="Participant">
-          <Signature>{waiver.participantSignature}</Signature>
+          <Signature name={waiver.participantSignature} image={waiver.participantSignatureImage} />
         </Row>
         {waiver.minor ? (
           <Row label="Parent or guardian">
-            <Signature>{waiver.guardianSignature}</Signature>
+            <Signature name={waiver.guardianSignature} image={waiver.guardianSignatureImage} />
           </Row>
         ) : null}
         <Row label="Signed">{signedWhen(waiver.signedAt)}</Row>
@@ -116,6 +116,17 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function Signature({ children }: { children: ReactNode }) {
-  return <span className="text-[1.25rem] italic font-semibold tracking-[-0.01em]">{children}</span>;
+/* Drawn: the ink, with the printed name under it. Typed: the name. */
+function Signature({ name, image }: { name: string; image?: string }) {
+  if (image) {
+    return (
+      <span className="inline-flex flex-col">
+        {/* A data URL from the signature pad, checked to be a PNG on the way in. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={image} alt={`Signature of ${name}`} className="h-20 w-auto max-w-full self-start object-contain sm:h-24" />
+        <span className="border-t border-ink-3/40 pt-1 text-[0.8125rem] text-ink-3">{name}, signed by hand</span>
+      </span>
+    );
+  }
+  return <span className="text-[1.25rem] italic font-semibold tracking-[-0.01em]">{name}</span>;
 }
