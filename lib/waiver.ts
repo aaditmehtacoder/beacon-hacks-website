@@ -1,0 +1,178 @@
+import { z } from "zod";
+import { EVENT } from "./event";
+
+/**
+ * The participant waiver at /waiver: what a student (and, under 18, a
+ * parent or guardian) fills in and signs, checked the same way in the
+ * browser and on the server.
+ *
+ * WAIVER_VERSION is stored with every signature. Change it whenever the
+ * agreement text in lib/waiver-text.ts changes, so each record says which
+ * words were agreed to.
+ */
+export const WAIVER_VERSION = "2027.1";
+
+/** Age of majority in California. */
+export const ADULT_AGE = 18;
+
+/** Age on the day of the event, from a YYYY-MM-DD date of birth. */
+export function ageOnEventDay(dob: string): number | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
+  if (!m) return null;
+  const [ey, em, ed] = EVENT.date.iso.split("-").map(Number);
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  let age = ey - y;
+  if (em < mo || (em === mo && ed < d)) age -= 1;
+  return age;
+}
+
+export const GRADES = ["9", "10", "11", "12"] as const;
+export const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
+export const DIETS = [
+  { value: "vegetarian", label: "Vegetarian" },
+  { value: "vegan", label: "Vegan" },
+  { value: "gluten-free", label: "Gluten-free" },
+  { value: "dairy-free", label: "Dairy-free" },
+  { value: "nut-free", label: "Nut allergy" },
+  { value: "halal", label: "Halal" },
+  { value: "kosher", label: "Kosher" },
+] as const;
+export type Diet = (typeof DIETS)[number]["value"];
+
+/* ------------------------------------------------------------ fields */
+
+const text = (label: string, max = 120) =>
+  z.string().trim().min(1, `Add ${label}.`).max(max, `Keep ${label} under ${max} characters.`);
+const note = (max = 600) => z.string().trim().max(max, `Keep this under ${max} characters.`).default("");
+
+const email = (label = "an email") =>
+  z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, `Add ${label}.`)
+    .max(200)
+    .pipe(z.email("That email does not look right."));
+
+/* Ten to fifteen digits, however they are punctuated. */
+const phone = (label = "a phone number") =>
+  z
+    .string()
+    .trim()
+    .min(1, `Add ${label}.`)
+    .max(40)
+    .refine((v) => {
+      const digits = v.replace(/\D/g, "");
+      return digits.length >= 10 && digits.length <= 15;
+    }, "Use a full phone number, with area code.");
+
+const yes = (message: string) => z.literal(true, { error: message });
+
+/** A typed signature counts if it is the signer's name, give or take case and spaces. */
+const squash = (s: string) => s.toLowerCase().replace(/[^a-zÀ-ɏ]+/g, "");
+
+export const waiverSchema = z
+  .object({
+    firstName: text("your first name", 60),
+    lastName: text("your last name", 60),
+    email: email("the email you registered with on Luma"),
+    phone: phone("your phone number"),
+    dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Add your date of birth."),
+    grade: z.enum(GRADES, { error: "Pick your grade." }),
+    school: text("your school", 160),
+    shirtSize: z.enum(SHIRT_SIZES, { error: "Pick a shirt size." }),
+
+    guardianName: z.string().trim().max(120).default(""),
+    guardianRelationship: z.string().trim().max(60).default(""),
+    guardianEmail: z.string().trim().toLowerCase().max(200).default(""),
+    guardianPhone: z.string().trim().max(40).default(""),
+
+    emergencyName: text("an emergency contact", 120),
+    emergencyRelationship: text("how they are related to you", 60),
+    emergencyPhone: phone("their phone number"),
+
+    allergies: note(),
+    medications: note(),
+    conditions: note(),
+    diet: z.array(z.enum(DIETS.map((d) => d.value) as [Diet, ...Diet[]])).max(DIETS.length).default([]),
+    dietNotes: note(300),
+
+    agreeRelease: yes("Agree to the release to continue."),
+    agreeMedical: yes("Agree to the medical authorization to continue."),
+    agreeConduct: yes("Agree to the code of conduct to continue."),
+    agreePrivacy: yes("Agree to how we use this information to continue."),
+    mediaConsent: z.enum(["yes", "no"], { error: "Choose yes or no for photos." }),
+
+    participantSignature: text("your signature", 120),
+    guardianSignature: z.string().trim().max(120).default(""),
+  })
+  /* Runs even when other fields have problems (`when`), so every problem
+     shows at once. The value may be unparsed then: read it defensively. */
+  .superRefine(
+    (raw, ctx) => {
+      const str = (x: unknown) => (typeof x === "string" ? x.trim() : "");
+      const r = raw as Record<string, unknown>;
+      const v = {
+        firstName: str(r.firstName),
+        lastName: str(r.lastName),
+        email: str(r.email).toLowerCase(),
+        dateOfBirth: str(r.dateOfBirth),
+        guardianName: str(r.guardianName),
+        guardianRelationship: str(r.guardianRelationship),
+        guardianEmail: str(r.guardianEmail).toLowerCase(),
+        guardianPhone: str(r.guardianPhone),
+        participantSignature: str(r.participantSignature),
+        guardianSignature: str(r.guardianSignature),
+      };
+      const age = ageOnEventDay(v.dateOfBirth);
+      if (age === null || age < 12 || age > 20) {
+        ctx.addIssue({ code: "custom", path: ["dateOfBirth"], message: "Check your date of birth." });
+        return;
+      }
+
+      if (v.participantSignature && squash(v.participantSignature) !== squash(`${v.firstName}${v.lastName}`)) {
+        ctx.addIssue({ code: "custom", path: ["participantSignature"], message: "Type your full name exactly as above." });
+      }
+
+      if (age >= ADULT_AGE) return;
+
+      /* Under 18 on the day: a parent or guardian signs too. */
+      const need = (path: string, ok: boolean, message: string) => {
+        if (!ok) ctx.addIssue({ code: "custom", path: [path], message });
+      };
+      need("guardianName", v.guardianName.length > 0, "Add your parent or guardian's name.");
+      need("guardianRelationship", v.guardianRelationship.length > 0, "Add how they are related to you.");
+      need("guardianEmail", z.email().safeParse(v.guardianEmail).success, "Add their email.");
+      const digits = v.guardianPhone.replace(/\D/g, "").length;
+      need("guardianPhone", digits >= 10 && digits <= 15, "Add their full phone number, with area code.");
+      if (v.guardianEmail && v.guardianEmail === v.email) {
+        ctx.addIssue({ code: "custom", path: ["guardianEmail"], message: "Use your parent or guardian's own email." });
+      }
+      if (!v.guardianSignature) {
+        ctx.addIssue({ code: "custom", path: ["guardianSignature"], message: "Your parent or guardian signs here." });
+      } else if (v.guardianName && squash(v.guardianSignature) !== squash(v.guardianName)) {
+        ctx.addIssue({ code: "custom", path: ["guardianSignature"], message: "Type their full name exactly as above." });
+      }
+    },
+    { when: () => true },
+  );
+
+export type WaiverInput = z.input<typeof waiverSchema>;
+export type WaiverData = z.output<typeof waiverSchema>;
+export type WaiverField = keyof WaiverInput;
+
+/** One signed waiver, as stored. */
+export type Waiver = WaiverData & {
+  id: string;
+  version: string;
+  signedAt: string;
+  /** Age on the event day, worked out at signing. */
+  age: number;
+  minor: boolean;
+  /** Where the signature came from, for the record. */
+  ip: string;
+  userAgent: string;
+  /** 1 on the first signature; signing again with the same email replaces it. */
+  revision: number;
+  checkedInAt?: string;
+};

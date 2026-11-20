@@ -313,4 +313,6 @@
   .no-print { display: none !important; }
   .reveal, .sun-up { animation: none !important; }
   body { background: #fff; }
+  /* The waiver's printed copy: just the record. */
+  body:has([data-print="waiver"]) > header { display: none !important; }
 }
