@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { ADMIN_COOKIE, adminPassword, isAdmin } from "@/lib/admin-auth";
 import { listWaivers, waiverBackend } from "@/lib/waiver-store";
+import { mailConfigured } from "@/lib/waiver-mail";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { LoginForm } from "@/components/admin/login-form";
 import { WaiverDashboard, SignOut } from "@/components/admin/waiver-dashboard";
@@ -27,7 +28,7 @@ export default async function Admin() {
       <main id="main" tabIndex={-1} className="flex flex-1 flex-col bg-fog focus:outline-none print:bg-transparent">
         {signedIn ? (
           <div className="wrap py-10 sm:py-14 print:py-0">
-            <WaiverDashboard waivers={await listWaivers()} backend={waiverBackend()} />
+            <WaiverDashboard waivers={await listWaivers()} backend={waiverBackend()} emailing={mailConfigured()} />
           </div>
         ) : (
           <div className="wrap flex flex-1 items-center justify-center py-16">

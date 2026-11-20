@@ -31,7 +31,16 @@ const EMAIL = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
  * name for the full signed waiver. The Luma panel compares the guest list
  * export with who has signed, in the browser; nothing from it is stored.
  */
-export function WaiverDashboard({ waivers: initial, backend }: { waivers: Waiver[]; backend: WaiverBackend }) {
+export function WaiverDashboard({
+  waivers: initial,
+  backend,
+  emailing,
+}: {
+  waivers: Waiver[];
+  backend: WaiverBackend;
+  /** Whether each new waiver is emailed to the team inbox. */
+  emailing: boolean;
+}) {
   const router = useRouter();
   const [waivers, setWaivers] = useState(initial);
   /* A refresh brings a new list from the server: take it. */
@@ -161,6 +170,12 @@ export function WaiverDashboard({ waivers: initial, backend }: { waivers: Waiver
           {backend === "file"
             ? "Development: waivers are saved in .data/waivers.json on this computer. In production they go to the Upstash database."
             : "No database is connected, so the waiver form is refusing signatures. Connect Upstash Redis in Vercel and redeploy."}
+        </p>
+      ) : null}
+
+      {!emailing ? (
+        <p role="status" className="rounded-xl bg-fog-2 px-5 py-3.5 text-[0.9375rem] leading-relaxed text-ink-2">
+          Emailing each waiver to the team inbox is off. Set GMAIL_USER and GMAIL_APP_PASSWORD to turn it on.
         </p>
       ) : null}
 

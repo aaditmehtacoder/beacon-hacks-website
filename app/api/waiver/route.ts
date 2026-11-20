@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { ADULT_AGE, WAIVER_VERSION, ageOnEventDay, waiverSchema } from "@/lib/waiver";
 import { saveWaiver, waiverBackend } from "@/lib/waiver-store";
+import { sendWaiverEmail } from "@/lib/waiver-mail";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 
 /**
@@ -57,6 +58,16 @@ export async function POST(request: Request) {
       minor,
       ip: clientIp(request),
       userAgent: (request.headers.get("user-agent") ?? "").slice(0, 300),
+    });
+    /* A copy to the team inbox, once the signer has their answer. A
+       failed email never loses the waiver: it is already saved. */
+    after(async () => {
+      try {
+        const result = await sendWaiverEmail(saved);
+        if (result === "skipped") console.info("[waiver] email not configured; saved without emailing");
+      } catch (error) {
+        console.error("[waiver] email failed", error);
+      }
     });
     return NextResponse.json({ ok: true, id: saved.id, signedAt: saved.signedAt, revision: saved.revision });
   } catch (error) {
