@@ -10,7 +10,7 @@ import { EVENT } from "./event";
  * agreement text in lib/waiver-text.ts changes, so each record says which
  * words were agreed to.
  */
-export const WAIVER_VERSION = "2027.3";
+export const WAIVER_VERSION = "2027.4";
 
 /** Age of majority in California. */
 export const ADULT_AGE = 18;

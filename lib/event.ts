@@ -84,8 +84,8 @@ export const EVENT = {
    * every link on the site reads from here.
    */
   email: {
-    team: "team@beaconhacks.com",
-    sponsors: "team@beaconhacks.com",
+    team: "team.beaconhacks@gmail.com",
+    sponsors: "team.beaconhacks@gmail.com",
   },
 
   /**

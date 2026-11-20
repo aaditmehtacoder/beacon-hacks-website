@@ -179,4 +179,4 @@ JSON. `.env.example` lists both.
 
 ## Still to fill in
 
-- A separate sponsors address, if wanted. Everything routes to `team@beaconhacks.com`.
+- A separate sponsors address, if wanted. Everything routes to `team.beaconhacks@gmail.com`.
