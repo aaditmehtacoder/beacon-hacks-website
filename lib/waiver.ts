@@ -11,7 +11,7 @@ import { formatPhone } from "./phone";
  * agreement text in lib/waiver-text.ts changes, so each record says which
  * words were agreed to.
  */
-export const WAIVER_VERSION = "2027.4";
+export const WAIVER_VERSION = "2027.5";
 
 /** Age of majority in California. */
 export const ADULT_AGE = 18;
@@ -37,6 +37,20 @@ export const TEAM_STATUSES = [
   { value: "solo", label: "Working solo" },
 ] as const;
 export type TeamStatus = (typeof TEAM_STATUSES)[number]["value"];
+/**
+ * How a participant under 18 leaves: their parent or guardian's choice,
+ * checked by staff at the door.
+ */
+export const DEPARTURES = [
+  { value: "guardian", label: "My parent or guardian picks me up", summary: "Picked up by a parent or guardian" },
+  { value: "adult", label: "Another adult picks me up", summary: "Picked up by another adult" },
+  { value: "self", label: "I may leave on my own", summary: "May leave on their own" },
+] as const;
+export type Departure = (typeof DEPARTURES)[number]["value"];
+
+/** How long an emailed signing link works. Organizers can send a new one from /admin. */
+export const GUARDIAN_LINK_DAYS = 14;
+
 /** Teams are up to four, so up to three others. */
 export const MAX_TEAMMATES = 3;
 
@@ -116,6 +130,12 @@ export const waiverSchema = z
     guardianRelationship: z.string().trim().max(60).default(""),
     guardianEmail: z.string().trim().toLowerCase().max(200).default(""),
     guardianPhone: z.string().trim().max(40).default(""),
+    /* Under 18: how they get home, and who collects them if not a parent. */
+    departure: z
+      .union([z.enum(DEPARTURES.map((d) => d.value) as [Departure, ...Departure[]]), z.literal("")])
+      .default(""),
+    pickupName: z.string().trim().max(120).default(""),
+    pickupPhone: z.string().trim().max(40).default(""),
 
     emergencyName: text("an emergency contact", 120),
     emergencyRelationship: text("how they are related to you", 60),
@@ -124,6 +144,7 @@ export const waiverSchema = z
     allergies: note(),
     medications: note(),
     conditions: note(),
+    emergencyInstructions: note(300),
     diet: z.array(z.enum(DIETS.map((d) => d.value) as [Diet, ...Diet[]])).max(DIETS.length).default([]),
     dietNotes: note(300),
 
@@ -137,6 +158,8 @@ export const waiverSchema = z
        the typed field holds their printed name. */
     participantSignature: z.string().trim().max(120).default(""),
     participantSignatureImage: drawn,
+    /* The parent or guardian confirms they are one, with authority to consent. */
+    guardianAuthority: z.boolean().default(false),
     guardianSignature: z.string().trim().max(120).default(""),
     guardianSignatureImage: drawn,
     /* Under 18: the parent or guardian signs here now, by a link we email
@@ -195,13 +218,20 @@ export const waiverSchema = z
       need("guardianEmail", z.email().safeParse(v.guardianEmail).success, "Add their email.");
       const digits = v.guardianPhone.replace(/\D/g, "").length;
       need("guardianPhone", digits >= 10 && digits <= 15, "Add their full phone number, with area code.");
+      const departure = str(r.departure);
+      need("departure", DEPARTURES.some((d) => d.value === departure), "Pick how you will get home.");
+      if (departure === "adult") {
+        need("pickupName", str(r.pickupName).length > 0, "Add the name of the adult picking you up.");
+        const pickup = str(r.pickupPhone).replace(/\D/g, "").length;
+        need("pickupPhone", pickup >= 10 && pickup <= 15, "Add their full phone number, with area code.");
+      }
       if (v.guardianEmail && v.guardianEmail === v.email) {
         ctx.addIssue({ code: "custom", path: ["guardianEmail"], message: "Use your parent or guardian's own email." });
       }
       /* Signing later, by link or on paper: nothing to sign now. */
-      if (v.guardianMethod !== "here") {
-        /* nothing */
-      } else if (v.guardianDrew) {
+      if (v.guardianMethod !== "here") return;
+      need("guardianAuthority", r.guardianAuthority === true, "Your parent or guardian ticks this to confirm.");
+      if (v.guardianDrew) {
         /* drawn: nothing to match */
       } else if (!v.guardianSignature) {
         ctx.addIssue({ code: "custom", path: ["guardianSignature"], message: "Your parent or guardian signs here." });
@@ -245,6 +275,20 @@ export type Waiver = WaiverData & {
   approvalEmailedAt?: string;
   approvalEmailError?: string;
 };
+
+/** "Picked up by another adult: Sam Lee, (408) 555-0123", or "" for an adult participant. */
+export function departureSummary(w: Pick<Waiver, "minor" | "departure" | "pickupName" | "pickupPhone">): string {
+  if (!w.minor) return "";
+  const d = DEPARTURES.find((x) => x.value === w.departure);
+  if (!d) return "Not asked";
+  return d.value === "adult" ? `${d.summary}: ${[w.pickupName, w.pickupPhone].filter(Boolean).join(", ")}` : d.summary;
+}
+
+/** Whether an emailed signing link is still inside its window. */
+export function guardianLinkLive(w: Pick<Waiver, "guardianRequestedAt">, now = Date.now()): boolean {
+  if (!w.guardianRequestedAt) return false;
+  return now - new Date(w.guardianRequestedAt).getTime() < GUARDIAN_LINK_DAYS * 86_400_000;
+}
 
 export const isApproved = (w: Pick<Waiver, "approvedAt">) => !!w.approvedAt;
 

@@ -5,7 +5,9 @@ import { useRef, useState, type ChangeEvent, type ComponentProps, type FormEvent
 import { EVENT } from "@/lib/event";
 import {
   ADULT_AGE,
+  DEPARTURES,
   DIETS,
+  GUARDIAN_LINK_DAYS,
   GRADES,
   MAX_TEAMMATES,
   TEAM_STATUSES,
@@ -13,13 +15,14 @@ import {
   WAIVER_VERSION,
   ageOnEventDay,
   waiverSchema,
+  type Departure,
   type Diet,
   type GuardianMethod,
   type TeamStatus,
   type Waiver,
   type WaiverField,
 } from "@/lib/waiver";
-import { CLAUSES, ESIGN } from "@/lib/waiver-text";
+import { CLAUSES, ESIGN, guardianConsent } from "@/lib/waiver-text";
 import { formatPhone } from "@/lib/phone";
 import { suggestEmail } from "@/lib/email-typos";
 import { Button } from "@/components/ui/button";
@@ -43,12 +46,16 @@ type Form = {
   guardianRelationship: string;
   guardianEmail: string;
   guardianPhone: string;
+  departure: "" | Departure;
+  pickupName: string;
+  pickupPhone: string;
   emergencyName: string;
   emergencyRelationship: string;
   emergencyPhone: string;
   allergies: string;
   medications: string;
   conditions: string;
+  emergencyInstructions: string;
   diet: Diet[];
   dietNotes: string;
   agreeRelease: boolean;
@@ -58,6 +65,7 @@ type Form = {
   mediaConsent: "" | "yes" | "no";
   participantSignature: string;
   participantSignatureImage: string;
+  guardianAuthority: boolean;
   guardianSignature: string;
   guardianSignatureImage: string;
   guardianMethod: GuardianMethod;
@@ -82,12 +90,16 @@ const EMPTY: Form = {
   guardianRelationship: "",
   guardianEmail: "",
   guardianPhone: "",
+  departure: "",
+  pickupName: "",
+  pickupPhone: "",
   emergencyName: "",
   emergencyRelationship: "",
   emergencyPhone: "",
   allergies: "",
   medications: "",
   conditions: "",
+  emergencyInstructions: "",
   diet: [],
   dietNotes: "",
   agreeRelease: false,
@@ -97,6 +109,7 @@ const EMPTY: Form = {
   mediaConsent: "",
   participantSignature: "",
   participantSignatureImage: "",
+  guardianAuthority: false,
   guardianSignature: "",
   guardianSignatureImage: "",
   guardianMethod: "here",
@@ -120,6 +133,7 @@ function payload(form: Form, modes: Modes): Form {
     ...form,
     participantSignature: modes.participant === "type" ? form.participantSignature : "",
     participantSignatureImage: modes.participant === "draw" ? form.participantSignatureImage : "",
+    guardianAuthority: form.guardianMethod === "here" && form.guardianAuthority,
     guardianSignature: form.guardianMethod === "here" && modes.guardian === "type" ? form.guardianSignature : "",
     guardianSignatureImage: form.guardianMethod === "here" && modes.guardian === "draw" ? form.guardianSignatureImage : "",
   };
@@ -268,7 +282,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
   if (signed) return <Signed waiver={signed} />;
 
   /* Phone fields format as you type; the caret stays after the same digit. */
-  function onPhone(key: "phone" | "guardianPhone" | "emergencyPhone", e: ChangeEvent<HTMLInputElement>) {
+  function onPhone(key: "phone" | "guardianPhone" | "pickupPhone" | "emergencyPhone", e: ChangeEvent<HTMLInputElement>) {
     const el = e.target;
     const caret = el.selectionStart ?? el.value.length;
     const digitsBefore = el.value.slice(0, caret).replace(/\D/g, "").length;
@@ -294,7 +308,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
       {...props}
     />
   );
-  const area = (key: keyof Form & WaiverField, placeholder: string) => (
+  const area = (key: keyof Form & WaiverField, placeholder: string, hint = false) => (
     <textarea
       id={`w-${key}`}
       className={`${fieldClass} min-h-24 resize-y`}
@@ -302,7 +316,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
       onChange={(e) => update(key, e.target.value as never)}
       placeholder={placeholder}
       aria-invalid={errors[key] ? true : undefined}
-      aria-describedby={describedBy(`w-${key}`, false, !!errors[key])}
+      aria-describedby={describedBy(`w-${key}`, hint, !!errors[key])}
       rows={2}
     />
   );
@@ -428,7 +442,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
           lede={
             age === null
               ? "Needed if you will be under 18 on January 30, 2027. They also sign at the end."
-              : `You will be ${age} on the day, so a parent or guardian signs too. They can do it on this device at the end.`
+              : `You will be ${age} on the day, so a parent or guardian signs too: on this device, from a link we email them, or on paper.`
           }
         >
           <div className="grid gap-5 sm:grid-cols-2">
@@ -451,6 +465,25 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
               {input("guardianPhone", { type: "tel", inputMode: "tel", autoComplete: "off", placeholder: "(408) 555-0123", onChange: (e) => onPhone("guardianPhone", e) })}
             </Field>
           </div>
+          <Choices
+            id="w-departure"
+            label="How will you get home?"
+            hint="Pick what your parent or guardian has agreed to. They confirm it when they sign, and we check it when you leave."
+            options={DEPARTURES.map((d) => ({ value: d.value, label: d.label }))}
+            value={form.departure}
+            onChange={(v) => update("departure", v as Departure)}
+            error={errors.departure}
+          />
+          {form.departure === "adult" ? (
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field id="w-pickupName" label="Adult picking you up" error={errors.pickupName}>
+                {input("pickupName", { autoComplete: "off", placeholder: "Full name" })}
+              </Field>
+              <Field id="w-pickupPhone" label="Their phone number" error={errors.pickupPhone}>
+                {input("pickupPhone", { type: "tel", inputMode: "tel", autoComplete: "off", placeholder: "(408) 555-0123", onChange: (e) => onPhone("pickupPhone", e) })}
+              </Field>
+            </div>
+          ) : null}
         </Card>
       ) : (
         <Card n={3} title="Parent or guardian" lede={`You will be ${age} on the day, so you sign for yourself. Skip ahead.`} />
@@ -476,14 +509,23 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
       </Card>
 
       <Card n={5} title="Health and food" lede="Only organizers who need it, and anyone treating you, will see this. Leave blank if none.">
-        <Field id="w-allergies" label="Allergies" optional error={errors.allergies}>
-          {area("allergies", "Food, medicine, insect stings…")}
+        <Field
+          id="w-allergies"
+          label="Allergies"
+          optional
+          hint="Food comes from caterers and sponsors and may contain or have touched allergens, so we can't promise an allergen-free event."
+          error={errors.allergies}
+        >
+          {area("allergies", "Food, medicine, insect stings…", true)}
         </Field>
         <Field id="w-medications" label="Medications" optional error={errors.medications}>
           {area("medications", "Anything you take, or carry like an inhaler or EpiPen")}
         </Field>
         <Field id="w-conditions" label="Medical conditions we should know about" optional error={errors.conditions}>
           {area("conditions", "Asthma, diabetes, seizures…")}
+        </Field>
+        <Field id="w-emergencyInstructions" label="Emergency instructions, or where your medication is" optional error={errors.emergencyInstructions}>
+          {area("emergencyInstructions", "e.g. EpiPen in the front pocket of my backpack; call my mom first")}
         </Field>
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-2 flex w-full items-baseline justify-between text-[0.9375rem] font-semibold text-ink">
@@ -524,8 +566,8 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
             <div key={clause.id} className="rounded-xl border border-line">
               <div className="px-5 pt-4 pb-3">
                 <h3 className="text-[1rem] font-bold font-stretch-[112.5%] tracking-[-0.01em]">{clause.title}</h3>
-                {clause.paragraphs.map((p) => (
-                  <p key={p.slice(0, 32)} className="mt-2 text-[0.9375rem] leading-relaxed text-ink-2">
+                {clause.paragraphs.map((p, i) => (
+                  <p key={i} className="mt-2 text-[0.9375rem] leading-relaxed text-ink-2">
                     <Linkify text={p} />
                   </p>
                 ))}
@@ -594,11 +636,30 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
             <div className="mt-5">
               {form.guardianMethod === "here" ? (
                 <>
-                  <p className="mb-4 text-[0.9375rem] leading-relaxed text-ink-2">
-                    <strong className="font-semibold text-ink">Hand the device to your parent or guardian.</strong> By
-                    signing, you agree to this waiver for yourself and for your child, and confirm the information
-                    above is correct.
+                  <p className="text-[0.9375rem] leading-relaxed text-ink-2">
+                    <strong className="font-semibold text-ink">Hand the device to your parent or guardian.</strong> They
+                    read the agreement above, then this:
                   </p>
+                  <div className="mt-3 mb-4 flex flex-col gap-2 rounded-xl bg-card p-4 text-[0.9375rem] leading-relaxed text-ink-2">
+                    {guardianConsent(`${form.firstName} ${form.lastName}`.trim() || undefined).map((p) => (
+                      <p key={p.slice(0, 24)}>{p}</p>
+                    ))}
+                  </div>
+                  <div className="mb-5">
+                    <Check
+                      id="w-guardianAuthority"
+                      checked={form.guardianAuthority}
+                      onChange={(v) => update("guardianAuthority", v)}
+                      invalid={!!errors.guardianAuthority}
+                    >
+                      I am {form.guardianName || "their parent or legal guardian"}, and I agree to the statement above.
+                    </Check>
+                    {errors.guardianAuthority ? (
+                      <div className="mt-2">
+                        <FieldError id="w-guardianAuthority-error">{errors.guardianAuthority}</FieldError>
+                      </div>
+                    ) : null}
+                  </div>
                   <SignBlock
                     id="w-guardianSignature"
                     label="Parent or guardian signature"
@@ -616,7 +677,8 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
                   When you submit, we email{" "}
                   <strong className="font-semibold text-ink">{form.guardianEmail || "your parent or guardian"}</strong> a
                   private link. They check what you entered, read the agreement and sign from their own phone or
-                  computer. Your waiver is complete once they do.
+                  computer. The link works once and for {GUARDIAN_LINK_DAYS} days. Your waiver is complete once they sign,
+                  and you can&rsquo;t check in until then.
                 </p>
               ) : (
                 <p className="text-[0.9375rem] leading-relaxed text-ink-2">
@@ -625,7 +687,7 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
                   <a href={`mailto:${EVENT.email.team}`} className="link text-ink">
                     {EVENT.email.team}
                   </a>{" "}
-                  or bring it to check-in.
+                  or bring it to check-in. You can&rsquo;t check in without it.
                 </p>
               )}
             </div>

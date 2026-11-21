@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { FieldError, describedBy, fieldClass } from "@/components/ui/field";
 import { SignBlock, type Mode } from "./waiver-form";
+import { guardianConsent } from "@/lib/waiver-text";
 
 /**
  * The parent or guardian's part: agree, then draw or type a signature.
@@ -13,11 +14,13 @@ export function GuardianSign({
   token,
   guardianName,
   childName,
+  childFullName,
   relationship,
 }: {
   token: string;
   guardianName: string;
   childName: string;
+  childFullName: string;
   relationship: string;
 }) {
   const [agree, setAgree] = useState(false);
@@ -31,7 +34,7 @@ export function GuardianSign({
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
-    if (!agree) return setError({ field: "agree", message: "Tick to agree before you sign." });
+    if (!agree) return setError({ field: "agree", message: "Tick to confirm you are their parent or legal guardian and agree." });
     if (mode === "draw" && !image) return setError({ field: "guardianSignature", message: "Sign in the box, or switch to Type." });
     if (mode === "type" && !typed.trim()) return setError({ field: "guardianSignature", message: "Type your full name to sign." });
     setSending(true);
@@ -77,7 +80,12 @@ export function GuardianSign({
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5 rounded-2xl border border-line bg-card p-6 sm:p-8">
-      <h2 className="text-[1.375rem] leading-tight font-bold font-stretch-[112.5%] tracking-[-0.015em]">Your signature</h2>
+      <h2 className="text-[1.375rem] leading-tight font-bold font-stretch-[112.5%] tracking-[-0.015em]">Parent or guardian consent</h2>
+      <div className="flex flex-col gap-2 rounded-xl bg-fog-2/60 p-5 text-[0.9375rem] leading-relaxed text-ink-2">
+        {guardianConsent(childFullName).map((p) => (
+          <p key={p.slice(0, 24)}>{p}</p>
+        ))}
+      </div>
       <label className="flex cursor-pointer items-start gap-3 text-[0.9375rem] leading-relaxed text-ink">
         <input
           id="g-agree"
@@ -88,8 +96,8 @@ export function GuardianSign({
           className="mt-1 size-5 shrink-0 cursor-pointer accent-ink"
         />
         <span>
-          I am {guardianName}, {childName}&rsquo;s {relationship.toLowerCase() || "parent or guardian"}. I have read this waiver
-          and agree to it for myself and for {childName}, and the information above is correct.
+          I am {guardianName}, {childName}&rsquo;s {relationship.toLowerCase() || "parent or guardian"}, and I agree to the
+          statement above.
         </span>
       </label>
       {error?.field === "agree" ? <FieldError id="g-agree-error">{error.message}</FieldError> : null}

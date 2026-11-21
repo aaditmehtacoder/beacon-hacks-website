@@ -1,7 +1,7 @@
 import { Linkify } from "./linkify";
 import type { ReactNode } from "react";
-import { CLAUSES, ESIGN, WAIVER_FOOTER } from "@/lib/waiver-text";
-import { DIETS, guardianSigned, teamSummary, type Waiver } from "@/lib/waiver";
+import { CLAUSES, ESIGN, WAIVER_FOOTER, guardianConsent } from "@/lib/waiver-text";
+import { DIETS, departureSummary, guardianSigned, teamSummary, type Waiver } from "@/lib/waiver";
 
 const DIET_LABEL: Record<string, string> = Object.fromEntries(DIETS.map((d) => [d.value, d.label]));
 
@@ -45,6 +45,7 @@ export function WaiverRecord({ waiver, showAudit = false }: { waiver: Waiver; sh
           <Row label="Name">{`${waiver.guardianName} (${waiver.guardianRelationship})`}</Row>
           <Row label="Email">{waiver.guardianEmail}</Row>
           <Row label="Phone">{waiver.guardianPhone}</Row>
+          <Row label="Going home">{departureSummary(waiver)}</Row>
         </Block>
       ) : null}
 
@@ -57,6 +58,7 @@ export function WaiverRecord({ waiver, showAudit = false }: { waiver: Waiver; sh
         <Row label="Allergies">{waiver.allergies || none}</Row>
         <Row label="Medications">{waiver.medications || none}</Row>
         <Row label="Medical conditions">{waiver.conditions || none}</Row>
+        <Row label="Emergency instructions">{waiver.emergencyInstructions || none}</Row>
         <Row label="Diet">
           {waiver.diet.length || waiver.dietNotes
             ? [waiver.diet.map((d) => DIET_LABEL[d] ?? d).join(", "), waiver.dietNotes].filter(Boolean).join(". ")
@@ -68,8 +70,8 @@ export function WaiverRecord({ waiver, showAudit = false }: { waiver: Waiver; sh
         {CLAUSES.map((clause) => (
           <div key={clause.id} className="break-inside-avoid border-b border-line py-3 last:border-0">
             <p className="font-semibold">{clause.title}</p>
-            {clause.paragraphs.map((p) => (
-              <p key={p.slice(0, 32)} className="mt-1.5 text-[0.875rem] leading-relaxed text-ink-2">
+            {clause.paragraphs.map((p, i) => (
+              <p key={i} className="mt-1.5 text-[0.875rem] leading-relaxed text-ink-2">
                 <Linkify text={p} />
               </p>
             ))}
@@ -82,6 +84,19 @@ export function WaiverRecord({ waiver, showAudit = false }: { waiver: Waiver; sh
 
       <Block title="Signatures">
         <p className="pb-3 text-[0.875rem] leading-relaxed text-ink-2">{ESIGN}</p>
+        {waiver.minor ? (
+          <div className="mb-3 break-inside-avoid rounded-xl border border-line p-4">
+            <p className="text-[0.875rem] font-semibold">Parent or guardian consent</p>
+            {guardianConsent(`${waiver.firstName} ${waiver.lastName}`).map((p, i) => (
+              <p key={i} className="mt-1.5 text-[0.875rem] leading-relaxed text-ink-2">
+                {p}
+              </p>
+            ))}
+            {waiver.guardianAuthority ? (
+              <p className="mt-2 text-[0.875rem] font-semibold text-ink">Confirmed by {waiver.guardianName}</p>
+            ) : null}
+          </div>
+        ) : null}
         <Row label="Participant">
           <Signature name={waiver.participantSignature} image={waiver.participantSignatureImage} />
         </Row>
@@ -159,17 +174,22 @@ function Signature({ name, image }: { name: string; image?: string }) {
   return <span className="text-[1.25rem] italic font-semibold tracking-[-0.01em]">{name}</span>;
 }
 
-/* For a parent signing on paper: the statement, a line to sign on and the date. */
+/* For a parent signing on paper: lines to sign, print their name and date, under the consent above. */
 function PaperLine({ name }: { name: string }) {
   return (
     <span className="flex flex-col gap-4">
       <span className="text-[0.875rem] leading-relaxed text-ink-2">
-        By signing, I agree to this waiver for myself and for my child, and confirm the information above is correct.
+        By signing, I confirm the parent or guardian consent above and agree to this waiver for myself and on my
+        child&rsquo;s behalf.
       </span>
-      <span className="grid gap-6 sm:grid-cols-[1fr_9rem]">
+      <span className="grid gap-6 sm:grid-cols-[1fr_1fr_9rem]">
         <span className="flex flex-col gap-1">
           <span className="h-12 border-b-2 border-ink" />
-          <span className="text-[0.8125rem] text-ink-3">Signature of {name}</span>
+          <span className="text-[0.8125rem] text-ink-3">Signature of parent or legal guardian</span>
+        </span>
+        <span className="flex flex-col gap-1">
+          <span className="flex h-12 items-end border-b-2 border-ink pb-1 text-ink-2">{name}</span>
+          <span className="text-[0.8125rem] text-ink-3">Printed name</span>
         </span>
         <span className="flex flex-col gap-1">
           <span className="h-12 border-b-2 border-ink" />

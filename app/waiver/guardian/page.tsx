@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { EVENT } from "@/lib/event";
 import { hashGuardianToken, looksLikeToken } from "@/lib/guardian-token";
 import { findByGuardianToken } from "@/lib/waiver-store";
+import { GUARDIAN_LINK_DAYS, guardianLinkLive } from "@/lib/waiver";
 import { SiteHeader } from "@/components/site-header";
 import { WaiverRecord } from "@/components/waiver/waiver-record";
 import { GuardianSign } from "@/components/waiver/guardian-sign";
@@ -22,7 +23,8 @@ export const dynamic = "force-dynamic";
 export default async function GuardianPage({ searchParams }: PageProps<"/waiver/guardian">) {
   const raw = (await searchParams).token;
   const token = Array.isArray(raw) ? raw[0] : raw;
-  const waiver = looksLikeToken(token) ? await findByGuardianToken(hashGuardianToken(token)) : null;
+  const found = looksLikeToken(token) ? await findByGuardianToken(hashGuardianToken(token)) : null;
+  const waiver = found && guardianLinkLive(found) ? found : null;
 
   return (
     <>
@@ -56,14 +58,15 @@ export default async function GuardianPage({ searchParams }: PageProps<"/waiver/
                 <WaiverRecord waiver={waiver} />
               </div>
               <div className="mt-6 print:hidden">
-                <GuardianSign token={token!} guardianName={waiver.guardianName} childName={waiver.firstName} relationship={waiver.guardianRelationship} />
+                <GuardianSign token={token!} guardianName={waiver.guardianName} childName={waiver.firstName} childFullName={`${waiver.firstName} ${waiver.lastName}`} relationship={waiver.guardianRelationship} />
               </div>
             </>
           ) : (
             <div className="rounded-2xl border border-line bg-card p-8 text-center sm:p-12">
-              <h1 className="text-[1.75rem] leading-tight font-extrabold font-stretch-125% tracking-[-0.03em]">This link has been used</h1>
+              <h1 className="text-[1.75rem] leading-tight font-extrabold font-stretch-125% tracking-[-0.03em]">This link no longer works</h1>
               <p className="mx-auto mt-4 max-w-md text-[1.0625rem] leading-relaxed text-ink-3">
-                It may already be signed, or a newer link was sent. Check for a later email, or write to{" "}
+                It may already be signed, a newer link was sent, or it is more than {GUARDIAN_LINK_DAYS} days old. Check for a
+                later email, or write to{" "}
                 <a href={`mailto:${EVENT.email.team}`} className="link text-ink">
                   {EVENT.email.team}
                 </a>{" "}

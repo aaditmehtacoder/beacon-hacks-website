@@ -3,7 +3,7 @@ import { ADMIN_COOKIE, isAdmin } from "@/lib/admin-auth";
 import { getWaiver, listWaivers, removeWaiver, setCheckedIn, setGuardianToken, updateWaiver } from "@/lib/waiver-store";
 import { approvedEmail, guardianSignEmail, mailConfigured, sendMail, teamReviewEmail } from "@/lib/waiver-mail";
 import { guardianLink, newGuardianToken } from "@/lib/guardian-token";
-import { DIETS, guardianSigned, teamSummary, type Waiver } from "@/lib/waiver";
+import { DIETS, departureSummary, guardianSigned, teamSummary, type Waiver } from "@/lib/waiver";
 
 function unauthorized() {
   return NextResponse.json({ ok: false, error: "Sign in first." }, { status: 401 });
@@ -30,12 +30,16 @@ const COLUMNS: [string, (w: Waiver) => unknown][] = [
   ["Guardian relationship", (w) => w.guardianRelationship],
   ["Guardian email", (w) => w.guardianEmail],
   ["Guardian phone", (w) => w.guardianPhone],
+  ["Going home", (w) => departureSummary(w).split(":")[0]],
+  ["Pickup adult", (w) => w.pickupName],
+  ["Pickup phone", (w) => w.pickupPhone],
   ["Emergency contact", (w) => w.emergencyName],
   ["Emergency relationship", (w) => w.emergencyRelationship],
   ["Emergency phone", (w) => w.emergencyPhone],
   ["Allergies", (w) => w.allergies],
   ["Medications", (w) => w.medications],
   ["Medical conditions", (w) => w.conditions],
+  ["Emergency instructions", (w) => w.emergencyInstructions],
   ["Diet", (w) => w.diet.map((d) => DIET_LABEL[d] ?? d).join("; ")],
   ["Diet notes", (w) => w.dietNotes],
   ["Photo consent", (w) => w.mediaConsent],
@@ -43,6 +47,7 @@ const COLUMNS: [string, (w: Waiver) => unknown][] = [
   ["Participant signed by", (w) => (w.participantSignatureImage ? "drawing" : "typing")],
   ["Guardian signature", (w) => w.guardianSignature],
   ["Guardian signed by", (w) => (!w.minor ? "" : !guardianSigned(w) ? `not yet (${w.guardianMethod ?? "here"})` : w.guardianMethod === "paper" ? "paper" : w.guardianSignatureImage ? "drawing" : "typing")],
+  ["Guardian confirmed authority", (w) => (w.minor ? (w.guardianAuthority ? "yes" : "") : "")],
   ["Guardian signed at", (w) => w.guardianSignedAt ?? (w.minor && guardianSigned(w) ? w.signedAt : "")],
   ["Waiver version", (w) => w.version],
   ["Revision", (w) => w.revision],
@@ -94,6 +99,12 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "Send an id and an action." }, { status: 400 });
   }
 
+  /* No one checks in without a complete waiver: under 18, signed by a parent or guardian. */
+  if (action === "checkin") {
+    const w = await getWaiver(id);
+    if (!w) return NextResponse.json({ ok: false, error: "Not found." }, { status: 404 });
+    if (!guardianSigned(w)) return NextResponse.json({ ok: false, error: "Their parent or guardian has not signed yet." }, { status: 409 });
+  }
   if (action === "checkin" || action === "uncheckin") {
     const row = await setCheckedIn(id, action === "checkin");
     return row ? NextResponse.json({ ok: true, waiver: row }) : NextResponse.json({ ok: false, error: "Not found." }, { status: 404 });
@@ -120,6 +131,8 @@ export async function PATCH(request: NextRequest) {
       guardianSignature: `${current.guardianName} (signed on paper)`,
       guardianSignatureImage: "",
       guardianMethod: "paper",
+      /* The paper copy carries the same consent statement they signed. */
+      guardianAuthority: true,
       guardianSignedAt: new Date().toISOString(),
       guardianIp: "",
       guardianUserAgent: "Paper copy, marked received in admin",

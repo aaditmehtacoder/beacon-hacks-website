@@ -4,12 +4,13 @@ import { clientIp, rateLimited } from "@/lib/rate-limit";
 import { hashGuardianToken, looksLikeToken } from "@/lib/guardian-token";
 import { clearGuardianToken, findByGuardianToken, updateWaiver } from "@/lib/waiver-store";
 import { mailConfigured, sendMail, teamReviewEmail } from "@/lib/waiver-mail";
+import { guardianLinkLive } from "@/lib/waiver";
 
 const squash = (s: string) => s.toLowerCase().replace(/[^a-zÀ-ɏ]+/g, "");
 
 const body = z.object({
   token: z.string(),
-  agree: z.literal(true, { error: "Agree to the waiver to sign it." }),
+  agree: z.literal(true, { error: "Tick to confirm you are their parent or legal guardian and agree." }),
   guardianSignature: z.string().trim().max(120).default(""),
   guardianSignatureImage: z
     .string()
@@ -33,8 +34,11 @@ export async function POST(request: Request) {
   }
   const { token, guardianSignature, guardianSignatureImage } = parsed.data;
   const waiver = looksLikeToken(token) ? await findByGuardianToken(hashGuardianToken(token)) : null;
-  if (!waiver) {
-    return NextResponse.json({ ok: false, error: "This link has already been used or has been replaced by a newer one." }, { status: 410 });
+  if (!waiver || !guardianLinkLive(waiver)) {
+    return NextResponse.json(
+      { ok: false, error: "This link has expired, been used, or been replaced by a newer one. Email us for a new one." },
+      { status: 410 },
+    );
   }
 
   if (!guardianSignatureImage) {
@@ -47,6 +51,7 @@ export async function POST(request: Request) {
   const signed = await updateWaiver(waiver.id, {
     guardianSignature: guardianSignatureImage ? waiver.guardianName : guardianSignature,
     guardianSignatureImage,
+    guardianAuthority: true,
     guardianSignedAt: new Date().toISOString(),
     guardianIp: clientIp(request),
     guardianUserAgent: (request.headers.get("user-agent") ?? "").slice(0, 300),

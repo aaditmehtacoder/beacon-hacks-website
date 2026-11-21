@@ -5,6 +5,7 @@ import { guardianSignEmail, mailConfigured, sendMail, teamReviewEmail } from "@/
 import { guardianLink, newGuardianToken } from "@/lib/guardian-token";
 import { clientIp, rateLimited } from "@/lib/rate-limit";
 import { domainReceivesMail } from "@/lib/email-domain";
+import { formatPhone } from "@/lib/phone";
 
 /**
  * A signed waiver. Checked with the same schema as the form, then stored
@@ -67,7 +68,11 @@ export async function POST(request: Request) {
       ...(data.participantSignatureImage ? { participantSignature: `${data.firstName} ${data.lastName}` } : {}),
       ...(minor && data.guardianSignatureImage ? { guardianSignature: data.guardianName } : {}),
       /* Signing later: whatever is in the guardian signature fields now is not theirs. */
-      ...(minor && data.guardianMethod !== "here" ? { guardianSignature: "", guardianSignatureImage: "" } : {}),
+      ...(minor && data.guardianMethod !== "here" ? { guardianSignature: "", guardianSignatureImage: "", guardianAuthority: false } : {}),
+      /* Only another adult collecting them needs a name and number. */
+      ...(minor && data.departure === "adult"
+        ? { pickupPhone: formatPhone(data.pickupPhone) }
+        : { pickupName: "", pickupPhone: "" }),
       /* An adult signs alone: drop anything left in the guardian fields. */
       ...(minor
         ? {}
@@ -79,6 +84,8 @@ export async function POST(request: Request) {
             guardianSignature: "",
             guardianSignatureImage: "",
             guardianMethod: "here" as const,
+            guardianAuthority: false,
+            departure: "" as const,
           }),
       id: crypto.randomUUID(),
       version: WAIVER_VERSION,

@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { EVENT } from "./event";
-import { DIETS, teamSummary, type Waiver } from "./waiver";
+import { DIETS, GUARDIAN_LINK_DAYS, departureSummary, teamSummary, type Waiver } from "./waiver";
+import { CLAUSES, ESIGN, WAIVER_FOOTER, guardianConsent } from "./waiver-text";
 
 /**
  * The two waiver emails, and sending them.
@@ -8,7 +9,8 @@ import { DIETS, teamSummary, type Waiver } from "./waiver";
  *  1. teamReviewEmail: when someone signs, a copy to the team inbox with a
  *     button to review and approve it in /admin.
  *  2. approvedEmail: when an organizer approves it, "you're in" to the
- *     participant, with the parent or guardian copied under 18.
+ *     participant, with the parent or guardian copied under 18, and a full
+ *     copy of the signed waiver underneath.
  *  3. guardianSignEmail: under 18, when the participant chose to have their
  *     parent or guardian sign by link, the link.
  *
@@ -82,6 +84,20 @@ ${rows
 </table>`;
 }
 
+/* Agreement text: ** marks bold. */
+const rich = (s: string) => esc(s).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+const plain = (s: string) => s.replace(/\*\*/g, "");
+
+/**
+ * A signature as a table row. Drawn signatures travel as inline images
+ * (Gmail blocks data: URLs), pushed onto `attachments`.
+ */
+function signatureRow(label: string, typed: string, image: string | undefined, cid: string, attachments: Mail["attachments"]): [string, string] {
+  if (!image) return [label, `<span style="font-style:italic;font-weight:600;font-size:17px">${esc(typed)}</span> <span style="color:${MUTED};font-size:13px">typed</span>`];
+  attachments.push({ filename: `${cid}.png`, content: Buffer.from(image.split(",")[1] ?? "", "base64"), contentType: "image/png", cid });
+  return [label, `<img src="cid:${cid}" alt="Signature of ${esc(typed)}" height="64" style="display:block;height:64px"><span style="color:${MUTED};font-size:13px">${esc(typed)}, drawn</span>`];
+}
+
 function button(href: string, label: string) {
   return `<p style="margin:22px 0 0"><a href="${esc(href)}" style="display:inline-block;background:#ffc72c;color:${INK};font-weight:700;text-decoration:none;padding:13px 22px;border-radius:999px">${esc(label)}</a></p>`;
 }
@@ -92,7 +108,7 @@ export function teamReviewEmail(w: Waiver): Mail {
   const name = `${w.firstName} ${w.lastName}`;
   const flags = [
     w.minor ? "under 18" : "18+",
-    w.allergies || w.medications || w.conditions ? "health notes" : "",
+    w.allergies || w.medications || w.conditions || w.emergencyInstructions ? "health notes" : "",
     w.mediaConsent === "no" ? "no photos" : "",
     w.revision > 1 ? `signed again (${w.revision})` : "",
   ].filter(Boolean);
@@ -110,26 +126,22 @@ export function teamReviewEmail(w: Waiver): Mail {
           ["Parent or guardian", esc(`${w.guardianName} (${w.guardianRelationship})`)],
           ["Their email", esc(w.guardianEmail)],
           ["Their phone", esc(w.guardianPhone)],
+          ["Going home", esc(departureSummary(w))],
         ] as [string, string][])
       : []),
     ["Emergency contact", esc(`${w.emergencyName} (${w.emergencyRelationship}), ${w.emergencyPhone}`)],
     ["Allergies", esc(w.allergies || "None")],
     ["Medications", esc(w.medications || "None")],
     ["Conditions", esc(w.conditions || "None")],
+    ["Emergency instructions", esc(w.emergencyInstructions || "None")],
     ["Food", esc(diet || "None")],
     ["Photos and video", w.mediaConsent === "yes" ? "Yes" : "No"],
     ["Signed", esc(`${WHEN.format(new Date(w.signedAt))} Pacific, version ${w.version}`)],
   ];
 
-  /* Drawn signatures travel as inline images; Gmail blocks data: URLs. */
   const attachments: Mail["attachments"] = [];
-  const signature = (label: string, typed: string, image: string | undefined, cid: string): [string, string] => {
-    if (!image) return [label, `<span style="font-style:italic;font-weight:600;font-size:17px">${esc(typed)}</span> <span style="color:${MUTED};font-size:13px">typed</span>`];
-    attachments.push({ filename: `${cid}.png`, content: Buffer.from(image.split(",")[1] ?? "", "base64"), contentType: "image/png", cid });
-    return [label, `<img src="cid:${cid}" alt="Signature of ${esc(typed)}" height="64" style="display:block;height:64px"><span style="color:${MUTED};font-size:13px">${esc(typed)}, drawn</span>`];
-  };
-  rows.push(signature("Participant signature", w.participantSignature, w.participantSignatureImage, "participant-signature"));
-  if (w.minor) rows.push(signature("Guardian signature", w.guardianSignature, w.guardianSignatureImage, "guardian-signature"));
+  rows.push(signatureRow("Participant signature", w.participantSignature, w.participantSignatureImage, "participant-signature", attachments));
+  if (w.minor) rows.push(signatureRow("Guardian signature", w.guardianSignature, w.guardianSignatureImage, "guardian-signature", attachments));
 
   const link = `${EVENT.url}/admin/waivers/${w.id}`;
   const html = frame(
@@ -186,6 +198,7 @@ export function approvedEmail(w: Waiver): Mail {
     `Read the <a href="${EVENT.url}/code-of-conduct" style="color:${INK};font-weight:600">code of conduct</a> before the day.`,
   ].filter(Boolean);
 
+  const copy = signedCopy(w);
   const html = frame(
     "Waiver approved",
     `You&rsquo;re in, ${esc(w.firstName)}.`,
@@ -197,9 +210,10 @@ ${bring.map((b) => `<div style="padding:2px 0">&bull;&nbsp; ${esc(b)}</div>`).jo
 </div>
 <div style="font-size:15px;line-height:1.6;margin:18px 4px 0">
 ${links.map((l) => `<p style="margin:0 0 8px">${l}</p>`).join("")}
-${w.minor ? `<p style="margin:12px 0 0;color:${MUTED}">${esc(w.guardianName)}, you are copied because you signed for ${esc(w.firstName)}. Please plan for pickup by 11 PM; there is no overnight stay.</p>` : ""}
+${w.minor ? `<p style="margin:12px 0 0;color:${MUTED}">${esc(w.guardianName)}, you are copied because you signed for ${esc(w.firstName)}. Going home: ${esc(departureSummary(w).toLowerCase())}, by 11 PM; there is no overnight stay. A copy of the signed waiver is below.</p>` : `<p style="margin:12px 0 0;color:${MUTED}">A copy of the waiver you signed is below.</p>`}
 <p style="margin:12px 0 0;color:${MUTED}">Questions? Reply to this email.</p>
-</div>`,
+</div>
+${copy.html}`,
   );
 
   const text = [
@@ -217,9 +231,11 @@ ${w.minor ? `<p style="margin:12px 0 0;color:${MUTED}">${esc(w.guardianName)}, y
     "",
     ...(EVENT.social.discord ? [`Discord: ${EVENT.social.discord}`] : []),
     `Code of conduct: ${EVENT.url}/code-of-conduct`,
-    ...(w.minor ? ["", `${w.guardianName}, you are copied because you signed for ${w.firstName}. Please plan for pickup by 11 PM; there is no overnight stay.`] : []),
+    ...(w.minor ? ["", `${w.guardianName}, you are copied because you signed for ${w.firstName}. Going home: ${departureSummary(w).toLowerCase()}, by 11 PM; there is no overnight stay.`] : []),
     "",
     "Questions? Reply to this email.",
+    "",
+    copy.text,
   ].join("\n");
 
   return {
@@ -230,8 +246,62 @@ ${w.minor ? `<p style="margin:12px 0 0;color:${MUTED}">${esc(w.guardianName)}, y
     subject: line(`You're in: ${EVENT.name}, ${EVENT.date.short}`),
     html,
     text,
-    attachments: [],
+    attachments: copy.attachments,
   };
+}
+
+/**
+ * The signed waiver in full, for the signers' records: what was entered,
+ * the agreement word for word, the consent and both signatures.
+ */
+function signedCopy(w: Waiver): { html: string; text: string; attachments: Mail["attachments"] } {
+  const attachments: Mail["attachments"] = [];
+  const when = (iso?: string) => (iso ? `${WHEN.format(new Date(iso))} Pacific` : "");
+  const name = `${w.firstName} ${w.lastName}`;
+  const rows: [string, string][] = [
+    ["Participant", esc(`${name}, ${w.email}, ${w.phone}`)],
+    ["Date of birth", esc(`${w.dateOfBirth} (${w.age} on the day)`)],
+    ...(w.minor
+      ? ([
+          ["Parent or guardian", esc(`${w.guardianName} (${w.guardianRelationship}), ${w.guardianEmail}, ${w.guardianPhone}`)],
+          ["Going home", esc(departureSummary(w))],
+        ] as [string, string][])
+      : []),
+    ["Emergency contact", esc(`${w.emergencyName} (${w.emergencyRelationship}), ${w.emergencyPhone}`)],
+    ["Photos and video", w.mediaConsent === "yes" ? "Yes" : "No"],
+  ];
+  rows.push(signatureRow("Participant signature", w.participantSignature, w.participantSignatureImage, "copy-participant-signature", attachments));
+  rows.push(["Participant signed", esc(when(w.signedAt))]);
+  if (w.minor) {
+    rows.push(signatureRow("Parent or guardian signature", w.guardianSignature, w.guardianSignatureImage, "copy-guardian-signature", attachments));
+    rows.push(["Parent or guardian signed", esc(when(w.guardianSignedAt ?? w.signedAt))]);
+  }
+  rows.push(["Confirmation", esc(`${confirmation(w)}, version ${w.version}`)]);
+
+  const p = (t: string) => `<p style="margin:6px 0 0;color:#3a4352;font-size:13px;line-height:1.55">${t}</p>`;
+  const agreement = CLAUSES.map(
+    (c) => `<div style="padding:12px 0;border-bottom:1px solid ${RULE}"><div style="font-weight:700;font-size:14px">${esc(c.title)}</div>${c.paragraphs.map((x) => p(rich(x))).join("")}<div style="margin-top:6px;font-size:13px;font-weight:700">${c.id === "media" ? `Photos and video: ${w.mediaConsent === "yes" ? "Yes" : "No"}` : "Agreed"}</div></div>`,
+  ).join("");
+  const consent = w.minor
+    ? `<div style="padding:12px 0;border-bottom:1px solid ${RULE}"><div style="font-weight:700;font-size:14px">Parent or guardian consent</div>${guardianConsent(name).map((x) => p(esc(x))).join("")}</div>`
+    : "";
+
+  const html = `<div style="margin-top:28px;border-top:2px solid ${INK};padding-top:14px">
+<div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700">The signed waiver</div>
+${table(rows)}
+<div style="background:#fff;border-radius:12px;padding:4px 16px 12px;margin-top:12px">${agreement}${consent}${p(esc(ESIGN))}${p(esc(WAIVER_FOOTER))}</div>
+</div>`;
+
+  const text = [
+    "THE SIGNED WAIVER",
+    ...rows.map(([k, v]) => `${k}: ${v.replace(/<img[^>]*>/g, "").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&#39;/g, "'")}`),
+    "",
+    ...CLAUSES.flatMap((c) => [c.title.toUpperCase(), ...c.paragraphs.map(plain), c.id === "media" ? `Photos and video: ${w.mediaConsent === "yes" ? "Yes" : "No"}` : "Agreed", ""]),
+    ...(w.minor ? ["PARENT OR GUARDIAN CONSENT", ...guardianConsent(name), ""] : []),
+    ESIGN,
+    WAIVER_FOOTER,
+  ].join("\n");
+  return { html, text, attachments };
 }
 
 /* ------------------------------------------------------------ 3. to the parent */
@@ -252,7 +322,7 @@ export function guardianSignEmail(w: Waiver, link: string): Mail {
 <p style="margin:12px 0 0">Because ${esc(w.firstName)} is under 18, a parent or guardian signs too. It takes about two minutes: check what ${esc(w.firstName)} entered, read the agreement and sign with your finger, mouse or by typing your name.</p>
 </div>
 ${button(link, "Review and sign")}
-<p style="color:${MUTED};font-size:13px;line-height:1.5;margin:14px 4px 0">This link is just for you, ${esc(w.guardianName)}; please don&rsquo;t forward it. Prefer paper? Open the link and print the waiver instead. Not expecting this? You can ignore it, or reply and tell us.</p>`,
+<p style="color:${MUTED};font-size:13px;line-height:1.5;margin:14px 4px 0">This link is just for you, ${esc(w.guardianName)}; please don&rsquo;t forward it. It works once, for ${GUARDIAN_LINK_DAYS} days. Prefer paper? Open the link and print the waiver instead. Not expecting this? You can ignore it, or reply and tell us.</p>`,
   );
   const text = [
     `Please sign ${w.firstName}'s waiver for ${EVENT.name}`,
@@ -261,7 +331,7 @@ ${button(link, "Review and sign")}
     "",
     `Review and sign: ${link}`,
     "",
-    "This link is just for you; please don't forward it. Not expecting this? Ignore it, or reply and tell us.",
+    `This link is just for you; please don't forward it. It works once, for ${GUARDIAN_LINK_DAYS} days. Not expecting this? Ignore it, or reply and tell us.`,
   ].join("\n");
   return {
     fromName: EVENT.name,

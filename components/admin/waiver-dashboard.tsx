@@ -22,7 +22,7 @@ const WHEN = new Intl.DateTimeFormat("en-US", {
 });
 const when = (iso: string) => WHEN.format(new Date(iso));
 
-const hasHealth = (w: Waiver) => !!(w.allergies || w.medications || w.conditions);
+const hasHealth = (w: Waiver) => !!(w.allergies || w.medications || w.conditions || w.emergencyInstructions);
 const EMAIL = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
 
 /**
@@ -272,6 +272,8 @@ export function WaiverDashboard({
                       <Tag tone="danger">Approved, email failed</Tag>
                     )}
                     {w.minor ? <Tag>Under 18 · {w.guardianName}</Tag> : <Tag>18+</Tag>}
+                    {w.minor && w.departure === "self" ? <Tag tone="warn">May leave on their own</Tag> : null}
+                    {w.minor && w.departure === "adult" ? <Tag tone="warn">Picked up by {w.pickupName}</Tag> : null}
                     {hasHealth(w) ? <Tag tone="danger">Health notes</Tag> : null}
                     {w.diet.length ? <Tag>{w.diet.map((d) => DIET_LABEL[d]).join(", ")}</Tag> : null}
                     {w.mediaConsent === "no" ? <Tag tone="warn">No photos</Tag> : null}
