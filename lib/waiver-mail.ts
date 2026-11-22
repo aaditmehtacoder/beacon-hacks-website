@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import { EVENT } from "./event";
-import { DIETS, GUARDIAN_LINK_DAYS, departureSummary, teamSummary, type Waiver } from "./waiver";
+import { DIETS, GUARDIAN_LINK_DAYS, departureSummary, genderLabel, teamSummary, type Waiver } from "./waiver";
 import { CLAUSES, ESIGN, WAIVER_FOOTER, guardianConsent } from "./waiver-text";
 
 /**
@@ -118,6 +118,7 @@ export function teamReviewEmail(w: Waiver): Mail {
     ["Email", esc(w.email)],
     ["Phone", esc(w.phone)],
     ["Date of birth", esc(`${w.dateOfBirth} (${w.age} on the day)`)],
+    ["Gender", esc(genderLabel(w))],
     ["School", esc(`${w.school}, grade ${w.grade}`)],
     ["T-shirt", esc(w.shirtSize)],
     ["Team", esc(teamSummary(w))],

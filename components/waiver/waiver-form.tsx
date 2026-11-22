@@ -8,6 +8,7 @@ import {
   DEPARTURES,
   DIETS,
   GUARDIAN_LINK_DAYS,
+  GENDERS,
   GRADES,
   MAX_TEAMMATES,
   TEAM_STATUSES,
@@ -17,6 +18,7 @@ import {
   waiverSchema,
   type Departure,
   type Diet,
+  type Gender,
   type GuardianMethod,
   type TeamStatus,
   type Waiver,
@@ -36,6 +38,7 @@ type Form = {
   email: string;
   phone: string;
   dateOfBirth: string;
+  gender: "" | Gender;
   grade: string;
   school: string;
   shirtSize: string;
@@ -80,6 +83,7 @@ const EMPTY: Form = {
   email: "",
   phone: "",
   dateOfBirth: "",
+  gender: "",
   grade: "",
   school: "",
   shirtSize: "",
@@ -356,6 +360,14 @@ export function WaiverForm({ initialEmail = "" }: { initialEmail?: string }) {
             {input("dateOfBirth", { type: "date", autoComplete: "bday", max: EVENT.date.iso })}
           </Field>
         </div>
+        <Choices
+          id="w-gender"
+          label="Gender"
+          options={GENDERS.map((g) => ({ value: g.value, label: g.label }))}
+          value={form.gender}
+          onChange={(v) => update("gender", v as Gender)}
+          error={errors.gender}
+        />
         <Field id="w-school" label="School" error={errors.school}>
           {input("school", { autoComplete: "organization" })}
         </Field>

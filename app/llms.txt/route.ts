@@ -1,5 +1,5 @@
 import { EVENT } from "@/lib/event";
-import { FAQS, JUDGES, PACKAGES, PARTNERS, PRIZES_AND_PERKS, SCHEDULE, TRACKS, VENUE_SPONSOR, type Perk } from "@/lib/content";
+import { FAQS, JUDGES, PACKAGES, PARTNERS, PRIZES_AND_PERKS, SCHEDULE, VENUE_SPONSOR, type Perk } from "@/lib/content";
 
 /* Built once at build time from the same data as the page, so it never
    says something the site does not. */
@@ -50,7 +50,7 @@ function llms() {
     "",
     "## Tracks",
     "",
-    ...TRACKS.map((t) => `- ${t.name}: ${t.body}`),
+    "- Three tracks, revealed at the opening ceremony on the day.",
     "",
     "## Schedule (draft)",
     "",

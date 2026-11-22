@@ -20,7 +20,7 @@ components/          one file per section, plus ui/ primitives and ui/icons.tsx
   apply/             the Apply button, a link to the registration page on Luma
   notify/            the updates form at the end of the home page, and its hook
 lib/event.ts         every fact about the event that appears twice
-lib/content.ts       all page copy and data: tracks, schedule, venue sponsor,
+lib/content.ts       all page copy and data: schedule, venue sponsor,
                      partners, prizes, judges, packages, FAQ
 lib/store.ts         where updates signups live (Upstash Redis, or a local file)
 assets/og/           Mona Sans instances for the generated share card (OFL)
@@ -80,8 +80,8 @@ NEXT_DIST_DIR=.next-check npm run build   # build beside a running dev server
   so its links keep 7:1 over the fog. Discord and Apply sit at its right;
   on phones Discord moves into the menu, which drops down as the same glass.
 - **The hero** ends in a strip: the four facts, and the countdown to doors
-  open (`EVENT.date.starts`, labelled as the target date until
-  `EVENT.date.confirmed`). The countdown is worked out in the browser, so the
+  open (`EVENT.date.starts`; it would say "target date" if
+  `EVENT.date.confirmed` were false). The countdown is worked out in the browser, so the
   static page never holds a stale number; seconds stop under reduced motion.
 - **The sponsor wall** (`components/sponsors.tsx`) shows the venue sponsor, then Hack Club as fiscal sponsor (`FISCAL_SPONSOR`, linking the public HCB ledger and donations),
   then one row per cash tier with its open places drawn dashed (`slots` in
@@ -124,12 +124,13 @@ unconfirmed thing says so in its own data and on the page.
 
 | Fact | State | Unlock by |
 |---|---|---|
-| Date | Target, Saturday, January 30, 2027 | Set `EVENT.date.confirmed`; every "target date" note keys off it. Then add a schema.org `Event` block in `app/page.tsx`. |
+| Date | Confirmed, Saturday, January 30, 2027 (`EVENT.date.confirmed`, so no "target date" notes) | Add a schema.org `Event` block in `app/page.tsx`. |
 | Venue | Confirmed: Cupertino Odd Fellows Lodge #70, Odd Fellows Hall, 20589 W. Homestead Road, Cupertino (named by the organizers Nov 10, 2026). Shown as the venue sponsor and named across the site. | — |
 | Applications | Open early, nobody confirmed | The venue and budget are set. |
 | Partners | In kind: CodeCrafters, YRI Fellowship, Art of Problem Solving, Browserbase, Tavus, .xyz, Scrimba, Rosebud AI, SunFounder, n8n, Simple Delights, OpenRubric, ElevenLabs, PCBWay. Community: Non-Trivial. Supporter: Origami Prep, Algoverse ($100, plus their discounts), San Carlos Elms ($250) (`PARTNERS`) | A written yes. |
 | Prizes and perks | Prizes from CodeCrafters, YRI Fellowship, Origami Prep, AoPS, Scrimba and Algoverse; perks from Browserbase, Tavus, .xyz, Rosebud AI, SunFounder and Algoverse. Who gives, never what (`PRIZES_AND_PERKS`) | A written yes; `status: "pending"` shows "Being finalized". |
-| Judges | Swosti Panda, Vasuki Uday Kiran Vudathala, Anna Zhang and Tiger Wang (Nessie, with their public YC bio and photo for now), Parth Maniar (role, employer, LinkedIn, photo and a short bio from his public profile), Dan Shalev (Wilcox Business Experience, with a lockup made from their mark; role, photo and bio from his public LinkedIn), Tejas Chaphalkar (Meta; his own bio and headshot by email), Rucha Gurav (IBM; bio from her email and LinkedIn, LinkedIn photo), Animesh Alang (UC Santa Cruz; bio from his email, LinkedIn photo), Jayati Sinha (J.P. Morgan Private Bank; her own bio and headshot), Naman Modi (Apple, contract; his own bio, LinkedIn photo) (`JUDGES`) | Agreement in writing plus a bio and headshot; a judge without a photo shows initials. |
+| Judges | Swosti Panda, Vasuki Uday Kiran Vudathala, Anna Zhang and Tiger Wang (Nessie, with their public YC bio and photo for now), Dan Shalev (Wilcox Business Experience, with a lockup made from their mark; role, photo and bio from his public LinkedIn) (`JUDGES`; cut to these five Nov 22, 2026) | Agreement in writing plus a bio and headshot; a judge without a photo shows initials. |
+| Tracks | Three, sealed: the page shows them as unlit until the opening ceremony. Their names and briefs are kept out of this public repo on purpose. | Add them to `components/tracks.tsx` at the ceremony. |
 | Food | Breakfast, pizza for lunch, dinner, dessert from Simple Delights (schedule notes and the FAQ) | Already free for every student; vendors are in the local `.plans/food.md`. |
 
 No prize-pool total is ever shown, and no sponsor's prize on its own either.

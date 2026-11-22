@@ -47,6 +47,9 @@ export function Hero() {
               Apply
               <Arrow />
             </ApplyButton>
+            <LinkButton href="/waiver" variant="outline-night" size="lg">
+              Sign the waiver
+            </LinkButton>
             <LinkButton href="#sponsors" variant="outline-night" size="lg">
               Sponsor us
             </LinkButton>

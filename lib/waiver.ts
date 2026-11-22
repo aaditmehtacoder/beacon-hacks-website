@@ -31,6 +31,20 @@ export const GRADES = ["9", "10", "11", "12"] as const;
 export const GUARDIAN_METHODS = ["here", "email", "paper"] as const;
 export type GuardianMethod = (typeof GUARDIAN_METHODS)[number];
 export const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
+/**
+ * Gender, with an opt-out so nobody has to say. California recognizes
+ * nonbinary as a legal gender (SB 179, 2017), so it is a choice too.
+ * Waivers signed before Nov 22, 2026 were not asked.
+ */
+export const GENDERS = [
+  { value: "female", label: "Female" },
+  { value: "male", label: "Male" },
+  { value: "nonbinary", label: "Non-binary" },
+  { value: "undisclosed", label: "Prefer not to say" },
+] as const;
+export type Gender = (typeof GENDERS)[number]["value"];
+/** "Female", or "Not asked" on a waiver signed before the question existed. */
+export const genderLabel = (w: { gender?: string }) => GENDERS.find((g) => g.value === w.gender)?.label ?? "Not asked";
 export const TEAM_STATUSES = [
   { value: "team", label: "I have a team" },
   { value: "looking", label: "Find me a team" },
@@ -112,6 +126,7 @@ export const waiverSchema = z
     email: email("the email you registered with on Luma"),
     phone: phone("your phone number"),
     dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Add your date of birth."),
+    gender: z.enum(GENDERS.map((g) => g.value) as [Gender, ...Gender[]], { error: "Pick one, or Prefer not to say." }),
     grade: z.enum(GRADES, { error: "Pick your grade." }),
     school: text("your school", 160),
     shirtSize: z.enum(SHIRT_SIZES, { error: "Pick a shirt size." }),
@@ -247,7 +262,9 @@ export type WaiverData = z.output<typeof waiverSchema>;
 export type WaiverField = keyof WaiverInput;
 
 /** One signed waiver, as stored. */
-export type Waiver = WaiverData & {
+export type Waiver = Omit<WaiverData, "gender"> & {
+  /** Missing on waivers signed before the question was added. */
+  gender?: Gender;
   id: string;
   version: string;
   signedAt: string;

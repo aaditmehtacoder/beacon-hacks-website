@@ -3,7 +3,7 @@ import { ADMIN_COOKIE, isAdmin } from "@/lib/admin-auth";
 import { getWaiver, listWaivers, removeWaiver, setCheckedIn, setGuardianToken, updateWaiver } from "@/lib/waiver-store";
 import { approvedEmail, guardianSignEmail, mailConfigured, sendMail, teamReviewEmail } from "@/lib/waiver-mail";
 import { guardianLink, newGuardianToken } from "@/lib/guardian-token";
-import { DIETS, departureSummary, guardianSigned, teamSummary, type Waiver } from "@/lib/waiver";
+import { DIETS, departureSummary, genderLabel, guardianSigned, teamSummary, type Waiver } from "@/lib/waiver";
 
 function unauthorized() {
   return NextResponse.json({ ok: false, error: "Sign in first." }, { status: 401 });
@@ -20,6 +20,7 @@ const COLUMNS: [string, (w: Waiver) => unknown][] = [
   ["Phone", (w) => w.phone],
   ["Date of birth", (w) => w.dateOfBirth],
   ["Age on event day", (w) => w.age],
+  ["Gender", (w) => genderLabel(w)],
   ["Grade", (w) => w.grade],
   ["School", (w) => w.school],
   ["Shirt size", (w) => w.shirtSize],

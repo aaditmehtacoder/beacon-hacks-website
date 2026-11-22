@@ -15,7 +15,7 @@ const mona = Mona_Sans({
 
 const TITLE = "Beacon Hacks · Free hackathon for Bay Area high school students";
 const HOSTED = EVENT.venue.name ? `, hosted by ${EVENT.venue.name}` : "";
-const DESCRIPTION = `A free one-day hackathon for Bay Area high school builders${HOSTED} in ${EVENT.venue.label}. Target date Saturday, January 30, 2027. Grades 9 to 12, no experience needed. Applications are open.`;
+const DESCRIPTION = `A free one-day hackathon for Bay Area high school builders${HOSTED} in ${EVENT.venue.label}. ${EVENT.date.confirmed ? "" : "Target date "}${EVENT.date.label}. Grades 9 to 12, no experience needed. Applications are open.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(EVENT.url),

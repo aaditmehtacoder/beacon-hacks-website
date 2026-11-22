@@ -1,7 +1,7 @@
 import { Linkify } from "./linkify";
 import type { ReactNode } from "react";
 import { CLAUSES, ESIGN, WAIVER_FOOTER, guardianConsent } from "@/lib/waiver-text";
-import { DIETS, departureSummary, guardianSigned, teamSummary, type Waiver } from "@/lib/waiver";
+import { DIETS, departureSummary, genderLabel, guardianSigned, teamSummary, type Waiver } from "@/lib/waiver";
 
 const DIET_LABEL: Record<string, string> = Object.fromEntries(DIETS.map((d) => [d.value, d.label]));
 
@@ -27,6 +27,7 @@ export function WaiverRecord({ waiver, showAudit = false }: { waiver: Waiver; sh
         <Row label="Email">{waiver.email}</Row>
         <Row label="Phone">{waiver.phone}</Row>
         <Row label="Date of birth">{`${waiver.dateOfBirth} (${waiver.age} on the event day)`}</Row>
+        <Row label="Gender">{genderLabel(waiver)}</Row>
         <Row label="School and grade">{`${waiver.school}, grade ${waiver.grade}`}</Row>
         <Row label="Shirt size">{waiver.shirtSize}</Row>
       </Block>

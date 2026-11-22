@@ -43,15 +43,15 @@ export const EVENT = {
   name: "Beacon Hacks",
   tagline: "A free hackathon for Bay Area high school builders.",
 
-  /** The target date. Set `confirmed: true` once it is final; every
-      "target date" note on the site keys off this flag. */
+  /** The date. While `confirmed` is false, every place that shows it adds
+      a "target date" note; the organizers dropped that note Nov 22, 2026. */
   date: {
     iso: "2027-01-30",
     /** When doors open, Pacific time: what the countdown counts to. */
     starts: "2027-01-30T08:30:00-08:00",
     label: "Saturday, January 30, 2027",
     short: "Sat, Jan 30, 2027",
-    confirmed: false,
+    confirmed: true,
     note: "Target date",
   },
 
