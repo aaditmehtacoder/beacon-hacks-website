@@ -466,6 +466,9 @@ export const JUDGES: Judge[] = [
     role: "Founder",
     org: "Green Silicon Valley",
     bio: "Founded Green Silicon Valley, a student-run nonprofit bringing hands-on environmental STEM lessons to K-12 classrooms. Led Team AeroForge to second place nationally in NASA’s DWU challenge and built internal tooling at International Battery Company. Senior at Adrian Wilcox High School.",
+    linkedin: "https://www.linkedin.com/in/ayush-garg-3554962b1/",
+    photo: "/photos/judges/ayush-garg.jpg",
+    focus: "50% 40%",
   },
 ];
 
