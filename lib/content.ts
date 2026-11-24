@@ -384,6 +384,9 @@ export type Judge = {
  * Their logo is a bare mark, so public/logos/wilcox-wbe.png is a lockup:
  * that mark plus "WBE" in Mona Sans, ink. Role from his LinkedIn.
  * On Nov 22, 2026 the organizers cut the list to these five.
+ * Luca Hadife and Mohamed Hosny (Kebra, YC S26) wrote in on Nov 23, 2026
+ * and sent their own bios and headshots. No logo or LinkedIn from them
+ * yet, so their cards name Kebra in text.
  */
 export const JUDGES: Judge[] = [
   {
@@ -435,6 +438,22 @@ export const JUDGES: Judge[] = [
     linkedin: "https://www.linkedin.com/in/danshalev1/",
     photo: "/photos/judges/dan-shalev.jpg",
     focus: "50% 50%",
+  },
+  {
+    name: "Luca Hadife",
+    role: "Co-founder and CEO",
+    org: "Kebra",
+    bio: "Co-founded Kebra (YC S26). Previously worked on multimodal databases at Microsoft and was an early team member at Amata. UC Berkeley graduate in Data Science and Sustainable Design.",
+    photo: "/photos/judges/luca-hadife.jpg",
+    focus: "50% 30%",
+  },
+  {
+    name: "Mohamed Hosny",
+    role: "Co-founder and CTO",
+    org: "Kebra",
+    bio: "Co-founded Kebra (YC S26). Previously taught Computer Architecture at UC Berkeley EECS and worked on data center networking infrastructure at Arista Networks. UC Berkeley graduate in Electrical Engineering and Computer Science.",
+    photo: "/photos/judges/mohamed-hosny.jpg",
+    focus: "50% 30%",
   },
 ];
 
