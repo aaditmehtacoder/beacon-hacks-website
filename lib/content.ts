@@ -385,8 +385,10 @@ export type Judge = {
  * that mark plus "WBE" in Mona Sans, ink. Role from his LinkedIn.
  * On Nov 22, 2026 the organizers cut the list to these five.
  * Luca Hadife and Mohamed Hosny (Kebra, YC S26) wrote in on Nov 23, 2026
- * and sent their own bios and headshots. No logo or LinkedIn from them
- * yet, so their cards name Kebra in text.
+ * and sent their own bios and headshots. The logo is the nav lockup from
+ * kebra.com; the LinkedIn links are the ones on Kebra's YC company page.
+ * Ayush Garg was added the same day from the bio he texted the user, and
+ * sits next to Dan; the two students close the list, after the Kebra pair.
  */
 export const JUDGES: Judge[] = [
   {
@@ -430,6 +432,26 @@ export const JUDGES: Judge[] = [
     focus: "50% 35%",
   },
   {
+    name: "Luca Hadife",
+    role: "Co-founder and CEO",
+    org: "Kebra",
+    orgLogo: { src: "/logos/kebra.png", width: 339, height: 96 },
+    bio: "Co-founded Kebra (YC S26). Previously worked on multimodal databases at Microsoft and was an early team member at Amata. UC Berkeley graduate in Data Science and Sustainable Design.",
+    linkedin: "https://www.linkedin.com/in/luca-hadife/",
+    photo: "/photos/judges/luca-hadife.jpg",
+    focus: "50% 30%",
+  },
+  {
+    name: "Mohamed Hosny",
+    role: "Co-founder and CTO",
+    org: "Kebra",
+    orgLogo: { src: "/logos/kebra.png", width: 339, height: 96 },
+    bio: "Co-founded Kebra (YC S26). Previously taught Computer Architecture at UC Berkeley EECS and worked on data center networking infrastructure at Arista Networks. UC Berkeley graduate in Electrical Engineering and Computer Science.",
+    linkedin: "https://www.linkedin.com/in/mohamed-hosny-hussein/",
+    photo: "/photos/judges/mohamed-hosny.jpg",
+    focus: "50% 30%",
+  },
+  {
     name: "Dan Shalev",
     role: "DECA Chapter President",
     org: "Wilcox Business Experience",
@@ -440,20 +462,10 @@ export const JUDGES: Judge[] = [
     focus: "50% 50%",
   },
   {
-    name: "Luca Hadife",
-    role: "Co-founder and CEO",
-    org: "Kebra",
-    bio: "Co-founded Kebra (YC S26). Previously worked on multimodal databases at Microsoft and was an early team member at Amata. UC Berkeley graduate in Data Science and Sustainable Design.",
-    photo: "/photos/judges/luca-hadife.jpg",
-    focus: "50% 30%",
-  },
-  {
-    name: "Mohamed Hosny",
-    role: "Co-founder and CTO",
-    org: "Kebra",
-    bio: "Co-founded Kebra (YC S26). Previously taught Computer Architecture at UC Berkeley EECS and worked on data center networking infrastructure at Arista Networks. UC Berkeley graduate in Electrical Engineering and Computer Science.",
-    photo: "/photos/judges/mohamed-hosny.jpg",
-    focus: "50% 30%",
+    name: "Ayush Garg",
+    role: "Founder",
+    org: "Green Silicon Valley",
+    bio: "Founded Green Silicon Valley, a student-run nonprofit bringing hands-on environmental STEM lessons to K-12 classrooms. Led Team AeroForge to second place nationally in NASA’s DWU challenge and built internal tooling at International Battery Company. Senior at Adrian Wilcox High School.",
   },
 ];
 
